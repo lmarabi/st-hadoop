@@ -1,0 +1,179 @@
+<!--
+ Copyright (c) 2015 by Regents of the University of Minnesota.
+ All rights reserved. This program and the accompanying materials
+ are made available under the terms of the Apache License, Version 2.0 which 
+ accompanies this distribution and is available at
+ http://www.opensource.org/licenses/apache2.0.php.
+-->
+
+<project name="SpatialHadoop" default="compile1" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+  <description>Compiles SpatialHadoop and builds packages to be installed on an existing Hadoop cluster</description>
+  <!-- set global properties for this build -->
+  <property name="src" location="src/main/java"/>
+	<property name="res" location="src/main/resources"/>
+  <property name="doc" location="doc"/>
+  <property name="bin" location="bin"/>
+  <property name="build" location="${bin}/classes"/>
+  <property name="dist"  location="${bin}/dist"/>
+  <property name="version" value="2.4"/>
+  
+  <path id="common.lib.path.ref">
+    <fileset dir="lib/ivy/common" includes="*.jar"/>
+  </path>
+
+  <path id="hadoop.lib.path.ref">
+    <fileset dir="lib/ivy/hadoop" includes="*.jar"/>
+  </path>
+
+  <target name="resolve" depends="init-ivy" description="--> retrieve dependencies with ivy">
+    <ivy:retrieve pattern="lib/ivy/[conf]/[artifact]-[revision].[ext]" />
+  </target>
+  
+  <target name="init" depends="resolve">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+  </target>
+	
+  <target name="compile" depends="init"
+        description="compile the source " >
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac srcdir="${src}" destdir="${build}"
+        classpath="${toString:other.path.ref}:${toString:common.lib.path.ref}:${toString:hadoop.lib.path.ref}"
+        target="1.6" source="1.6" debug="true" debuglevel="lines,vars,source"/>
+    <copy todir="${build}">
+      <fileset dir="${res}">
+        <include name="spatial-default.xml"/>
+        <include name="zoom_view.html"/>
+        <include name="webapps/**/*"/>
+      </fileset>
+    </copy>
+  </target>	
+
+	<target name="doc" depends="init"
+      description="Generates JavaDoc for the source code">
+    <mkdir dir="${doc}"/>
+    <javadoc sourcepath="${src}" destdir="${doc}"/>
+  </target>
+  
+  <target name="dist" depends="compile"
+        description="generate the distribution for Hadoop 2.x" >
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}"/>
+
+    <!-- Put everything in ${build} into the spatialhadoop-${version}.jar file -->
+    <jar jarfile="${dist}/spatialhadoop-${version}.jar" basedir="${build}">
+      <manifest>
+        <attribute name="Manifest-Version" value="1.0"/>
+        <attribute name="Main-Class" value="edu.umn.cs.spatialHadoop.operations.Main"/>
+      </manifest>
+    </jar>
+
+    <!-- For backward compatibility, provide a jar that contains just the main class-->
+    <jar jarfile="${dist}/spatialhadoop-main.jar">
+      <fileset dir="${build}" includes="edu/umn/cs/spatialHadoop/operations/Main.class"/>
+      <manifest>
+        <attribute name="Manifest-Version" value="1.0"/>
+        <attribute name="Main-Class" value="edu.umn.cs.spatialHadoop.operations.Main"/>
+      </manifest>
+    </jar>
+  </target>
+
+	 <target name="emr-jar" depends="dist"
+	      description="Creates a JAR file that can run on Amazon EMR for Hadoop 2.x">
+    <zip destfile="${dist}/spatialhadoop-${version}-emr.jar">
+      <zipgroupfileset dir="lib/ivy/common">
+        <include name="esri-geometry-api-*.jar"/>
+        <exclude name="*sources.jar"/>
+        <exclude name="*javadoc.jar"/>
+        <include name="jts-*.jar"/>
+      </zipgroupfileset>
+      <zipgroupfileset dir="${dist}" includes="spatialhadoop-${version}.jar"/>
+    </zip>
+  </target>
+
+	<!-- Build targets for Hadoop 2 -->
+
+	<target name="package" depends="dist">
+    <!-- Build the tar file -->
+    <tar destfile="${dist}/package/spatialhadoop-${version}.tar.gz"
+         compression="gzip">
+      <tarfileset dir=".">
+        <include name="README.md"/>
+        <include name="LICENSE.txt"/>
+      </tarfileset>
+      
+      <tarfileset dir="src/main/package">
+        <include name="etc/**"/>
+      </tarfileset>    	
+
+      <tarfileset dir="src/main/package" filemode="755">
+        <include name="bin/**"/>
+      </tarfileset>
+    	
+      <tarfileset dir="${res}" prefix="hadoop/hdfs/webapps/hdfs">
+        <include name="webapps/**"/>
+      </tarfileset>
+    	
+      <tarfileset dir="lib/ivy/common" prefix="share/hadoop/common/lib/">
+        <include name="esri-geometry-api-*.jar"/>
+        <exclude name="*sources.jar"/>
+        <exclude name="*javadoc.jar"/>
+        <include name="jts-*.jar"/>
+        <include name="javax.mail*.jar"/>
+      </tarfileset>
+
+      <tarfileset dir="${dist}" prefix="share/hadoop/common/lib/">
+        <include name="spatialhadoop-${version}.jar"/>
+      </tarfileset>
+
+      <tarfileset dir="${dist}">
+        <include name="spatialhadoop-main.jar"/>
+      </tarfileset>
+    </tar>
+	</target>
+	
+  <target name="install" depends="package"
+    description="Install SpatialHadoop on an existing Hadoop 2 installation">
+  	<echo message="Installing on a Hadoop 2.x installation"/>
+    <!-- Extract the constructed package file (tar) in the destination directory -->
+    <untar src="${dist}/package/spatialhadoop-${version}.tar.gz"
+           dest="${hadoop.dir}" compression="gzip"/>
+  </target>
+	
+	<target name="clean" description="clean up" >
+    <!-- Delete the binary directory trees -->
+    <delete dir="${bin}"/>
+    <delete dir="lib/ivy"/>
+  </target>
+
+    <property name="ivy.install.version" value="2.4.0" />
+    <condition property="ivy.home" value="${env.IVY_HOME}">
+      <isset property="env.IVY_HOME" />
+    </condition>
+    <property name="ivy.home" value="${user.home}/.ant" />
+    <property name="ivy.jar.dir" value="${ivy.home}/lib" />
+    <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+
+    <target name="download-ivy" unless="offline">
+
+        <mkdir dir="${ivy.jar.dir}"/>
+        <!-- download Ivy from web site so that it can be used even without any special installation -->
+        <get src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar" 
+             dest="${ivy.jar.file}" usetimestamp="true"/>
+    </target>
+
+    <target name="init-ivy" depends="download-ivy">
+      <!-- try to load ivy here from ivy home, in case the user has not already dropped
+              it into ant's lib dir (note that the latter copy will always take precedence).
+              We will not fail as long as local lib dir exists (it may be empty) and
+              ivy is in at least one of ant's lib dir or the local lib dir. -->
+        <path id="ivy.lib.path">
+            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml"
+                 uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+    </target>
+</project>

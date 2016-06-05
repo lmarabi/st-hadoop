@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>SHAHED</title>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <link rel="stylesheet" href="css/shahed.css">
+  <script>
+  $(function() {
+    $( "#tabs" ).tabs();
+  });
+  </script>
+</head>
+<body style="height: 100%">
+ 
+<div id="tabs" class="fullscreen">
+  <ul>
+    <li><a href="#tabs-1">Aggregate Query</a></li>
+    <li><a href="#tabs-2">Selection Query</a></li>
+    <li><a href="#tabs-3">Visualization</a></li>
+  </ul>
+  <div id="tabs-1" class="fullscreen" style="padding: 0;">
+    <iframe src="aggregate_query.html" class="fullscreen"></iframe>
+  </div>
+  <div id="tabs-2" class="fullscreen" style="padding: 0;">
+    <iframe src="pointQuery.html" class="fullscreen"></iframe>
+  </div>
+  <div id="tabs-3" class="fullscreen" style="padding: 0;">
+    <iframe src="generate_image.html" class="fullscreen"></iframe>
+  </div>
+</div>
+ 
+ 
+</body>
+</html>

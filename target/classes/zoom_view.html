@@ -1,0 +1,45 @@
+<!-- Derived from the example at https://developers.google.com/maps/documentation/javascript/examples/maptype-image -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Image map types</title>
+    <style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+    <script>
+      var customTypeOptions = {
+        getTileUrl: function(coord, zoom) {
+          var bound = Math.pow(2, zoom);
+          return #{TILE_URL};
+        },
+        tileSize: new google.maps.Size(#{TILE_WIDTH}, #{TILE_HEIGHT}),
+        maxZoom: #{MAX_ZOOM},
+        minZoom: #{MIN_ZOOM},
+      };
+  
+      var customMapType = new google.maps.ImageMapType(customTypeOptions);
+      
+      function initialize() {
+        var myLatlng = new google.maps.LatLng(0, 0);
+        var mapOptions = {
+          center: myLatlng,
+          zoom: 1,
+          streetViewControl: false,
+        };
+  
+        var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+        map.mapTypes.set('custom', customMapType);
+        map.setMapTypeId('custom');
+      }
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+  </head>
+  <body>
+    <div id="map-canvas"></div>
+  </body>
+</html>
