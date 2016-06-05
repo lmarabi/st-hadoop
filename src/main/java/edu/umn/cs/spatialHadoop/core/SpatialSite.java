@@ -47,8 +47,6 @@ import edu.umn.cs.spatialHadoop.OperationsParams;
 import edu.umn.cs.spatialHadoop.indexing.GlobalIndex;
 import edu.umn.cs.spatialHadoop.indexing.Partition;
 import edu.umn.cs.spatialHadoop.indexing.RTree;
-import edu.umn.cs.spatialHadoop.indexing.SpatioTemporalGlobalIndex;
-import edu.umn.cs.spatialHadoop.indexing.SpatioTemporalPartition;
 import edu.umn.cs.spatialHadoop.mapred.RandomShapeGenerator.DistributionType;
 import edu.umn.cs.spatialHadoop.mapred.ShapeIterRecordReader;
 import edu.umn.cs.spatialHadoop.mapred.SpatialRecordReader.ShapeIterator;
@@ -57,7 +55,7 @@ import edu.umn.cs.spatialHadoop.util.FileUtil;
 /**
  * Combines all the configuration needed for SpatialHadoop.
  * 
- * @author Ahmed Eldawy + Louai Alarabi
+ * @author Ahmed Eldawy
  *
  */
 public class SpatialSite {
@@ -364,100 +362,7 @@ public class SpatialSite {
   
   
   
-  /**
-   * Returns the global index (partitions) of a file that is indexed using
-   * the index command. If the file is not indexed, it returns null.
-   * The return value is of type {@link GlobalIndex} where the generic
-   * parameter is specified as {@link Partition}.
-   * @param fs
-   * @param dir
-   * @return
-   */
-  public static SpatioTemporalGlobalIndex<SpatioTemporalPartition> getSpatioTemporalGlobalIndex(FileSystem fs, Path dir) {
-    try {
-      FileStatus[] allFiles;
-      if (OperationsParams.isWildcard(dir)) {
-        allFiles = fs.globStatus(dir);
-      } else {
-        allFiles = fs.listStatus(dir);
-      }
-      
-      FileStatus masterFile = null;
-      int nasaFiles = 0;
-      for (FileStatus fileStatus : allFiles) {
-        if (fileStatus.getPath().getName().startsWith("_master")) {
-          if (masterFile != null)
-            throw new RuntimeException("Found more than one master file in "+dir);
-          masterFile = fileStatus;
-        } else if (fileStatus.getPath().getName().toLowerCase().matches(".*h\\d\\dv\\d\\d.*\\.(hdf|jpg|xml)")) {
-          // Handle on-the-fly global indexes imposed from file naming of NASA data
-          nasaFiles++;
-        }
-      }
-      if (masterFile != null) {
-        ShapeIterRecordReader reader = new ShapeIterRecordReader(
-            fs.open(masterFile.getPath()), 0, masterFile.getLen());
-        Rectangle dummy = reader.createKey();
-        reader.setShape(new SpatioTemporalPartition());
-        ShapeIterator values = reader.createValue();
-        ArrayList<SpatioTemporalPartition> partitions = new ArrayList<SpatioTemporalPartition>();
-        while (reader.next(dummy, values)) {
-          for (Shape value : values) {
-            partitions.add((Partition) value.clone());
-          }
-        }
-        SpatioTemporalGlobalIndex<SpatioTemporalPartition> globalIndex = new SpatioTemporalGlobalIndex<SpatioTemporalPartition>();
-        globalIndex.bulkLoad(partitions.toArray(new Partition[partitions.size()]));
-        String extension = masterFile.getPath().getName();
-        extension = extension.substring(extension.lastIndexOf('.') + 1);
-        globalIndex.setCompact(GridRecordWriter.PackedIndexes.contains(extension));
-        globalIndex.setReplicated(GridRecordWriter.ReplicatedIndexes.contains(extension));
-        return globalIndex;
-      } else if (nasaFiles > allFiles.length / 2) {
-        // A folder that contains HDF files
-        // Create a global index on the fly for these files based on their names
-        Partition[] partitions = new Partition[allFiles.length];
-        for (int i = 0; i < allFiles.length; i++) {
-          final Pattern cellRegex = Pattern.compile(".*(h\\d\\dv\\d\\d).*");
-          String filename = allFiles[i].getPath().getName();
-          Matcher matcher = cellRegex.matcher(filename);
-          Partition partition = new Partition();
-          partition.filename = filename;
-          if (matcher.matches()) {
-            String cellname = matcher.group(1);
-            int h = Integer.parseInt(cellname.substring(1, 3));
-            int v = Integer.parseInt(cellname.substring(4, 6));
-            partition.cellId = v * 36 + h;
-            // Calculate coordinates on MODIS Sinusoidal grid
-            partition.x1 = h * 10 - 180;
-            partition.y2 = (18 - v) * 10 - 90;
-            partition.x2 = partition.x1 + 10;
-            partition.y1 = partition.y2 - 10;
-            // Convert to Latitude Longitude
-            double lon1 = partition.x1 / Math.cos(partition.y1 * Math.PI / 180);
-            double lon2 = partition.x1 / Math.cos(partition.y2 * Math.PI / 180);
-            partition.x1 = Math.min(lon1, lon2);
-            lon1 = partition.x2 / Math.cos(partition.y1 * Math.PI / 180);
-            lon2 = partition.x2 / Math.cos(partition.y2 * Math.PI / 180);
-            partition.x2 = Math.max(lon1, lon2);
-          } else {
-            partition.set(-180, -90, 180, 90);
-            partition.cellId = allFiles.length + i;
-          }
-          partitions[i] = partition;
-        }
-        GlobalIndex<Partition> gindex = new GlobalIndex<Partition>();
-        gindex.bulkLoad(partitions);
-        return gindex;
-      } else {
-        return null;
-      }
-    } catch (IOException e) {
-      LOG.info("Error retrieving global index of '"+dir+"'");
-      LOG.info(e);
-      return null;
-    }
-  }
+
 
   /**
    * Checks whether a file is indexed using an R-tree or not. This allows

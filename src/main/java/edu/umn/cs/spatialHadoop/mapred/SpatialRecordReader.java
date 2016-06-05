@@ -40,7 +40,6 @@ import org.apache.hadoop.util.LineReader;
 import edu.umn.cs.spatialHadoop.core.Rectangle;
 import edu.umn.cs.spatialHadoop.core.Shape;
 import edu.umn.cs.spatialHadoop.core.SpatialSite;
-import edu.umn.cs.spatialHadoop.core.StShape;
 import edu.umn.cs.spatialHadoop.indexing.GlobalIndex;
 import edu.umn.cs.spatialHadoop.indexing.Partition;
 import edu.umn.cs.spatialHadoop.indexing.RTree;
@@ -432,23 +431,6 @@ public abstract class SpatialRecordReader<K, V> implements RecordReader<K, V> {
     return true;
   }
   
-  /**
-   * Reads next shape from input and returns true. If no more shapes are left
-   * in the split, a false is returned. This function first reads a line
-   * by calling the method {@link #nextLine(Text)} then parses the returned
-   * line by calling {@link Shape#fromText(Text)} on that line. If no stock
-   * shape is set, a {@link NullPointerException} is thrown.
-   * @param s
-   * @return
-   * @throws IOException 
-   * @author louai Alarabi
-   */
-  protected boolean nextShape(StShape s) throws IOException {
-    if (!nextLine(tempLine))
-      return false;
-    s.fromText(tempLine);
-    return true;
-  }
   
   /**
    * Reads all shapes left in the current block in one shot. This function
@@ -581,75 +563,7 @@ public abstract class SpatialRecordReader<K, V> implements RecordReader<K, V> {
     
   }
   
-  
-  /**
-   * An iterator that iterates over all shapes in the input file
-   * @author Louai Alarabi
-   */
-  public static class StShapeIterator implements Iterator<StShape>, Iterable<StShape> {
-    protected StShape shape;
-    protected StShape nextShape;
-    private SpatialRecordReader<?, ? extends StShape> srr;
-    
-    public StShapeIterator() {
-    }
-
-    public void setSpatialRecordReader(SpatialRecordReader<?, ? extends StShape> srr) {
-      this.srr = srr;
-      try {
-        if (shape != null)
-          nextShape = shape.clone();
-        if (nextShape != null && !srr.nextShape(nextShape))
-            nextShape = null;
-      } catch (IOException e) {
-      }
-    }
-    
-    public void setShape(StShape shape) {
-      this.shape = shape;
-      this.nextShape = shape.clone();
-      try {
-        if (srr != null && !srr.nextShape(nextShape))
-            nextShape = null;
-      } catch (IOException e) {
-      }
-    }
-
-    public boolean hasNext() {
-      if (nextShape == null)
-        return false;
-      return nextShape != null;
-    }
-
-    @Override
-    public StShape next() {
-      try {
-        if (nextShape == null)
-          return null;
-        // Swap Shape and nextShape and read next
-        StShape temp = shape;
-        shape = nextShape;
-        nextShape = temp;
-        
-        if (!srr.nextShape(nextShape))
-          nextShape = null;
-        return shape;
-      } catch (IOException e) {
-        return null;
-      }
-    }
-
-    @Override
-    public Iterator<StShape> iterator() {
-      return this;
-    }
-
-    @Override
-    public void remove() {
-      throw new RuntimeException("Unsupported method ShapeIterator#remove");
-    }
-    
-  }
+ 
   
   /**
    * Reads the next RTree from file. The file must be part of an R-tree index.

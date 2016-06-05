@@ -27,9 +27,6 @@ import edu.umn.cs.spatialHadoop.core.ResultCollector;
 import edu.umn.cs.spatialHadoop.core.Shape;
 import edu.umn.cs.spatialHadoop.mapred.ShapeIterRecordReader;
 import edu.umn.cs.spatialHadoop.mapred.SpatialRecordReader.ShapeIterator;
-import edu.umn.cs.spatialHadoop.core.Interval;
-import edu.umn.cs.spatialHadoop.core.StShape;
-import edu.umn.cs.spatialHadoop.core.Temporal;
 
 /**
  * @author Ahmed Eldawy
@@ -201,23 +198,4 @@ public class HilbertCurvePartitioner extends Partitioner {
 		}
 	}
 
-	@Override
-	public void createFromPoints(Interval mbr, Temporal[] points, int capacity)
-			throws IllegalArgumentException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void overlapPartitions(StShape shape,
-			ResultCollector<Integer> matcher) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public int overlapPartition(StShape shape) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 }
