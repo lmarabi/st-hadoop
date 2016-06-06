@@ -22,11 +22,6 @@ import edu.umn.cs.spatialHadoop.core.Point;
 import edu.umn.cs.spatialHadoop.core.Rectangle;
 import edu.umn.cs.spatialHadoop.core.ResultCollector;
 import edu.umn.cs.spatialHadoop.core.Shape;
-<<<<<<< HEAD
-
-=======
->>>>>>> e329756faf3ac87d4c41f9829672f67c50ab93e0
-import edu.umn.cs.spatialHadoop.core.Temporal;
 
 /**
  * A partitioner that partitioner data using a uniform grid. If a shape overlaps
@@ -189,8 +184,4 @@ public class GridPartitioner extends Partitioner {
 		return getPartition(index);
 	}
 
-<<<<<<< HEAD
-
-=======
->>>>>>> e329756faf3ac87d4c41f9829672f67c50ab93e0
 }

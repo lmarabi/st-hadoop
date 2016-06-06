@@ -22,10 +22,8 @@ import edu.umn.cs.spatialHadoop.core.Point;
 import edu.umn.cs.spatialHadoop.core.Rectangle;
 import edu.umn.cs.spatialHadoop.core.ResultCollector;
 import edu.umn.cs.spatialHadoop.core.Shape;
-<<<<<<< HEAD
-import edu.umn.cs.spatialHadoop.core.Temporal;
-=======
->>>>>>> e329756faf3ac87d4c41f9829672f67c50ab93e0
+
+
 
 /**
  * Partition the space based on Z-curve.
@@ -119,9 +117,6 @@ public class ZCurvePartitioner extends Partitioner {
 	 */
 	public static long computeZOrder(long x, long y) {
 		long morton = 0;
-
-<<<<<<< HEAD
-=======
 		for (long bitPosition = 0; bitPosition < 32; bitPosition++) {
 			long mask = 1L << bitPosition;
 			morton |= (x & mask) << (bitPosition + 1);
@@ -268,5 +263,5 @@ public class ZCurvePartitioner extends Partitioner {
 	}
 
 
->>>>>>> e329756faf3ac87d4c41f9829672f67c50ab93e0
+
 }

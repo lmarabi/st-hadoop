@@ -1,13 +1,12 @@
 package edu.umn.cs.spatialHadoop.core;
 
+import java.awt.Graphics;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.io.Text;
 
-<<<<<<< HEAD
 import edu.umn.cs.spatialHadoop.core.Rectangle;
 import edu.umn.cs.spatialHadoop.core.Shape;
 import edu.umn.cs.spatialHadoop.io.TextSerializerHelper;
@@ -40,24 +39,9 @@ public class Temporal implements Shape, Comparable<Temporal> {
 	    this.timeStamp = t;
 		this.x = this.timeStamp.doubleValue();
 		this.y = this.timeStamp.doubleValue();
-=======
-public class Temporal extends Point {
-	private static final Log LOG = LogFactory.getLog(Temporal.class);
-	public Long timeStamp;
-	public double x; 
-	public double y;
-
-	public Temporal() {
-
-	}
-
-	public Temporal(long timeStamp) {
-		this.timeStamp = timeStamp;
->>>>>>> e329756faf3ac87d4c41f9829672f67c50ab93e0
 	}
 
 	public void write(DataOutput out) throws IOException {
-<<<<<<< HEAD
 		out.writeLong(timeStamp);
 	}
 
@@ -142,7 +126,7 @@ public class Temporal extends Point {
   
   @Override
   public String toString() {
-    return "Temporal: ("+timeStamp+", "+x+", "+y+")";
+    return "Temporal: ("+timeStamp+")";
   }
   
   @Override
@@ -185,18 +169,5 @@ public class Temporal extends Point {
     int imgy = (int) Math.round(y * yscale);
     g.fillRect(imgx, imgy, 1, 1);
   }
-=======
-		// TODO Auto-generated method stub
-		out.writeLong(timeStamp);
-		out.writeDouble(timeStamp.doubleValue());
-		out.writeDouble(timeStamp.doubleValue());
-	}
-	
-	@Override
-	public void readFields(DataInput in) throws IOException {
-		this.timeStamp = in.readLong();
-		
-	}
->>>>>>> e329756faf3ac87d4c41f9829672f67c50ab93e0
 
 }

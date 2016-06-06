@@ -30,10 +30,6 @@ import edu.umn.cs.spatialHadoop.mapred.ShapeIterRecordReader;
 import edu.umn.cs.spatialHadoop.mapred.SpatialRecordReader.ShapeIterator;
 import edu.umn.cs.spatialHadoop.util.BitArray;
 import edu.umn.cs.spatialHadoop.util.IntArray;
-<<<<<<< HEAD
-import edu.umn.cs.spatialHadoop.core.Temporal;
-=======
->>>>>>> e329756faf3ac87d4c41f9829672f67c50ab93e0
 
 /**
  * Partition the space based on a Quad tree
@@ -319,9 +315,5 @@ public class QuadTreePartitioner extends Partitioner {
 		}
 	}
 
-<<<<<<< HEAD
-=======
 
-
->>>>>>> e329756faf3ac87d4c41f9829672f67c50ab93e0
 }
