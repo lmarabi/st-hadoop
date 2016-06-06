@@ -55,7 +55,7 @@ import edu.umn.cs.spatialHadoop.util.FileUtil;
 /**
  * Combines all the configuration needed for SpatialHadoop.
  * 
- * @author Ahmed Eldawy + Louai Alarabi
+ * @author Ahmed Eldawy
  *
  */
 public class SpatialSite {
@@ -362,6 +362,10 @@ public class SpatialSite {
   
   
   
+<<<<<<< HEAD
+=======
+
+>>>>>>> e329756faf3ac87d4c41f9829672f67c50ab93e0
 
   /**
    * Checks whether a file is indexed using an R-tree or not. This allows

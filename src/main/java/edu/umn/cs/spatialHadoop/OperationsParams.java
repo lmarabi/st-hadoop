@@ -484,6 +484,10 @@ public class OperationsParams extends Configuration {
 		str += shape.toText(new Text()).toString();
 		conf.set(param, str);
 	}
+<<<<<<< HEAD
+=======
+	
+>>>>>>> e329756faf3ac87d4c41f9829672f67c50ab93e0
 
 
 	public static long getSize(Configuration conf, String key) {

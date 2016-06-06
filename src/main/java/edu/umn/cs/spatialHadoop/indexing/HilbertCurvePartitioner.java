@@ -27,7 +27,10 @@ import edu.umn.cs.spatialHadoop.core.ResultCollector;
 import edu.umn.cs.spatialHadoop.core.Shape;
 import edu.umn.cs.spatialHadoop.mapred.ShapeIterRecordReader;
 import edu.umn.cs.spatialHadoop.mapred.SpatialRecordReader.ShapeIterator;
+<<<<<<< HEAD
 import edu.umn.cs.spatialHadoop.core.Temporal;
+=======
+>>>>>>> e329756faf3ac87d4c41f9829672f67c50ab93e0
 
 /**
  * @author Ahmed Eldawy

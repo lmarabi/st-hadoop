@@ -25,13 +25,16 @@ import edu.umn.cs.spatialHadoop.core.Point;
 import edu.umn.cs.spatialHadoop.core.Rectangle;
 import edu.umn.cs.spatialHadoop.core.ResultCollector;
 import edu.umn.cs.spatialHadoop.core.Shape;
+<<<<<<< HEAD
 
 import edu.umn.cs.spatialHadoop.core.Temporal;
+=======
+>>>>>>> e329756faf3ac87d4c41f9829672f67c50ab93e0
 
 
 /**
  * An interface for spatially partitioning data into partitions.
- * @author Ahmed Eldawy + Louai Alarabi
+ * @author Ahmed Eldawy
  *
  */
 public abstract class Partitioner implements Writable {
@@ -49,7 +52,10 @@ public abstract class Partitioner implements Writable {
   public abstract void createFromPoints(Rectangle mbr, Point[] points,
       int capacity) throws IllegalArgumentException;
   
+<<<<<<< HEAD
 
+=======
+>>>>>>> e329756faf3ac87d4c41f9829672f67c50ab93e0
   
   /**
    * Overlap a shape with partitions and calls a matcher for each overlapping
@@ -71,7 +77,10 @@ public abstract class Partitioner implements Writable {
    */
   public abstract int overlapPartition(Shape shape);
   
+<<<<<<< HEAD
 
+=======
+>>>>>>> e329756faf3ac87d4c41f9829672f67c50ab93e0
   
   /**
    * Returns the details of a specific partition given its ID.

@@ -30,7 +30,10 @@ import edu.umn.cs.spatialHadoop.core.ResultCollector;
 import edu.umn.cs.spatialHadoop.core.Shape;
 import edu.umn.cs.spatialHadoop.mapred.ShapeIterRecordReader;
 import edu.umn.cs.spatialHadoop.mapred.SpatialRecordReader.ShapeIterator;
+<<<<<<< HEAD
 import edu.umn.cs.spatialHadoop.core.Temporal;
+=======
+>>>>>>> e329756faf3ac87d4c41f9829672f67c50ab93e0
 
 /**
  * A partitioner that partitioner data using a K-d tree-based partitioner.
@@ -393,4 +396,8 @@ public class KdTreePartitioner extends Partitioner {
 			System.out.print(sizes[i] + ",");
 	}
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> e329756faf3ac87d4c41f9829672f67c50ab93e0
 }
