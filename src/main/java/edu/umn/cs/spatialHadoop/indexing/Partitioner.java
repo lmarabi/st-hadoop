@@ -21,12 +21,11 @@ import org.apache.hadoop.io.Writable;
 import org.mortbay.log.Log;
 
 import edu.umn.cs.spatialHadoop.core.CellInfo;
-import edu.umn.cs.spatialHadoop.core.Interval;
 import edu.umn.cs.spatialHadoop.core.Point;
 import edu.umn.cs.spatialHadoop.core.Rectangle;
 import edu.umn.cs.spatialHadoop.core.ResultCollector;
 import edu.umn.cs.spatialHadoop.core.Shape;
-import edu.umn.cs.spatialHadoop.core.StShape;
+
 import edu.umn.cs.spatialHadoop.core.Temporal;
 
 
@@ -50,15 +49,7 @@ public abstract class Partitioner implements Writable {
   public abstract void createFromPoints(Rectangle mbr, Point[] points,
       int capacity) throws IllegalArgumentException;
   
-  /**
-   * Populate this partitioner for a set of points and number of partitions
-   * @param mbr - the minimal bounding rectangle of the input space
-   * @param points - the points to be partitioned
-   * @param capacity - maximum number of points per partition
-   * @throws IllegalArgumentException if points are empty 
-   */
-  public abstract void createFromPoints(Interval mbr, Temporal[] points,
-      int capacity) throws IllegalArgumentException;
+
   
   /**
    * Overlap a shape with partitions and calls a matcher for each overlapping
@@ -68,13 +59,6 @@ public abstract class Partitioner implements Writable {
    */
   public abstract void overlapPartitions(Shape shape, ResultCollector<Integer> matcher);
   
-  /**
-   * Overlap a StShape with partitions and calls a matcher for each overlapping
-   * partition.
-   * @param shape
-   * @param matcher
-   */
-  public abstract void overlapPartitions(StShape shape, ResultCollector<Integer> matcher);
   
   /**
    * Returns only one overlapping partition. If the given shape overlaps more
@@ -87,16 +71,7 @@ public abstract class Partitioner implements Writable {
    */
   public abstract int overlapPartition(Shape shape);
   
-  /**
-   * Returns only one overlapping partition. If the given shape overlaps more
-   * than one partitions, the partitioner returns only one of them according to
-   * its own criteria. If it does not overlap any partition, it returns -1
-   * which is an invalid partition ID.
-   * 
-   * @param shape
-   * @return
-   */
-  public abstract int overlapPartition(StShape shape);
+
   
   /**
    * Returns the details of a specific partition given its ID.

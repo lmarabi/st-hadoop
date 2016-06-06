@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite failures="0" time="0" errors="0" skipped="0" tests="5" name="edu.umn.cs.spatialHadoop.OperationsParamsTest">
+<testsuite failures="0" time="0.001" errors="0" skipped="0" tests="5" name="edu.umn.cs.spatialHadoop.OperationsParamsTest">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/soft/jdk1.7.0_76-arch/jre/lib/amd64"/>
     <property name="java.vm.version" value="24.76-b04"/>
     <property name="java.vm.vendor" value="Oracle Corporation"/>
-    <property name="maven.multiModuleProjectDirectory" value="/export/scratch/louai/scratch1/workspace/antProject/shadoop-ext"/>
+    <property name="maven.multiModuleProjectDirectory" value="/export/scratch/louai/scratch1/workspace/antProject/sthadoop"/>
     <property name="java.vendor.url" value="http://java.oracle.com/"/>
     <property name="path.separator" value=":"/>
     <property name="guice.disable.misplaced.annotation.check" value="true"/>
@@ -15,7 +15,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="sun.os.patch.level" value="unknown"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="user.dir" value="/export/scratch/louai/scratch1/workspace/antProject/shadoop-ext"/>
+    <property name="user.dir" value="/export/scratch/louai/scratch1/workspace/antProject/sthadoop"/>
     <property name="java.runtime.version" value="1.7.0_76-b13"/>
     <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment"/>
     <property name="java.endorsed.dirs" value="/soft/jdk1.7.0_76-arch/jre/lib/endorsed"/>
@@ -60,9 +60,9 @@
     <property name="sun.desktop" value="gnome"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase time="0" classname="edu.umn.cs.spatialHadoop.OperationsParamsTest" name="testDetectPoint"/>
   <testcase time="0" classname="edu.umn.cs.spatialHadoop.OperationsParamsTest" name="testDetectRectangle"/>
   <testcase time="0" classname="edu.umn.cs.spatialHadoop.OperationsParamsTest" name="testDetectOSMEdge"/>
   <testcase time="0" classname="edu.umn.cs.spatialHadoop.OperationsParamsTest" name="testDetectOSMPolygon"/>
   <testcase time="0" classname="edu.umn.cs.spatialHadoop.OperationsParamsTest" name="testDetectOSMPoint"/>
+  <testcase time="0.001" classname="edu.umn.cs.spatialHadoop.OperationsParamsTest" name="testDetectPoint"/>
 </testsuite>

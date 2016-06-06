@@ -22,8 +22,6 @@ import edu.umn.cs.spatialHadoop.core.Point;
 import edu.umn.cs.spatialHadoop.core.Rectangle;
 import edu.umn.cs.spatialHadoop.core.ResultCollector;
 import edu.umn.cs.spatialHadoop.core.Shape;
-import edu.umn.cs.spatialHadoop.core.Interval;
-import edu.umn.cs.spatialHadoop.core.StShape;
 import edu.umn.cs.spatialHadoop.core.Temporal;
 
 /**
@@ -245,22 +243,4 @@ public class ZCurvePartitioner extends Partitioner {
     return cell;
   }
 
-@Override
-public void createFromPoints(Interval mbr, Temporal[] points, int capacity)
-		throws IllegalArgumentException {
-	// TODO Auto-generated method stub
-	
-}
-
-@Override
-public void overlapPartitions(StShape shape, ResultCollector<Integer> matcher) {
-	// TODO Auto-generated method stub
-	
-}
-
-@Override
-public int overlapPartition(StShape shape) {
-	// TODO Auto-generated method stub
-	return 0;
-}
 }

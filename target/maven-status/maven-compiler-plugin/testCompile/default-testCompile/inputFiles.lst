@@ -1,7 +1,7 @@
-/export/scratch/louai/scratch1/workspace/antProject/shadoop-ext/src/test/java/edu/umn/cs/spatialHadoop/io/TextSerializerHelperTest.java
-/export/scratch/louai/scratch1/workspace/antProject/shadoop-ext/src/test/java/edu/umn/cs/spatialHadoop/io/HeadTest.java
-/export/scratch/louai/scratch1/workspace/antProject/shadoop-ext/src/test/java/edu/umn/cs/spatialHadoop/operations/LocalSamplerTest.java
-/export/scratch/louai/scratch1/workspace/antProject/shadoop-ext/src/test/java/edu/umn/cs/spatialHadoop/visualization/MultilevelPlotTest.java
-/export/scratch/louai/scratch1/workspace/antProject/shadoop-ext/src/test/java/edu/umn/cs/spatialHadoop/nasa/HDFRecordReaderTest.java
-/export/scratch/louai/scratch1/workspace/antProject/shadoop-ext/src/test/java/edu/umn/cs/spatialHadoop/OperationsParamsTest.java
-/export/scratch/louai/scratch1/workspace/antProject/shadoop-ext/src/test/java/edu/umn/cs/spatialHadoop/TigerShapeTest.java
+/export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/test/java/edu/umn/cs/spatialHadoop/io/HeadTest.java
+/export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/test/java/edu/umn/cs/spatialHadoop/operations/LocalSamplerTest.java
+/export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/test/java/edu/umn/cs/spatialHadoop/visualization/MultilevelPlotTest.java
+/export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/test/java/edu/umn/cs/spatialHadoop/TigerShapeTest.java
+/export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/test/java/edu/umn/cs/spatialHadoop/io/TextSerializerHelperTest.java
+/export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/test/java/edu/umn/cs/spatialHadoop/nasa/HDFRecordReaderTest.java
+/export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/test/java/edu/umn/cs/spatialHadoop/OperationsParamsTest.java

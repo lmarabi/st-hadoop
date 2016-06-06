@@ -34,7 +34,6 @@ import edu.umn.cs.spatialHadoop.core.Rectangle;
 import edu.umn.cs.spatialHadoop.core.ResultCollector;
 import edu.umn.cs.spatialHadoop.core.Shape;
 import edu.umn.cs.spatialHadoop.core.SpatialSite;
-import edu.umn.cs.spatialHadoop.core.StShape;
 import edu.umn.cs.spatialHadoop.core.Temporal;
 import edu.umn.cs.spatialHadoop.indexing.Partition;
 import edu.umn.cs.spatialHadoop.io.Text2;
@@ -56,7 +55,7 @@ import edu.umn.cs.spatialHadoop.osm.OSMPolygon;
  * which makes it easier to pass around to mappers and reducers. It can be
  * initialized from a configuration and/or a list of command line arguments.
  * 
- * @author Ahmed Eldawy + Louai Alarabi
+ * @author Ahmed Eldawy
  *
  */
 public class OperationsParams extends Configuration {
@@ -356,15 +355,6 @@ public class OperationsParams extends Configuration {
 		return getShape(job, key, null);
 	}
 	
-	public static StShape getStShape(Configuration job, String key) {
-		return getStShape(job, key, null);
-	}
-	
-	public static StShape getStShape(Configuration conf, String key,
-			StShape defaultValue) {
-		TextSerializable t = getTextSerializable(conf, key, defaultValue);
-		return t instanceof StShape ? (StShape) t : null;
-	}
 
 	public static Shape getShape(Configuration conf, String key,
 			Shape defaultValue) {
@@ -395,8 +385,6 @@ public class OperationsParams extends Configuration {
 		} catch (Exception e) {
 			// shapeClass is not an explicit class name
 			String shapeTypeI = shapeType.toLowerCase();
-			System.err.println("****** louai ****** ShapeTypeLenght"+shapeType.split(",").length);
-			System.err.println("****** louai ****** ShapeType"+shapeType);
 			if (shapeTypeI.startsWith("rect")) {
 				shape = new Rectangle();
 			} else if (shapeTypeI.startsWith("point")) {
@@ -492,25 +480,6 @@ public class OperationsParams extends Configuration {
 	 *            An object to set in the configuration
 	 */
 	public static void setShape(Configuration conf, String param, Shape shape) {
-		String str = shape.getClass().getName() + ShapeValueSeparator;
-		str += shape.toText(new Text()).toString();
-		conf.set(param, str);
-	}
-	
-	/**
-	 * Sets the specified configuration parameter to the current value of the
-	 * shape. Both class name and shape values are encoded in one string and set
-	 * as the value of the configuration parameter. The shape can be retrieved
-	 * later using {@link SpatialSite#getShape(Configuration, String)}.
-	 * 
-	 * @param conf
-	 *            The configuration to update
-	 * @param param
-	 *            The name of the configuration line to set
-	 * @param shape
-	 *            An object to set in the configuration
-	 */
-	public static void setShape(Configuration conf, String param, StShape shape) {
 		String str = shape.getClass().getName() + ShapeValueSeparator;
 		str += shape.toText(new Text()).toString();
 		conf.set(param, str);
