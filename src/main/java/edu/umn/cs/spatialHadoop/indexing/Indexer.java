@@ -449,10 +449,10 @@ public class Indexer {
    */
   public static void main(String[] args) throws Exception {
 	  args = new String[5];
-	  args[0] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-extract";
+	  args[0] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-tweet";
 	  args[1] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-partition";
-	  args[2] = "sindex:rtree";
-	  args[3] = "shape:time";
+	  args[2] = "sindex:str";
+	  args[3] = "shape:edu.umn.cs.spatialHadoop.core.Tweets"; // time 
 	  args[4] = "-overwrite";
     OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
     

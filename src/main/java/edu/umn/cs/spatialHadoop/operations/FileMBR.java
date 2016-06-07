@@ -115,9 +115,9 @@ public class FileMBR {
         fileName = new Text(value.filename);
       }
       value.size = text.getLength() + 1; // +1 for new line
+      //System.out.println("Im here !!! ");
+      //System.out.println(text.toString());
       shape.fromText(text);
-      System.out.println("Im here !!! ");
-      System.out.println(shape.toString());
       Rectangle mbr = shape.getMBR();
       if (mbr != null) {
         value.set(mbr);

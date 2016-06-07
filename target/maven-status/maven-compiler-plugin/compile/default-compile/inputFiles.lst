@@ -35,6 +35,7 @@
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/osm/OSMEdge.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/hdf/DDID.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/osm/OSMPoint.java
+/export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/core/Tweets.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/hdf/DDNumberType.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/nasa/HTTPInputStream.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/operations/FileMBR.java
