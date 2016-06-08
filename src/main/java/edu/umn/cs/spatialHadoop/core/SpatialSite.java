@@ -359,8 +359,7 @@ public class SpatialSite {
       return null;
     }
   }
-  
-  
+
   /**
    * Checks whether a file is indexed using an R-tree or not. This allows
    * an operation to use the R-tree to speedup the processing if it exists.

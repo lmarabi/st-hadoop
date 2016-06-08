@@ -431,8 +431,6 @@ public abstract class SpatialRecordReader<K, V> implements RecordReader<K, V> {
     return true;
   }
   
-
-  
   /**
    * Reads all shapes left in the current block in one shot. This function
    * runs a loop where it keeps reading shapes by calling the method
@@ -563,7 +561,6 @@ public abstract class SpatialRecordReader<K, V> implements RecordReader<K, V> {
     }
     
   }
-
   
   /**
    * Reads the next RTree from file. The file must be part of an R-tree index.

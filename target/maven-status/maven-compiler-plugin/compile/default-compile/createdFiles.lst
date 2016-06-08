@@ -3,6 +3,7 @@ edu/umn/cs/spatialHadoop/operations/Union$UnionMap.class
 edu/umn/cs/spatialHadoop/operations/FarthestPair$PairDistance.class
 edu/umn/cs/spatialHadoop/visualization/MultilevelPlot$FlatPartitionMap.class
 edu/umn/cs/spatialHadoop/nasa/HDFRasterLayer$GradientType.class
+edu/umn/cs/spatialHadoop/core/SpatialTweets.class
 edu/umn/cs/spatialHadoop/delaunay/GSDTAlgorithm$1.class
 edu/umn/cs/spatialHadoop/osm/MapToJson.class
 edu/umn/cs/spatialHadoop/nasa/StockQuadTree$Node.class
@@ -86,6 +87,7 @@ edu/umn/cs/spatialHadoop/util/JspSpatialHelper.class
 edu/umn/cs/spatialHadoop/core/CSVOGC.class
 edu/umn/cs/spatialHadoop/operations/Sampler$6.class
 edu/umn/cs/spatialHadoop/operations/SJMR$SJMRReduce$1.class
+edu/umn/cs/spatialHadoop/core/TemporalTweets.class
 edu/umn/cs/spatialHadoop/operations/Sampler.class
 edu/umn/cs/spatialHadoop/operations/LocalSampler$2.class
 edu/umn/cs/spatialHadoop/nasa/ShahedServer$1.class
@@ -366,6 +368,7 @@ edu/umn/cs/spatialHadoop/nasa/GeoProjector.class
 edu/umn/cs/spatialHadoop/core/SpatialAlgorithms$7.class
 edu/umn/cs/spatialHadoop/mapred/RandomShapeGenerator.class
 edu/umn/cs/spatialHadoop/operations/KNN.class
+edu/umn/cs/spatialHadoop/core/Temporal.class
 edu/umn/cs/spatialHadoop/operations/RangeFilter.class
 edu/umn/cs/spatialHadoop/indexing/Indexer$PartitionerMap.class
 edu/umn/cs/spatialHadoop/operations/KNN$2.class

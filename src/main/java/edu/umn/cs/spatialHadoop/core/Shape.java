@@ -15,7 +15,7 @@ import org.apache.hadoop.io.Writable;
 import edu.umn.cs.spatialHadoop.io.TextSerializable;
 
 /**
- * A general 2D shape
+ * A general 2D shape.
  * @author Ahmed Eldawy
  *
  */

@@ -27,6 +27,7 @@
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/mapred/PairWritable.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/mapred/RTreeGridOutputFormat.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/mapred/ShapeLineInputFormat.java
+/export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/core/SpatialTweets.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/operations/Aggregate.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/indexing/Partition.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/util/WritableByteArray.java
@@ -35,7 +36,6 @@
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/osm/OSMEdge.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/hdf/DDID.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/osm/OSMPoint.java
-/export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/core/Tweets.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/hdf/DDNumberType.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/nasa/HTTPInputStream.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/operations/FileMBR.java
@@ -115,6 +115,7 @@
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/visualization/SimpleGraphics.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/hdf/DataDescriptor.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/delaunay/GSDTAlgorithm.java
+/export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/core/TemporalTweets.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/osm/OSMToKML.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/visualization/SVGGraphics.java
 /export/scratch/louai/scratch1/workspace/antProject/sthadoop/src/main/java/edu/umn/cs/spatialHadoop/nasa/AggregateQuadTree.java

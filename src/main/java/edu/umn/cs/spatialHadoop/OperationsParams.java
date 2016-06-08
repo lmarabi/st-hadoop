@@ -1,11 +1,11 @@
 /***********************************************************************
- * Copyright (c) 2015 by Regents of the University of Minnesota.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Apache License, Version 2.0 which 
- * accompanies this distribution and is available at
- * http://www.opensource.org/licenses/apache2.0.php.
- *
- *************************************************************************/
+* Copyright (c) 2015 by Regents of the University of Minnesota.
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Apache License, Version 2.0 which 
+* accompanies this distribution and is available at
+* http://www.opensource.org/licenses/apache2.0.php.
+*
+*************************************************************************/
 package edu.umn.cs.spatialHadoop;
 
 import java.awt.Color;
@@ -34,7 +34,6 @@ import edu.umn.cs.spatialHadoop.core.Rectangle;
 import edu.umn.cs.spatialHadoop.core.ResultCollector;
 import edu.umn.cs.spatialHadoop.core.Shape;
 import edu.umn.cs.spatialHadoop.core.SpatialSite;
-import edu.umn.cs.spatialHadoop.core.Temporal;
 import edu.umn.cs.spatialHadoop.indexing.Partition;
 import edu.umn.cs.spatialHadoop.io.Text2;
 import edu.umn.cs.spatialHadoop.io.TextSerializable;
@@ -47,7 +46,6 @@ import edu.umn.cs.spatialHadoop.operations.LocalSampler;
 import edu.umn.cs.spatialHadoop.osm.OSMEdge;
 import edu.umn.cs.spatialHadoop.osm.OSMPoint;
 import edu.umn.cs.spatialHadoop.osm.OSMPolygon;
-
 
 /**
  * A class that encapsulates all parameters sent for an operations implemented
@@ -104,10 +102,8 @@ public class OperationsParams extends Configuration {
 	 * Initialize the command line arguments from an existing configuration and
 	 * a list of additional arguments.
 	 * 
-	 * @param conf
-	 *            A set of configuration parameters to initialize to
-	 * @param additionalArgs
-	 *            Any additional command line arguments given by the user.
+	 * @param conf A set of configuration parameters to initialize to
+	 * @param additionalArgs Any additional command line arguments given by the user.
 	 */
 	public OperationsParams(Configuration conf, String... additionalArgs) {
 		super(conf);
@@ -117,7 +113,7 @@ public class OperationsParams extends Configuration {
 	public OperationsParams(OperationsParams params) {
 		super(params);
 		if (params.allPaths != null)
-			this.allPaths = params.allPaths.clone();
+		  this.allPaths = params.allPaths.clone();
 	}
 
 	public void initialize(String... args) {
@@ -185,16 +181,16 @@ public class OperationsParams extends Configuration {
 	 * e.printStackTrace(); } return null; }
 	 */
 
-	/**
-	 * Checks that there is at least one input path and that all input paths
-	 * exist. It treats all user-provided paths as input. This is useful for
-	 * input-only operations which do not take any output path (e.g., MBR and
-	 * Aggregate).
-	 * 
-	 * @return <code>true</code> if there is at least one input path and all
-	 *         input paths exist.
-	 * @throws IOException
-	 */
+  /**
+   * Checks that there is at least one input path and that all input paths
+   * exist. It treats all user-provided paths as input. This is useful for
+   * input-only operations which do not take any output path (e.g., MBR and
+   * Aggregate).
+   * 
+   * @return <code>true</code> if there is at least one input path and all input
+   *         paths exist.
+   * @throws IOException
+   */
 	public boolean checkInput() throws IOException {
 		Path[] inputPaths = getPaths();
 		if (inputPaths.length == 0) {
@@ -229,8 +225,7 @@ public class OperationsParams extends Configuration {
 	 * 
 	 * @return <code>true</code> if all checks pass. <code>false</code>
 	 *         otherwise.
-	 * @throws IOException
-	 *             If the method could not get the information of the input
+	 * @throws IOException If the method could not get the information of the input
 	 */
 	public boolean checkInputOutput(boolean outputRequired) throws IOException {
 		Path[] inputPaths = getInputPaths();
@@ -354,7 +349,6 @@ public class OperationsParams extends Configuration {
 	public static Shape getShape(Configuration job, String key) {
 		return getShape(job, key, null);
 	}
-	
 
 	public static Shape getShape(Configuration conf, String key,
 			Shape defaultValue) {
@@ -377,61 +371,55 @@ public class OperationsParams extends Configuration {
 		}
 
 		TextSerializable shape;
-
+		
 		try {
-			Class<? extends TextSerializable> shapeClass = conf.getClassByName(
-					shapeType).asSubclass(TextSerializable.class);
-			shape = shapeClass.newInstance();
+		  Class<? extends TextSerializable> shapeClass = conf
+          .getClassByName(shapeType).asSubclass(
+              TextSerializable.class);
+      shape = shapeClass.newInstance();
 		} catch (Exception e) {
-			// shapeClass is not an explicit class name
-			String shapeTypeI = shapeType.toLowerCase();
-			if (shapeTypeI.startsWith("rect")) {
-				shape = new Rectangle();
-			} else if (shapeTypeI.startsWith("point")) {
-				shape = new Point();
-			} else if (shapeTypeI.startsWith("tiger")) {
-				shape = new TigerShape();
-			} else if (shapeTypeI.startsWith("osm")) {
-				shape = new OSMPolygon();
-			} else if (shapeTypeI.startsWith("poly")) {
-				shape = new Polygon();
-			} else if (shapeTypeI.startsWith("ogc")) {
-				shape = new OGCESRIShape();
-			} else if (shapeTypeI.startsWith("wkt")) {
-				shape = new OGCJTSShape();
-			} else if (shapeTypeI.startsWith("nasapoint")) {
-				shape = new NASAPoint();
-			} else if (shapeTypeI.startsWith("nasarect")) {
-				shape = new NASARectangle();
-			} else if (shapeTypeI.startsWith("text")) {
-				shape = new Text2();
-			} else if (shapeTypeI.startsWith("time")) {
-				shape = new Temporal();
-			} else {
-				// Couldn't detect shape from short name or full class name
-				// May be it's an actual value that we can parse
-				
-				if (shapeType.split(",").length == 1) {
-					// A Temporal
-					shape = new Temporal();
-					shape.fromText(new Text((String) conf.get(key)));
-				} else if (shapeType.split(",").length == 2) {
-					// A point
-					shape = new Point();
-					shape.fromText(new Text((String) conf.get(key)));
-				} else if (shapeType.split(",").length == 4) {
-					// A rectangle
-					shape = new Rectangle();
-					shape.fromText(new Text((String) conf.get(key)));
-				} else {
-					LOG.warn("unknown shape type: '" + conf.get(key) + "'");
-					return null;
-				}
-			}
+		  // shapeClass is not an explicit class name
+		  String shapeTypeI = shapeType.toLowerCase();
+		  if (shapeTypeI.startsWith("rect")) {
+		    shape = new Rectangle();
+		  } else if (shapeTypeI.startsWith("point")) {
+		    shape = new Point();
+		  } else if (shapeTypeI.startsWith("tiger")) {
+		    shape = new TigerShape();
+		  } else if (shapeTypeI.startsWith("osm")) {
+		    shape = new OSMPolygon();
+		  } else if (shapeTypeI.startsWith("poly")) {
+		    shape = new Polygon();
+		  } else if (shapeTypeI.startsWith("ogc")) {
+		    shape = new OGCESRIShape();
+		  } else if (shapeTypeI.startsWith("wkt")) {
+		    shape = new OGCJTSShape();
+		  } else if (shapeTypeI.startsWith("nasapoint")) {
+		    shape = new NASAPoint();
+		  } else if (shapeTypeI.startsWith("nasarect")) {
+		    shape = new NASARectangle();
+		  } else if (shapeTypeI.startsWith("text")) {
+		    shape = new Text2();
+		  } else {
+		    // Couldn't detect shape from short name or full class name
+		    // May be it's an actual value that we can parse
+		    if (shapeType.split(",").length == 2) {
+		      // A point
+		      shape = new Point();
+		      shape.fromText(new Text((String) conf.get(key)));
+		    } else if (shapeType.split(",").length == 4) {
+		      // A rectangle
+		      shape = new Rectangle();
+		      shape.fromText(new Text((String) conf.get(key)));
+		    } else {
+		      LOG.warn("unknown shape type: '" + conf.get(key) + "'");
+		      return null;
+		    }
+		  }
 		}
 
 		if (shapeValue != null)
-			shape.fromText(shapeValue);
+		  shape.fromText(shapeValue);
 		// Special case for CSVOGC shape, specify the column if possible
 		if (shape instanceof CSVOGC) {
 			CSVOGC csvShape = (CSVOGC) shape;
@@ -448,7 +436,7 @@ public class OperationsParams extends Configuration {
 	public <S extends Shape> S[] getShapes(String key, S stock) {
 		String[] values = getArray(key);
 		if (values == null)
-			return null;
+		  return null;
 		S[] shapes = (S[]) Array.newInstance(stock.getClass(), values.length);
 		for (int i = 0; i < values.length; i++) {
 			shapes[i] = (S) stock.clone();
@@ -472,20 +460,15 @@ public class OperationsParams extends Configuration {
 	 * as the value of the configuration parameter. The shape can be retrieved
 	 * later using {@link SpatialSite#getShape(Configuration, String)}.
 	 * 
-	 * @param conf
-	 *            The configuration to update
-	 * @param param
-	 *            The name of the configuration line to set
-	 * @param shape
-	 *            An object to set in the configuration
+	 * @param conf The configuration to update
+	 * @param param The name of the configuration line to set
+	 * @param shape An object to set in the configuration
 	 */
 	public static void setShape(Configuration conf, String param, Shape shape) {
 		String str = shape.getClass().getName() + ShapeValueSeparator;
 		str += shape.toText(new Text()).toString();
 		conf.set(param, str);
 	}
-
-
 
 	public static long getSize(Configuration conf, String key) {
 		String size_str = conf.get(key);
@@ -506,8 +489,9 @@ public class OperationsParams extends Configuration {
 			size *= 1024 * 1024 * 1024 * 1024;
 		return size;
 	}
-
-	public static int getJoiningThresholdPerOnce(Configuration conf, String key) {
+	
+	public static int getJoiningThresholdPerOnce(Configuration conf,
+			String key) {
 		String joiningThresholdPerOnce_str = conf.get(key);
 		if (joiningThresholdPerOnce_str == null)
 			LOG.error("Your joiningThresholdPerOnce is not set");
@@ -517,50 +501,52 @@ public class OperationsParams extends Configuration {
 	public static void setJoiningThresholdPerOnce(Configuration conf,
 			String param, int joiningThresholdPerOnce) {
 		String str;
-		if (joiningThresholdPerOnce < 0) {
-			str = "50000";
-		} else {
+		if (joiningThresholdPerOnce < 0){
+			str = "50000";				
+		}else{
 			str = joiningThresholdPerOnce + "";
 		}
 		conf.set(param, str);
 	}
-
-	public static void setFilterOnlyModeFlag(Configuration conf, String param,
-			boolean filterOnlyMode) {
+	
+	public static void setFilterOnlyModeFlag(Configuration conf,
+			String param, boolean filterOnlyMode) {
 		String str;
-		if (filterOnlyMode) {
-			str = "true";
-		} else {
+		if (filterOnlyMode){
+			str = "true";	
+		}else{
 			str = "false";
 		}
 		conf.set(param, str);
 	}
-
-	public static boolean getFilterOnlyModeFlag(Configuration conf, String key) {
+	
+	public static boolean getFilterOnlyModeFlag(Configuration conf,
+			String key) {
 		String filterOnlyModeFlag = conf.get(key);
 		if (filterOnlyModeFlag == null)
 			LOG.error("Your filterOnlyMode is not set");
 		return Boolean.parseBoolean(filterOnlyModeFlag);
 	}
-
-	public static boolean getInactiveModeFlag(Configuration conf, String key) {
+	
+	public static boolean getInactiveModeFlag(Configuration conf,
+			String key) {
 		String inactiveModeFlag_str = conf.get(key);
 		if (inactiveModeFlag_str == null)
 			LOG.error("Your inactiveModeFlag is not set");
 		return Boolean.parseBoolean(inactiveModeFlag_str);
 	}
-
-	public static void setInactiveModeFlag(Configuration conf, String param,
-			boolean inactiveModeFlag) {
+	
+	public static void setInactiveModeFlag(Configuration conf,
+			String param, boolean inactiveModeFlag) {
 		String str;
-		if (inactiveModeFlag) {
-			str = "true";
-		} else {
+		if (inactiveModeFlag){
+			str = "true";	
+		}else{
 			str = "false";
 		}
 		conf.set(param, str);
 	}
-
+	
 	public static Path getRepartitionJoinIndexPath(Configuration conf,
 			String key) {
 		String repartitionJoinIndexPath_str = conf.get(key);
@@ -632,16 +618,15 @@ public class OperationsParams extends Configuration {
 			final int sampleCount = 10;
 			OperationsParams sampleParams = new OperationsParams(this);
 			try {
-				LocalSampler.sampleLocal(this.getInputPaths(), sampleCount,
-						new ResultCollector<Text>() {
-							@Override
-							public void collect(Text line) {
-								sampleLines.add(line.toString());
-							}
-						}, sampleParams);
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
+        LocalSampler.sampleLocal(this.getInputPaths(), sampleCount, new ResultCollector<Text>() {
+          @Override
+          public void collect(Text line) {
+            sampleLines.add(line.toString());
+          }
+        }, sampleParams);
+      } catch (InterruptedException e1) {
+        e1.printStackTrace();
+      }
 
 			if (sampleLines.isEmpty()) {
 				LOG.warn("No input to detect in '" + this.getInputPath() + "-");
@@ -650,15 +635,12 @@ public class OperationsParams extends Configuration {
 
 			// Collect some stats about the sample to help detecting shape type
 			final String Separators[] = { ",", "\t" };
-			int[] numOfSplits = { 0, 0 }; // Number of splits with each
-											// separator
-			boolean allNumericAllLines = true; // Whether or not all values are
-												// numbers
+			int[] numOfSplits = { 0, 0 }; // Number of splits with each separator
+			boolean allNumericAllLines = true; // Whether or not all values are numbers
 			int ogcIndex = -1; // The index of the column with OGC data
 
 			for (String sampleLine : sampleLines) {
-				// This flag is raised if all splits are numbers with one
-				// separator
+				// This flag is raised if all splits are numbers with one separator
 				boolean allNumericCurrentLine = false;
 				// Try to parse with commas and tabs
 				for (int iSeparator = 0; iSeparator < Separators.length; iSeparator++) {
@@ -673,17 +655,15 @@ public class OperationsParams extends Configuration {
 					for (int i = 0; i < parts.length; i++) {
 						String part = parts[i];
 						if (allNumericCurrentLineCurrentSeparator) {
-							try {
-								Double.parseDouble(part);
-							} catch (NumberFormatException e) {
-								allNumericCurrentLineCurrentSeparator = false;
-							}
+						  try {
+						    Double.parseDouble(part);
+						  } catch (NumberFormatException e) {
+						    allNumericCurrentLineCurrentSeparator = false;
+						  }
 						}
 						try {
-							TextSerializerHelper.consumeGeometryJTS(new Text(
-									part), '\0');
-							// Reaching this point means the geometry was parsed
-							// successfully
+							TextSerializerHelper.consumeGeometryJTS(new Text(part), '\0');
+							// Reaching this point means the geometry was parsed successfully
 							if (ogcIndex == -1)
 								ogcIndex = i;
 							else if (ogcIndex != i)
@@ -727,8 +707,7 @@ public class OperationsParams extends Configuration {
 		} catch (IOException e) {
 		}
 		if (autoDetectedShape == null) {
-			LOG.warn("Cannot detect shape for input '" + sampleLines.get(0)
-					+ "'");
+			LOG.warn("Cannot detect shape for input '" + sampleLines.get(0) + "'");
 			return false;
 		} else {
 			LOG.info("Autodetected shape '" + autoDetectedShape
@@ -737,156 +716,140 @@ public class OperationsParams extends Configuration {
 			return true;
 		}
 	}
-
+	
 	/**
 	 * Detects the shape of the given set of files assuming all of them hold
 	 * data of the same shape. It reads a random set of lines and uses the
-	 * {@link #detectShape(String[])} method to detect the shape of this sample
-	 * set of lines.
+	 * {@link #detectShape(String[])} method to detect the shape of this
+	 * sample set of lines.
 	 * 
-	 * @param path
-	 *            Input path to read data from
-	 * @param conf
-	 *            The configuration parameters of the environment
+	 * @param path Input path to read data from
+	 * @param conf The configuration parameters of the environment
 	 * @return The detected type of the shape or <code>null</code> if failed.
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
 	public static String detectShape(Path path, Configuration conf)
-			throws IOException, InterruptedException {
-		String[] lines = Head.head(path.getFileSystem(conf), path, 10);
-		return detectShape(lines);
+	    throws IOException, InterruptedException {
+	  String[] lines = Head.head(path.getFileSystem(conf), path, 10);
+	  return detectShape(lines);
 	}
-
+	
 	/**
 	 * Detects the shape from a sample set of lines
-	 * 
 	 * @param lines
 	 * @return
 	 */
 	public static String detectShape(String[] lines) {
-		// Possible separators used in auto detect
-		final char Separators[] = { ',', '\t' };
-		// Number of columns with each separator, -1 means an incompatible
-		// number
-		int[] numOfFields = new int[Separators.length];
-		for (String line : lines) {
-			for (int iSep = 0; iSep < Separators.length; iSep++) {
-				if (numOfFields[iSep] == -1)
-					continue; // Separator is already invalid, no need to check
-				int count = 1;
-				int i = 0;
-				while (i != -1 && i < line.length()
-						&& (i = line.indexOf(Separators[iSep], i)) != -1) {
-					count++;
-					i++;
-				}
-				if (numOfFields[iSep] == 0) // First line
-					numOfFields[iSep] = count;
-				else if (numOfFields[iSep] != count)
-					numOfFields[iSep] = -1; // Invalidate forever
-			}
-		}
+    // Possible separators used in auto detect
+    final char Separators[] = { ',', '\t' };
+    // Number of columns with each separator, -1 means an incompatible number
+    int[] numOfFields = new int[Separators.length];
+    for (String line : lines) {
+      for (int iSep = 0; iSep < Separators.length; iSep++) {
+        if (numOfFields[iSep] == -1)
+          continue; // Separator is already invalid, no need to check
+        int count = 1;
+        int i = 0;
+        while (i != -1 && i < line.length() &&
+            (i = line.indexOf(Separators[iSep], i)) != -1)
+          {count++; i++;}
+        if (numOfFields[iSep] == 0) // First line
+          numOfFields[iSep] = count;
+        else if (numOfFields[iSep] != count)
+          numOfFields[iSep] = -1; // Invalidate forever
+      }
+    }
 
-		// Regular expressions for expected columns.
-		// Notice that the regular expressions do not have to be very accurate
-		// as we are just guessing anyway
-		final Pattern[] TypesRegex = {
-				null, // Not yet detected
-				Pattern.compile("(-|\\+)?\\d+"), // Integer
-				Pattern.compile("(-|\\+)?(\\d*\\.\\d*|\\d+)(E(-|\\+)\\d+)?"), // Float
-				Pattern.compile("(POINT|MULTIPOINT|POLYGON|MULTIPOLYGON|LINESTRING|"
-						+ "MULTILINESTRING|GEOMETRYCOLLECTION|EMPTY|GEOMETRY)"
-						+ "[\\(\\),\\d\\-\\+E\\.\\s]*"), // Well-Known Text
-				Pattern.compile("(\\{\"[^\"]+\"=\"[^\"]+\"\\})*"), // JSON map
-				Pattern.compile("\\[(\\w+\\#\\w+,)*(\\w+\\#\\w+)?\\]"), // Pig
-																		// Map
-		};
-
-		for (int iSep = 0; iSep < Separators.length; iSep++) {
-			if (numOfFields[iSep] == -1)
-				continue;
-			// For each matched separator
-			// Try to detect the type of each column
-			int[] fieldTypes = new int[numOfFields[iSep]];
-			for (String line : lines) {
-				// For each line, try to detect the type of each field
-				String[] fieldValues = line.split("" + Separators[iSep]);
-				for (int iField = 0; iField < fieldValues.length; iField++) {
-					if (fieldTypes[iField] == -1)
-						continue; // A conflicting field, no need to check
-					// Try to detect the type of this field using possible
-					// regular expressions
-					boolean matched = false;
-					for (int iType = 1; iType < TypesRegex.length && !matched; iType++) {
-						if (matched = TypesRegex[iType].matcher(
-								fieldValues[iField]).matches()) {
-							// Matches a regular expression
-							if (fieldTypes[iField] == 0)
-								fieldTypes[iField] = iType;
-							else if (fieldTypes[iField] != iType) {
-								if (fieldTypes[iField] == 1 && iType == 2)
-									fieldTypes[iField] = 2;
-								else if (fieldTypes[iField] <= 2 && iType > 2
-										|| fieldTypes[iField] > 2 && iType <= 2)
-									fieldTypes[iField] = -1; // Mark field as
-																// conflicted
-							}
-						}
-					}
-				}
-			}
-			// Now, time to make a decision
-			if (iSep == 0
-					&& // Comma separated
-					numOfFields[iSep] == 2
-					&& // Two fields
-					(fieldTypes[0] == 1 || fieldTypes[0] == 2)
-					&& (fieldTypes[1] == 2 || fieldTypes[1] == 2)) {
-				// Two fields, separated by comma, and both are numeric
-				return "point";
-			} else if (iSep == 0
-					&& // Comma separated
-					numOfFields[iSep] == 4
-					&& // Four fields
-					(fieldTypes[0] == 1 || fieldTypes[0] == 2)
-					&& (fieldTypes[1] == 1 || fieldTypes[1] == 2)
-					&& (fieldTypes[2] == 1 || fieldTypes[2] == 2)
-					&& (fieldTypes[3] == 1 || fieldTypes[3] == 2)) {
-				// Four fields, separated by commas, and all are numeric
-				return "rectangle";
-			} else if (iSep == 0 && // Comma
-					numOfFields[iSep] == 9 && fieldTypes[0] == 1 && // Integer
-																	// EdgeID
-					fieldTypes[1] == 1 && // Integer StartNodeID
-					(fieldTypes[2] == 1 || fieldTypes[2] == 2) && // Longitude
-					(fieldTypes[3] == 1 || fieldTypes[3] == 2) && // Latitude
-					fieldTypes[4] == 1 && // Integer EndNodeID
-					(fieldTypes[5] == 1 || fieldTypes[5] == 2) && // Longitude
-					(fieldTypes[6] == 1 || fieldTypes[6] == 2) && // Latitude
-					fieldTypes[7] == 1 && // IntegerWayID
-					fieldTypes[8] == 4) { // JSON Map
-				return OSMEdge.class.getName();
-			} else if (iSep == 1 && // Tab separated
-					numOfFields[iSep] == 3 && // Three fields
-					fieldTypes[0] == 1 && // Integer OSM Polygon ID
-					fieldTypes[1] == 3 && // WKT
-					fieldTypes[2] == 5) { // Pig Map
-				return "osm";
-			} else if (iSep == 1 && // Tab separated
-					numOfFields[iSep] == 4 && // Four fields
-					fieldTypes[0] == 1 && // Integer OSM Node ID
-					(fieldTypes[1] == 1 || fieldTypes[1] == 2) && // Numeric
-																	// longitude
-					(fieldTypes[2] == 1 || fieldTypes[2] == 2) && // Numeric
-																	// latitude
-					fieldTypes[3] == 5) { // Pig Map
-				return OSMPoint.class.getName();
-			}
-		}
-
-		// Could not detect shape type. Return null.
-		return null;
+    // Regular expressions for expected columns.
+    // Notice that the regular expressions do not have to be very accurate
+    // as we are just guessing anyway
+    final Pattern[] TypesRegex = {
+        null, // Not yet detected
+        Pattern.compile("(-|\\+)?\\d+"), // Integer
+        Pattern.compile("(-|\\+)?(\\d*\\.\\d*|\\d+)(E(-|\\+)\\d+)?"), // Float
+        Pattern.compile("(POINT|MULTIPOINT|POLYGON|MULTIPOLYGON|LINESTRING|"
+            + "MULTILINESTRING|GEOMETRYCOLLECTION|EMPTY|GEOMETRY)"
+            + "[\\(\\),\\d\\-\\+E\\.\\s]*"), // Well-Known Text
+        Pattern.compile("(\\{\"[^\"]+\"=\"[^\"]+\"\\})*"), // JSON map
+        Pattern.compile("\\[(\\w+\\#\\w+,)*(\\w+\\#\\w+)?\\]"), // Pig Map
+    };
+    
+    for (int iSep = 0; iSep < Separators.length; iSep++) {
+      if (numOfFields[iSep] == -1)
+        continue;
+      // For each matched separator
+      // Try to detect the type of each column
+      int[] fieldTypes = new int[numOfFields[iSep]];
+      for (String line : lines) {
+        // For each line, try to detect the type of each field
+        String[] fieldValues = line.split(""+Separators[iSep]);
+        for (int iField = 0; iField < fieldValues.length; iField++) {
+          if (fieldTypes[iField] == -1)
+            continue; // A conflicting field, no need to check
+          // Try to detect the type of this field using possible regular expressions
+          boolean matched = false;
+          for (int iType = 1; iType < TypesRegex.length && !matched; iType++) {
+            if (matched = TypesRegex[iType].matcher(fieldValues[iField]).matches()) {
+              // Matches a regular expression
+              if (fieldTypes[iField] == 0)
+                fieldTypes[iField] = iType;
+              else if (fieldTypes[iField] != iType) {
+                if (fieldTypes[iField] == 1 && iType == 2)
+                  fieldTypes[iField] = 2;
+                else if (fieldTypes[iField] <= 2 && iType > 2 ||
+                    fieldTypes[iField] > 2 && iType <= 2)
+                  fieldTypes[iField] = -1; // Mark field as conflicted
+              }
+            }
+          }
+        }
+      }
+      // Now, time to make a decision
+      if (iSep == 0 && // Comma separated
+          numOfFields[iSep] == 2 && // Two fields
+          (fieldTypes[0] == 1 || fieldTypes[0] == 2) &&
+          (fieldTypes[1] == 2 || fieldTypes[1] == 2)) {
+        // Two fields, separated by comma, and both are numeric
+        return "point";
+      } else if (iSep == 0 && // Comma separated
+          numOfFields[iSep] == 4 && // Four fields
+          (fieldTypes[0] == 1 || fieldTypes[0] == 2) &&
+          (fieldTypes[1] == 1 || fieldTypes[1] == 2) &&
+          (fieldTypes[2] == 1 || fieldTypes[2] == 2) &&
+          (fieldTypes[3] == 1 || fieldTypes[3] == 2)) {
+        // Four fields, separated by commas, and all are numeric
+        return "rectangle";
+      } else if (iSep == 0 && // Comma
+          numOfFields[iSep] == 9 &&
+          fieldTypes[0] == 1 && // Integer EdgeID
+          fieldTypes[1] == 1 && // Integer StartNodeID
+          (fieldTypes[2] == 1 || fieldTypes[2] == 2) && // Longitude
+          (fieldTypes[3] == 1 || fieldTypes[3] == 2) && // Latitude
+          fieldTypes[4] == 1 && // Integer EndNodeID
+          (fieldTypes[5] == 1 || fieldTypes[5] == 2) && // Longitude
+          (fieldTypes[6] == 1 || fieldTypes[6] == 2) && // Latitude
+          fieldTypes[7] == 1 && // IntegerWayID
+          fieldTypes[8] == 4) { // JSON Map
+        return OSMEdge.class.getName();
+      } else if (iSep == 1 && // Tab separated
+          numOfFields[iSep] == 3 && // Three fields
+          fieldTypes[0] == 1 && // Integer OSM Polygon ID
+          fieldTypes[1] == 3 && // WKT
+          fieldTypes[2] == 5) { // Pig Map
+        return "osm";
+      } else if (iSep == 1 && // Tab separated
+          numOfFields[iSep] == 4 && // Four fields
+          fieldTypes[0] == 1 && // Integer OSM Node ID
+          (fieldTypes[1] == 1 || fieldTypes[1] == 2) && // Numeric longitude
+          (fieldTypes[2] == 1 || fieldTypes[2] == 2) && // Numeric latitude
+          fieldTypes[3] == 5) { // Pig Map
+        return OSMPoint.class.getName();
+      }
+    }
+    
+    // Could not detect shape type. Return null.
+	  return null;
 	}
 
 	/**
@@ -897,13 +860,10 @@ public class OperationsParams extends Configuration {
 	 * 
 	 * @return <code>true</code> to run in local mode, <code>false</code> to run
 	 *         in MapReduce mode.
-	 * @throws IOException
-	 *             If the underlying job fails with an IOException
-	 * @throws InterruptedException
-	 *             If the underlying job was interrupted
+	 * @throws IOException If the underlying job fails with an IOException 
+	 * @throws InterruptedException If the underlying job was interrupted
 	 */
-	public static boolean isLocal(Configuration jobConf, Path... input)
-			throws IOException, InterruptedException {
+	public static boolean isLocal(Configuration jobConf, Path... input) throws IOException, InterruptedException {
 		final boolean LocalProcessing = true;
 		final boolean MapReduceProcessing = false;
 
@@ -946,7 +906,7 @@ public class OperationsParams extends Configuration {
 		}
 	}
 
-	public void clearAllPaths() {
-		this.allPaths = null;
-	}
+  public void clearAllPaths() {
+    this.allPaths = null;
+  }
 }

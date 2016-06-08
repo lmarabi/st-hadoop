@@ -8,7 +8,6 @@
 *************************************************************************/
 package edu.umn.cs.spatialHadoop.io;
 
-
 import org.apache.hadoop.io.Text;
 
 /**

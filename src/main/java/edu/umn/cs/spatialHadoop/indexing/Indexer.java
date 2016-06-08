@@ -354,7 +354,7 @@ public class Indexer {
       inputMBR = FileMBR.fileMBR(inPath, new OperationsParams(conf));
       OperationsParams.setShape(conf, "mbr", inputMBR);
     }
-    //Read  Sample and then index -- louai 
+    
     setLocalIndexer(conf, sindex);
     final Partitioner partitioner = createPartitioner(inPath, outPath, conf, sindex);
 
@@ -448,12 +448,13 @@ public class Indexer {
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
-	  args = new String[5];
-	  args[0] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-tweet";
-	  args[1] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-partition";
-	  args[2] = "sindex:str";
-	  args[3] = "shape:edu.umn.cs.spatialHadoop.core.Tweets"; // time 
-	  args[4] = "-overwrite";
+//	args = new String[5];
+//    args[0] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-tweet";
+//    args[1] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-test-partition";
+//    args[2] = "sindex:str";
+//    args[3] = "shape:edu.umn.cs.spatialHadoop.core.TemporalTweets";
+//    args[4] = "-overwrite";
+	  
     OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
     
     if (!params.checkInputOutput(true)) {
