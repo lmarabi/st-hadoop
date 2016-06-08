@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: edu.umn.cs.spatialHadoop.visualization.MultilevelPlotTest
 -------------------------------------------------------------------------------
-Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 18.34 sec
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 16.854 sec

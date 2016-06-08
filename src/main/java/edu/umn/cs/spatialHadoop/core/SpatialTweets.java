@@ -25,8 +25,19 @@ public class SpatialTweets extends Point {
 
 	public SpatialTweets(String text) {
 		String[] list = text.toString().split(",");
-		created_at = Long.parseLong(list[0]);
-		super.fromText(new Text(list[1] + "," + list[2]));
+		if (list.length == 3) {
+			try {
+				created_at = Long.parseLong(list[0]);
+				x = Double.parseDouble(list[1]);
+				y = Double.parseDouble(list[2]);
+			} catch (NumberFormatException exception) {
+				created_at = (long) 0;
+				x = 0.0;
+				y = 0.0;
+				exception.printStackTrace();
+			}
+			super.fromText(new Text(x + "," + y));
+		}
 	}
 
 	@Override
@@ -52,9 +63,18 @@ public class SpatialTweets extends Point {
 	@Override
 	public void fromText(Text text) {
 		String[] list = text.toString().split(",");
-		System.out.println("\n>>>>>>>>>> " + text.toString());
-		created_at = Long.parseLong(list[0]);
-		super.fromText(new Text(list[1] + "," + list[2]));
+		if (list.length == 3) {
+			// System.out.println("\n>>>>>>>>>> " + text.toString());
+			try {
+				created_at = Long.parseLong(list[0]);
+				x = Double.parseDouble(list[1]);
+				y = Double.parseDouble(list[2]);
+			} catch (NumberFormatException exception) {
+				created_at = (long) 0;
+				exception.printStackTrace();
+			}
+			super.fromText(new Text(x + "," + y));
+		}
 	}
 
 	@Override

@@ -56,7 +56,7 @@ import edu.umn.cs.spatialHadoop.operations.Sampler;
 import edu.umn.cs.spatialHadoop.util.FileUtil;
 
 /**
- * @author Ahmed Eldawy
+ * @author Ahmed Eldawy + louai Alarabi
  *
  */
 public class Indexer {
@@ -77,10 +77,12 @@ public class Indexer {
     PartitionerClasses.put("zcurve", ZCurvePartitioner.class);
     PartitionerClasses.put("hilbert", HilbertCurvePartitioner.class);
     PartitionerClasses.put("kdtree", KdTreePartitioner.class);
+    PartitionerClasses.put("btr", BTRPartitioner.class);
     
     PartitionerReplicate = new HashMap<String, Boolean>();
     PartitionerReplicate.put("grid", true);
     PartitionerReplicate.put("str", false);
+    PartitionerReplicate.put("btr", false);
     PartitionerReplicate.put("str+", true);
     PartitionerReplicate.put("rtree", false);
     PartitionerReplicate.put("r+tree", true);
@@ -141,6 +143,7 @@ public class Indexer {
           });
         } else {
           partitionID.set(partitioner.overlapPartition(shape));
+//          System.out.println("shape "+shape.toString()+"  intersect("+partitionID.get()+")");
           if (partitionID.get() >= 0)
             context.write(partitionID, shape);
         }
@@ -309,7 +312,7 @@ public class Indexer {
       LOG.info("Partitioning the space into "+numPartitions+" partitions with capacity of "+partitionCapacity);
 
       partitioner.createFromPoints(inMBR, sample.toArray(new Point[sample.size()]), partitionCapacity);
-      
+      LOG.info("After Create The Partition Counts(part): "+partitioner.getPartitionCount());
       return partitioner;
     } catch (InstantiationException e) {
       e.printStackTrace();
@@ -449,12 +452,12 @@ public class Indexer {
    */
   public static void main(String[] args) throws Exception {
 //	args = new String[5];
-//    args[0] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-tweet";
-//    args[1] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-test-partition";
-//    args[2] = "sindex:str";
+//    args[0] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-extract/";
+//    args[1] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-Spatial-partition";
+//    args[2] = "sindex:btr";
 //    args[3] = "shape:edu.umn.cs.spatialHadoop.core.TemporalTweets";
 //    args[4] = "-overwrite";
-	  
+//	  
     OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
     
     if (!params.checkInputOutput(true)) {
