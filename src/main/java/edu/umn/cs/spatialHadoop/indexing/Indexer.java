@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -143,7 +144,7 @@ public class Indexer {
           });
         } else {
           partitionID.set(partitioner.overlapPartition(shape));
-//          System.out.println("shape "+shape.toString()+"  intersect("+partitionID.get()+")");
+          //System.out.println("shape "+shape.toString()+"  intersect("+partitionID.get()+")");
           if (partitionID.get() >= 0)
             context.write(partitionID, shape);
         }
@@ -312,7 +313,6 @@ public class Indexer {
       LOG.info("Partitioning the space into "+numPartitions+" partitions with capacity of "+partitionCapacity);
 
       partitioner.createFromPoints(inMBR, sample.toArray(new Point[sample.size()]), partitionCapacity);
-      LOG.info("After Create The Partition Counts(part): "+partitioner.getPartitionCount());
       return partitioner;
     } catch (InstantiationException e) {
       e.printStackTrace();
@@ -412,26 +412,29 @@ public class Indexer {
     FileSystem outFs = outPath.getFileSystem(params);
     Path wktPath = new Path(outPath, "_"+sindex+".wkt");
     PrintStream wktOut = new PrintStream(outFs.create(wktPath));
-    wktOut.println("ID\tBoundaries\tRecord Count\tSize\tFile name");
+    wktOut.println("ID\tBoundaries\tRecord Count\tSize\tFile name\tStartDay\tEndDay");
     Text tempLine = new Text2();
     Partition tempPartition = new Partition();
     LineReader in = new LineReader(outFs.open(masterPath));
     while (in.readLine(tempLine) > 0) {
       tempPartition.fromText(tempLine);
-      wktOut.println(tempPartition.toWKT());
+      Date starttime = new Date((long)(tempPartition.x1));
+      Date endtime = new Date((long)(tempPartition.x2));
+      wktOut.println(tempPartition.toWKT()+"\t"+starttime.toString()+"\t"+endtime.toString());
     }
     in.close();
     wktOut.close();
+    
   }
   
   public static Job index(Path inPath, Path outPath, OperationsParams params)
       throws IOException, InterruptedException, ClassNotFoundException {
-    if (OperationsParams.isLocal(new JobConf(params), inPath)) {
+//    if (OperationsParams.isLocal(new JobConf(params), inPath)) {
       indexLocal(inPath, outPath, params);
       return null;
-    } else {
-      return indexMapReduce(inPath, outPath, params);
-    }
+//    } else {
+//      return indexMapReduce(inPath, outPath, params);
+//    }
   }
 
   protected static void printUsage() {
@@ -451,12 +454,12 @@ public class Indexer {
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
-//	args = new String[5];
-//    args[0] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-extract/";
-//    args[1] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-Spatial-partition";
-//    args[2] = "sindex:btr";
-//    args[3] = "shape:edu.umn.cs.spatialHadoop.core.TemporalTweets";
-//    args[4] = "-overwrite";
+	args = new String[5];
+    args[0] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-extract/";
+    args[1] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-spatial-partition/";
+    args[2] = "sindex:str";
+    args[3] = "shape:edu.umn.cs.spatialHadoop.core.SpatialTweets";
+    args[4] = "-overwrite";
 //	  
     OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
     
