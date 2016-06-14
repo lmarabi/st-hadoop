@@ -429,12 +429,12 @@ public class Indexer {
   
   public static Job index(Path inPath, Path outPath, OperationsParams params)
       throws IOException, InterruptedException, ClassNotFoundException {
-//    if (OperationsParams.isLocal(new JobConf(params), inPath)) {
+    if (OperationsParams.isLocal(new JobConf(params), inPath)) {
       indexLocal(inPath, outPath, params);
       return null;
-//    } else {
-//      return indexMapReduce(inPath, outPath, params);
-//    }
+    } else {
+      return indexMapReduce(inPath, outPath, params);
+    }
   }
 
   protected static void printUsage() {
@@ -454,12 +454,12 @@ public class Indexer {
    * @throws Exception
    */
   public static void main(String[] args) throws Exception {
-	args = new String[5];
-    args[0] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-extract/";
-    args[1] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-spatial-partition/";
-    args[2] = "sindex:str";
-    args[3] = "shape:edu.umn.cs.spatialHadoop.core.SpatialTweets";
-    args[4] = "-overwrite";
+//	args = new String[5];
+//    args[0] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-extract/";
+//    args[1] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/st-spatial-partition/";
+//    args[2] = "sindex:btr";
+//    args[3] = "shape:edu.umn.cs.spatialHadoop.core.STPoint";
+//    args[4] = "-overwrite";
 //	  
     OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
     

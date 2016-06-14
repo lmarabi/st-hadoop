@@ -27,7 +27,7 @@ import edu.umn.cs.spatialHadoop.core.Shape;
 
 /**
  * A partitioner that partitioner data using the STR bulk loading algorithm.
- * @author Ahmed Eldawy
+ * @author Louai Alarabi
  *
  */
 public class BTRPartitioner extends Partitioner {
