@@ -28,8 +28,8 @@ public class TemporalTweets extends Point{
 	  public String language;
 	  public String osystem;
 	  public int priority;
-	  public double x; 
-	  public double y;
+//	  public double x; 
+//	  public double y;
 	  
 	  public TemporalTweets() {
 		// TODO Auto-generated constructor stub
@@ -45,11 +45,13 @@ public class TemporalTweets extends Point{
 		  follower_count = Integer.parseInt(list[5]);
 		  language = list[6];
 		  osystem = list[7];
-		  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		  Long tempTime = sdf.parse(created_at).getTime();
-		  x = tempTime.doubleValue();
-		  y = 0; 
-		  super.fromText(new Text(x+","+y));
+//		  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//		  Long tempTime = sdf.parse(created_at).getTime();
+//		  x = tempTime.doubleValue();
+//		  y = 0; 
+//		  super.fromText(new Text(x+","+y));
+		  super.fromText(new Text(list[8]+","+list[9]));
+
 	}
 	
 
@@ -111,17 +113,17 @@ public class TemporalTweets extends Point{
 	  follower_count = Integer.parseInt(list[5]);
 	  language = list[6];
 	  osystem = list[7];
-	  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-	  Long tempTime = (long) 0;
-	try {
-		tempTime = sdf.parse(created_at).getTime();
-	} catch (ParseException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	  x = tempTime.doubleValue();
-	  y = 0; 
-	  super.fromText(new Text(x+","+y));
+//	  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//	  Long tempTime = (long) 0;
+//	try {
+//		tempTime = sdf.parse(created_at).getTime();
+//	} catch (ParseException e) {
+//		// TODO Auto-generated catch block
+//		e.printStackTrace();
+//	}
+//	  x = tempTime.doubleValue();
+//	  y = 0; 
+	  super.fromText(new Text(list[8]+","+list[9]));
 	  
   }
 
