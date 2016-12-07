@@ -11,6 +11,7 @@ package edu.umn.cs.spatialHadoop.operations;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ProgramDriver;
 
+import edu.umn.cs.STHadoop.TimeSlicing;
 import edu.umn.cs.spatialHadoop.RandomSpatialGenerator;
 import edu.umn.cs.spatialHadoop.ReadFile;
 import edu.umn.cs.spatialHadoop.indexing.Indexer;
@@ -133,6 +134,9 @@ public class Main {
           "Run Hadoopviz Server");
       
       pgd.addClass("mplot", MagickPlot.class, "Plot using ImageMagick");
+      
+      // STHadoop
+      pgd.addClass("timeslicing", TimeSlicing.class, "Time-based slicing");
       
       pgd.driver(args);
       

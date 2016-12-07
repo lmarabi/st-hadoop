@@ -37,7 +37,6 @@ import edu.umn.cs.spatialHadoop.OperationsParams;
 import edu.umn.cs.spatialHadoop.core.Point;
 import edu.umn.cs.spatialHadoop.core.Rectangle;
 import edu.umn.cs.spatialHadoop.core.ResultCollector;
-import edu.umn.cs.spatialHadoop.core.STPoint;
 import edu.umn.cs.spatialHadoop.core.Shape;
 import edu.umn.cs.spatialHadoop.io.Text2;
 import edu.umn.cs.spatialHadoop.io.TextSerializable;
@@ -84,7 +83,7 @@ public class STSampler {
 	      if (inObj.getClass() == outObj.getClass()) {
 	        conversion = Conversion.None;
 	      } else {
-	        if (inObj instanceof Shape && outObj instanceof STPoint) {
+	        if (inObj instanceof Shape && outObj instanceof Point) {
 	          inShape = (Shape) inObj;
 	          conversion = Conversion.ShapeToPoint;
 	        } else if (inObj instanceof Shape && outObj instanceof Rectangle) {
@@ -557,7 +556,7 @@ public class STSampler {
 		  
 			args = new String[3];
 		    args[0] = "/export/scratch/louai/scratch1/workspace/dataset/sthadoop/input";
-		    args[1] = "shape:edu.umn.cs.STHadoop.TemporalTweets";
+		    args[1] = "shape:edu.umn.cs.STHadoop.STpointsTweets";//"shape:edu.umn.cs.STHadoop.TemporalTweets";
 		    args[2] = "ratio:0.1";
 		  
 	    OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
