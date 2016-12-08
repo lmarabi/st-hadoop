@@ -20,7 +20,6 @@ import edu.umn.cs.spatialHadoop.io.TextSerializerHelper;
  */
 public class STpointsTweets extends STPoint{
 	private static final Log LOG = LogFactory.getLog(STpointsTweets.class);
-	  public String created_at;
 	  public long tweet_id;
 	  public long user_id;
 	  public String screen_name;
@@ -134,6 +133,19 @@ public class STpointsTweets extends STPoint{
     c.osystem = this.osystem;
     super.set(x, y,time);
     return c;
+  }
+  
+  public static void main(String[] args){
+	  String temp = "2015-10-25 01:18,658165748653690882,375915680,beckyfinnz,got me daytrippin' #estelle #kaskade  #roomies #waiting @ Pier 94 https://t.co/INiCDwlbjG,437,en,Instagram,40.76971376,-73.99460931"; 
+	  try {
+		STpointsTweets point = new STpointsTweets(temp);
+		STPoint point3d  = (STPoint) point;
+		System.out.println(point.time);
+		System.out.println(point3d.time);
+	} catch (ParseException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
   }
 
 }

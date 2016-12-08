@@ -24,29 +24,36 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 import edu.umn.cs.spatialHadoop.OperationsParams;
+import edu.umn.cs.spatialHadoop.core.Shape;
+import edu.umn.cs.spatialHadoop.io.Text2;
+import edu.umn.cs.spatialHadoop.io.TextSerializable;
 
 /**
  * Driver
+ * 
  * @author louai
  *
  */
 
 public class TimeSlicing {
-
 	
-	public static int timeslicing(Path input, Path output, String timeFormat) throws Exception {
-		
+	Shape inshape; 
+
+	public static int timeslicing(Path input, Path output, String timeFormat,
+			OperationsParams params) throws Exception {
+
 		Configuration conf = new Configuration();
 		conf.set("time", timeFormat);
 		Job job = new Job(conf);
+	
 		FileSystem outfs = output.getFileSystem(conf);
 		outfs.delete(output, true);
-		job.setJobName("MultipleOutputs example");
+		job.setJobName("TimeSlicing-index");
 		job.setJarByClass(TimeSlicing.class);
 		LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
 		FileInputFormat.setInputPaths(job, input);
 		FileOutputFormat.setOutputPath(job, output);
-		
+
 		job.setMapperClass(MapperFormatMultiOutput.class);
 		job.setMapOutputKeyClass(Text.class);
 		job.setReducerClass(ReducerFormatMultiOutput.class);
@@ -56,7 +63,7 @@ public class TimeSlicing {
 		boolean success = job.waitForCompletion(true);
 		return success ? 0 : 1;
 	}
-	
+
 	private static void printUsage() {
 		System.out.println("TimeBased Slicing");
 		System.out.println("Parameters (* marks required parameters):");
@@ -69,140 +76,97 @@ public class TimeSlicing {
 	}
 
 	public static void main(String[] args) throws Exception {
-//		args = new String[3];
-//		args[0] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/temporalSlice/input/2015-random/input1";
-//		args[1] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/temporalSlice/output/"; 
-//		args[2] = "time:yyyy-MM";
+		args = new String[4];
+		args[0] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/temporalSlice/input/2015-random/input1";
+		args[1] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/temporalSlice/output/";
+		args[2] = "shape:edu.umn.cs.STHadoop.STPointTweets";
+		args[3] = "time:yyyy-MM";
 		OperationsParams params = new OperationsParams(
 				new GenericOptionsParser(args));
 		Path inputPath = params.getInputPath();
 		Path outputPath = params.getOutputPath();
 		String timeFormat = params.get("time");
-		int exitCode = timeslicing(inputPath, outputPath, timeFormat); 
+		int exitCode = timeslicing(inputPath, outputPath, timeFormat, params);
 		System.exit(exitCode);
 	}
-}
 
+	/**
+	 * Mapper
+	 * 
+	 * @author louai
+	 *
+	 */
+	class MapperFormatMultiOutput extends
+			Mapper<LongWritable, Text, Text, Text> {
 
-/*
+		private Text txtKey = new Text("");
+		private SimpleDateFormat sdf;// = new SimpleDateFormat("yyyy-MM-dd");
 
-public class DriverFormatMultiOutput extends Configured implements Tool {
+		@Override
+		public void map(LongWritable key, Text value, Context context)
+				throws IOException, InterruptedException {
 
-	@Override
-	public int run(String[] args) throws Exception {
+			String time = context.getConfiguration().get("time");
 
-		if (args.length != 3) {
-			System.out
-					.printf("Two parameters are required for DriverFormatMultiOutput- <input dir> <output dir> <time-format>\n");
-			return -1;
-		}
-		Path inputDir = new Path(args[0]);
-		Path OutputDir = new Path(args[1]); 
-		String timeFormat = args[2];
-		
-		Configuration conf = getConf(); 
-		conf.set("time", timeFormat);
-		Job job = new Job(conf);
-		FileSystem outfs = OutputDir.getFileSystem(getConf());
-		outfs.delete(OutputDir, true);
-		job.setJobName("MultipleOutputs example");
-		job.setJarByClass(DriverFormatMultiOutput.class);
-		LazyOutputFormat.setOutputFormatClass(job, TextOutputFormat.class);
-		FileInputFormat.setInputPaths(job, inputDir);
-		FileOutputFormat.setOutputPath(job, OutputDir);
-		
-		job.setMapperClass(MapperFormatMultiOutput.class);
-		job.setMapOutputKeyClass(Text.class);
-		job.setReducerClass(ReducerFormatMultiOutput.class);
-		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(Text.class);
+			sdf = new SimpleDateFormat(time);
+			if (value.toString().contains(",")) {
+				String keyDate = "unkown";
+				try {
 
-		boolean success = job.waitForCompletion(true);
-		return success ? 0 : 1;
-	}
+					Date date;
 
-	public static void main(String[] args) throws Exception {
-//		args = new String[2];
-//		args[0] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/temporalSlice/input/2015-random/input1";
-//		args[1] = "/export/scratch/louai/scratch1/workspace/dataset/idea-stHadoop/data/temporalSlice/output/"; 
-		int exitCode = ToolRunner.run(new Configuration(),
-				new DriverFormatMultiOutput(), args);
-		System.exit(exitCode);
-	}
-}
-
-*/
-
-/**
- * Mapper 
- * @author louai
- *
- */
-class MapperFormatMultiOutput extends Mapper<LongWritable, Text, Text, Text> {
-
-	private Text txtKey = new Text("");
-	private SimpleDateFormat sdf ;//= new SimpleDateFormat("yyyy-MM-dd");
-
-	@Override
-	public void map(LongWritable key, Text value, Context context)
-			throws IOException, InterruptedException {
-
-		String time = context.getConfiguration().get("time");
-		sdf = new SimpleDateFormat(time);
-		if (value.toString().contains(",")) {
-			String keyDate = "unkown";
-			try {
-				
-				Date date;
-				String temp = value.toString().substring(0,
-						(value.toString().indexOf(",")));
-				date = sdf.parse(temp);
-				keyDate = sdf.format(date);
-				keyDate = keyDate.replace(":", "-");
-				keyDate = keyDate.replace(" ", "-");
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch ( IndexOutOfBoundsException e){
-				e.printStackTrace();
+					String temp = value.toString().substring(0,
+							(value.toString().indexOf(",")));
+					date = sdf.parse(temp);
+					keyDate = sdf.format(date);
+					keyDate = keyDate.replace(":", "-");
+					keyDate = keyDate.replace(" ", "-");
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IndexOutOfBoundsException e) {
+					e.printStackTrace();
+				}
+				txtKey = new Text(sdf.toPattern() + "/" + keyDate + "/data");
+				context.write(txtKey, value);
 			}
-			txtKey = new Text(sdf.toPattern()+"/"+keyDate+ "/data");
-			context.write(txtKey, value);
-		}
-
-	}
-}
-
-/**
- * Reducer 
- * @author louai
- *
- */
-class ReducerFormatMultiOutput extends Reducer<Text, Text, Text, Text> {
-
-	private MultipleOutputs<Object, Text> mos;
-
-	@Override
-	protected void setup(Context context) throws IOException,
-			InterruptedException {
-		mos = new MultipleOutputs(context);
-
-	}
-
-	@Override
-	public void reduce(Text key, Iterable<Text> values, Context context)
-			throws IOException, InterruptedException {
-
-		for (Text value : values) {
-			mos.write(NullWritable.get(), value, key.toString());
 
 		}
 	}
 
-	@Override
-	protected void cleanup(Context context) throws IOException,
-			InterruptedException {
-		mos.close();
+	/**
+	 * Reducer
+	 * 
+	 * @author louai
+	 *
+	 */
+	class ReducerFormatMultiOutput extends Reducer<Text, Text, Text, Text> {
+
+		private MultipleOutputs<Object, Text> mos;
+
+		@Override
+		protected void setup(Context context) throws IOException,
+				InterruptedException {
+			mos = new MultipleOutputs(context);
+
+		}
+
+		@Override
+		public void reduce(Text key, Iterable<Text> values, Context context)
+				throws IOException, InterruptedException {
+
+			for (Text value : values) {
+				mos.write(NullWritable.get(), value, key.toString());
+
+			}
+		}
+
+		@Override
+		protected void cleanup(Context context) throws IOException,
+				InterruptedException {
+			mos.close();
+		}
+
 	}
 
 }
