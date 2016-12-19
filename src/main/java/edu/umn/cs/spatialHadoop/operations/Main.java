@@ -140,7 +140,7 @@ public class Main {
       // STHadoop
       pgd.addClass("timeslicing", TimeSlicing.class, "Time-based slicing");
       // This is for time manager to check indexes
-      pgd.addClass("STManager", STIndexManager.class,"STManager");
+      pgd.addClass("stmanager", STIndexManager.class,"STManager");
       
       pgd.driver(args);
       
