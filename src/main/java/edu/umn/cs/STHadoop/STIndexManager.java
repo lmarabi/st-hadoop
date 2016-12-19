@@ -60,7 +60,7 @@ public class STIndexManager {
 			sliceHomePath = new Path(this.datasetPath.toString() + "/"
 					+ this.timeFormat.getSimpleDateFormat());
 
-			// initializeIndexesHierarchy();
+			 initializeIndexesHierarchy();
 
 			existIndexes = new HashMap<String, Boolean>();
 
@@ -94,6 +94,7 @@ public class STIndexManager {
 	private void loadExistIndexesDictionary() throws IOException,
 			ParseException {
 		// load exist indexes.
+		
 		FileStatus[] indexesFiles = fileSystem.listStatus(indexesHomePath);
 		for (FileStatus index : indexesFiles) {
 			if (index.isDirectory()) {
