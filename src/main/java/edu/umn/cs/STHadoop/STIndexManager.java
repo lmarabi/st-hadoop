@@ -152,26 +152,9 @@ public class STIndexManager {
 
 	public static void main(String[] args) throws IOException, ParseException {
 		// Parse parameters
-		OperationsParams params = new OperationsParams(
-				new GenericOptionsParser(args));
-		final Path[] paths = params.getPaths();
-		if (paths.length <= 1 && !params.checkInput()) {
-			printUsage();
-			System.exit(1);
-		}
-		if (paths.length >= 2 && paths[1] == null) {
-			printUsage();
-			System.exit(1);
-		}
-		if (params.get("time") == null) {
-			System.err.println("You must provide a time range");
-			printUsage();
-			System.exit(1);
-		}
-
-		Path datasetPath = paths[0]; // dataset path
-		Path indexesPath = paths[1]; // index path
-		String time = params.get("time"); // time range
+		Path datasetPath = new Path(args[0]); // dataset path
+		Path indexesPath = new Path(args[1]); // index path
+		String time = args[2].substring(args[2].indexOf(':')+1, args[2].length()); // time range
 
 		STIndexManager temporalIndexManager = new STIndexManager(datasetPath,
 				indexesPath, time);
