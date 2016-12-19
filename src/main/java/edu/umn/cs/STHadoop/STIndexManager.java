@@ -17,6 +17,7 @@ import org.apache.hadoop.util.GenericOptionsParser;
 
 import edu.umn.cs.STHadoop.TimeFormatST.TimeFormatEnum;
 import edu.umn.cs.spatialHadoop.OperationsParams;
+import edu.umn.cs.spatialHadoop.operations.Repartition;
 
 /***
  * This index manager will check will play a role in spatio-temporal index
@@ -94,12 +95,9 @@ public class STIndexManager {
 	private void loadExistIndexesDictionary() throws IOException,
 			ParseException {
 		// load exist indexes.
-		
 		FileStatus[] indexesFiles = fileSystem.listStatus(indexesHomePath);
 		for (FileStatus index : indexesFiles) {
 			if (index.isDirectory()) {
-				System.out.println("The indexName: "
-						+ index.getPath().getName());
 				existIndexes.put(index.getPath().getName(), true);
 			}
 		}
@@ -108,7 +106,7 @@ public class STIndexManager {
 		FileStatus[] sliceFiles = fileSystem.listStatus(sliceHomePath);
 		for (FileStatus slice : sliceFiles) {
 			if (slice.isDirectory()) {
-				System.out.println("The SliceName: "
+				System.out.println("The SliceName Found: "
 						+ slice.getPath().getName());
 				if (!existIndexes.containsKey(slice.getPath().getName())) {
 					existIndexes.put(slice.getPath().getName(), false);
@@ -153,15 +151,29 @@ public class STIndexManager {
 
 	public static void main(String[] args) throws IOException, ParseException {
 		// Parse parameters
-		Path datasetPath = new Path(args[0]); // dataset path
-		Path indexesPath = new Path(args[1]); // index path
-		String time = args[2].substring(args[2].indexOf(':')+1, args[2].length()); // time range
-
+		OperationsParams params = new OperationsParams(
+				new GenericOptionsParser(args));
+		Path datasetPath = params.getInputPath();
+		Path indexesPath = params.getOutputPath();
+		if (params.get("time") == null) {
+			printUsage();
+		}
+		
+		String time = params.get("time");
+		
 		STIndexManager temporalIndexManager = new STIndexManager(datasetPath,
 				indexesPath, time);
 		String[] list = temporalIndexManager.getNeedToBuildIndexes();
 		for(String temp :list){
 			System.out.println("Need to build This index: "+temp);
+			Path inFile = new Path(temporalIndexManager.sliceHomePath+"/"+temp);
+			Path outputPath = new Path(temporalIndexManager.indexesHomePath+"/"+temp);
+			try {
+				Repartition.repartition(inFile, outputPath, params);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 	}
