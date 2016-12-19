@@ -11,6 +11,7 @@ package edu.umn.cs.spatialHadoop.operations;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ProgramDriver;
 
+import edu.umn.cs.STHadoop.STIndexManager;
 import edu.umn.cs.STHadoop.TimeSlicing;
 import edu.umn.cs.STHadoop.TimeSlicing;
 import edu.umn.cs.spatialHadoop.RandomSpatialGenerator;
@@ -138,6 +139,8 @@ public class Main {
       
       // STHadoop
       pgd.addClass("timeslicing", TimeSlicing.class, "Time-based slicing");
+      // This is for time manager to check indexes
+      pgd.addClass("STManager", STIndexManager.class,"STManager");
       
       pgd.driver(args);
       
