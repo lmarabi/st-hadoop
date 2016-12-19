@@ -137,6 +137,25 @@ public class STIndexManager {
 		}
 		return result;
 	}
+	
+	/**
+	 * This method physically create spatialPartition for each temporal slice. 
+	 * @throws IOException 
+	 */
+	private void repartitionResolution(OperationsParams params) throws IOException{
+		String[] list = this.getNeedToBuildIndexes();
+		for(String temp :list){
+			System.out.println("Need to build This index: "+temp);
+			Path inFile = new Path(sliceHomePath+"/"+temp);
+			Path outputPath = new Path(indexesHomePath+"/"+temp);
+			try {
+				Repartition.repartition(inFile, outputPath, params);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
 
 	private static void printUsage() {
 		System.out
@@ -160,21 +179,12 @@ public class STIndexManager {
 		}
 		
 		String time = params.get("time");
-		
+		// This constructor will check for what is needed to be done in the spatiotemporal index. 
 		STIndexManager temporalIndexManager = new STIndexManager(datasetPath,
 				indexesPath, time);
-		String[] list = temporalIndexManager.getNeedToBuildIndexes();
-		for(String temp :list){
-			System.out.println("Need to build This index: "+temp);
-			Path inFile = new Path(temporalIndexManager.sliceHomePath+"/"+temp);
-			Path outputPath = new Path(temporalIndexManager.indexesHomePath+"/"+temp);
-			try {
-				Repartition.repartition(inFile, outputPath, params);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		// This method physically create spatial partitions. 
+		temporalIndexManager.repartitionResolution(params);
+		
 
 	}
 
