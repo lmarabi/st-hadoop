@@ -63,7 +63,10 @@ public class STIndexManager {
 
 			// check if there is a temporal slice otherwise input dataset need
 			// to be temporaly sliced.
+			System.out.println("Slicing ..... start checking .... ");
 			temporalTimeSlicing(datasetPath, sliceHomePath, time);
+			
+			System.out.println("Init index hierarchy ...... ");
 			initializeIndexesHierarchy();
 
 			existIndexes = new HashMap<String, Boolean>();
@@ -84,6 +87,8 @@ public class STIndexManager {
 	 */
 	private void temporalTimeSlicing(Path inputdata, Path outputdata,
 			String time) throws Exception {
+		System.out.println("The input data directory: "+ inputdata.toString()+
+				"The output directory: "+ outputdata.toString());
 		// check daily folder
 		if (!this.fileSystem.exists(outputdata)) {
 			TimeSlicing.TemporalSliceMapReduce(inputdata, outputdata, time);
