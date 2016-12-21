@@ -58,7 +58,7 @@ public class STIndexManager {
 			indexesHomePath = new Path(this.indexesPath.toString() + "/"
 					+ this.timeFormat.getSimpleDateFormat());
 
-			sliceHomePath = new Path(this.datasetPath.getParent().toString() + "/slice/"
+			sliceHomePath = new Path(this.datasetPath.getParent().toString() + "slice/"
 					+ this.timeFormat.getSimpleDateFormat());
 
 			// check if there is a temporal slice otherwise input dataset need
@@ -91,7 +91,7 @@ public class STIndexManager {
 				"The output directory: "+ outputdata.toString());
 		// check daily folder
 		if (!this.fileSystem.exists(outputdata)) {
-			TimeSlicing.TemporalSliceMapReduce(inputdata, outputdata, time);
+			TimeSlicing.TemporalSliceMapReduce(inputdata, outputdata.getParent(), time);
 		}else{
 			System.out.println("The temporal sliced data exist");
 		}
