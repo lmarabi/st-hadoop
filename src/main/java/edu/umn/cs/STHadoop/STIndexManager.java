@@ -63,7 +63,7 @@ public class STIndexManager {
 
 			// check if there is a temporal slice otherwise input dataset need
 			// to be temporaly sliced.
-			temporalTimeSlicing(datasetPath, sliceHomePath.getParent(), time);
+			temporalTimeSlicing(datasetPath, sliceHomePath, time);
 			initializeIndexesHierarchy();
 
 			existIndexes = new HashMap<String, Boolean>();
