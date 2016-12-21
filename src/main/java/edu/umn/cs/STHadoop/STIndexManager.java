@@ -17,7 +17,7 @@ import org.apache.hadoop.util.GenericOptionsParser;
 
 import edu.umn.cs.STHadoop.TimeFormatST.TimeFormatEnum;
 import edu.umn.cs.spatialHadoop.OperationsParams;
-import edu.umn.cs.spatialHadoop.operations.Repartition;
+import edu.umn.cs.spatialHadoop.indexing.Indexer;
 
 /***
  * This index manager will check will play a role in spatio-temporal index
@@ -178,8 +178,11 @@ public class STIndexManager {
 			Path inFile = new Path(sliceHomePath + "/" + temp);
 			Path outputPath = new Path(indexesHomePath + "/" + temp);
 			try {
-				Repartition.repartition(inFile, outputPath, params);
+				Indexer.index(inFile, outputPath, params);
 			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
