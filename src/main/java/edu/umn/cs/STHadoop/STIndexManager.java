@@ -45,7 +45,7 @@ public class STIndexManager {
 	private HashMap<String, Boolean> existIndexes;
 
 	public STIndexManager(Path datasetPath, Path indexesPath, String time)
-			throws ParseException {
+			throws Exception {
 		try {
 			this.timeFormat = new TimeFormatST(TimeFormatEnum.valueOf(time));
 
@@ -58,10 +58,13 @@ public class STIndexManager {
 			indexesHomePath = new Path(this.indexesPath.toString() + "/"
 					+ this.timeFormat.getSimpleDateFormat());
 
-			sliceHomePath = new Path(this.datasetPath.toString() + "/"
+			sliceHomePath = new Path(this.datasetPath.toString() + "/slice/"
 					+ this.timeFormat.getSimpleDateFormat());
 
-			 initializeIndexesHierarchy();
+			// check if there is a temporal slice otherwise input dataset need
+			// to be temporaly sliced.
+			temporalTimeSlicing(datasetPath, sliceHomePath, time);
+			initializeIndexesHierarchy();
 
 			existIndexes = new HashMap<String, Boolean>();
 
@@ -71,6 +74,23 @@ public class STIndexManager {
 					+ e.getMessage());
 			e.printStackTrace();
 		}
+	}
+
+	/***
+	 * This method check if there the data is already sliced or not other wise
+	 * it will slice it.
+	 * 
+	 * @throws Exception
+	 */
+	private void temporalTimeSlicing(Path inputdata, Path outputdata,
+			String time) throws Exception {
+		// check daily folder
+		if (!this.fileSystem.exists(outputdata)) {
+			TimeSlicing.TemporalSliceMapReduce(inputdata, outputdata.getParent(), time);
+		}else{
+			System.out.println("The temporal sliced data exist");
+		}
+		
 	}
 
 	/**
@@ -115,39 +135,43 @@ public class STIndexManager {
 		}
 
 	}
-	
+
 	/**
-	 * This method return a list of paths that need to be build, which they don't exist in the index directory. 
+	 * This method return a list of paths that need to be build, which they
+	 * don't exist in the index directory.
+	 * 
 	 * @return
 	 */
-	private String[] getNeedToBuildIndexes(){
+	private String[] getNeedToBuildIndexes() {
 		List<String> needed = new ArrayList<String>();
-		//iterate over the the hashmap then return the list of non-existed paths. 
-		for(Map.Entry<String, Boolean> pair : existIndexes.entrySet()){
-			if(!pair.getValue()){
+		// iterate over the the hashmap then return the list of non-existed
+		// paths.
+		for (Map.Entry<String, Boolean> pair : existIndexes.entrySet()) {
+			if (!pair.getValue()) {
 				needed.add(pair.getKey());
 			}
 		}
-		
-		
-		// return path. 
+
+		// return path.
 		String[] result = new String[needed.size()];
-		for(int i=0; i< result.length; i++){
+		for (int i = 0; i < result.length; i++) {
 			result[i] = needed.get(i);
 		}
 		return result;
 	}
-	
+
 	/**
-	 * This method physically create spatialPartition for each temporal slice. 
-	 * @throws IOException 
+	 * This method physically create spatialPartition for each temporal slice.
+	 * 
+	 * @throws IOException
 	 */
-	private void repartitionResolution(OperationsParams params) throws IOException{
+	private void repartitionResolution(OperationsParams params)
+			throws IOException {
 		String[] list = this.getNeedToBuildIndexes();
-		for(String temp :list){
-			System.out.println("Need to build This index: "+temp);
-			Path inFile = new Path(sliceHomePath+"/"+temp);
-			Path outputPath = new Path(indexesHomePath+"/"+temp);
+		for (String temp : list) {
+			System.out.println("Need to build This index: " + temp);
+			Path inFile = new Path(sliceHomePath + "/" + temp);
+			Path outputPath = new Path(indexesHomePath + "/" + temp);
 			try {
 				Repartition.repartition(inFile, outputPath, params);
 			} catch (InterruptedException e) {
@@ -168,7 +192,7 @@ public class STIndexManager {
 		GenericOptionsParser.printGenericCommandUsage(System.out);
 	}
 
-	public static void main(String[] args) throws IOException, ParseException {
+	public static void main(String[] args) throws Exception {
 		// Parse parameters
 		OperationsParams params = new OperationsParams(
 				new GenericOptionsParser(args));
@@ -177,14 +201,15 @@ public class STIndexManager {
 		if (params.get("time") == null) {
 			printUsage();
 		}
-		
+
 		String time = params.get("time");
-		// This constructor will check for what is needed to be done in the spatiotemporal index. 
+
+		// This constructor will check for what is needed to be done in the
+		// spatiotemporal index.
 		STIndexManager temporalIndexManager = new STIndexManager(datasetPath,
 				indexesPath, time);
-		// This method physically create spatial partitions. 
+		// This method physically create spatial partitions.
 		temporalIndexManager.repartitionResolution(params);
-		
 
 	}
 
