@@ -62,7 +62,7 @@ public class STIndexManager {
 					+ this.timeFormat.getSimpleDateFormat());
 
 			// check if there is a temporal slice otherwise input dataset need
-			// to be temporaly sliced.
+			// to be temporally sliced.
 			System.out.println("Slicing ..... start checking .... ");
 			temporalTimeSlicing(datasetPath, sliceHomePath, time);
 			
