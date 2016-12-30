@@ -65,5 +65,10 @@ public class STPoint extends Point {
 		super.set(x, y);
 		return c;
 	}
+	
+	@Override
+	public String toString() {
+		return "Point: ("+x+","+y+","+time+")";
+	}
 
 }

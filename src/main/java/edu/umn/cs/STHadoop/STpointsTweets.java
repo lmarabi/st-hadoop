@@ -142,6 +142,11 @@ public class STpointsTweets extends STPoint{
 		STPoint point3d  = (STPoint) point;
 		System.out.println(point.time);
 		System.out.println(point3d.time);
+		
+		// Test casting from 3D to 2D shape.
+		Point point2D = (Point) point;
+		System.out.println("Point3D : "+point3d.toString());
+		System.out.println("Point2D : "+point2D.toString());
 	} catch (ParseException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
