@@ -23,6 +23,7 @@ import edu.umn.cs.spatialHadoop.indexing.Indexer;
 import edu.umn.cs.spatialHadoop.io.TextSerializable;
 import edu.umn.cs.spatialHadoop.operations.Sampler;
 import edu.umn.cs.spatialHadoop.util.FileUtil;
+import edu.umn.cs.sthadoop.core.STPoint;
 
 public class DataBasedSlicing {
 	private static final Log LOG = LogFactory.getLog(Indexer.class);

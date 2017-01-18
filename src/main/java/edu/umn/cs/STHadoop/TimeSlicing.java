@@ -27,10 +27,15 @@ import org.apache.hadoop.mapred.lib.MultipleTextOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 import edu.umn.cs.spatialHadoop.OperationsParams;
+import edu.umn.cs.spatialHadoop.core.Shape;
+import edu.umn.cs.spatialHadoop.io.Text2;
+import edu.umn.cs.spatialHadoop.io.TextSerializable;
+import edu.umn.cs.sthadoop.core.STPoint;
 
 public class TimeSlicing {
 
 	public static SimpleDateFormat sdf;
+	public static Shape inputShape;
 
 	static enum TimeFormat {
 		year, month, week, day, minute;
@@ -103,6 +108,14 @@ public class TimeSlicing {
 
 
 
+	/**
+	 * This method called to slice time based on time without considering the shape of the data
+	 * @param inputPath
+	 * @param outputPath
+	 * @param spaceFormat
+	 * @return
+	 * @throws Exception
+	 */
 	public static int TemporalSliceMapReduce(Path inputPath, Path outputPath, String spaceFormat) throws Exception {
 		switch (TimeFormat.valueOf(spaceFormat)) {
 		case minute:
@@ -152,6 +165,74 @@ public class TimeSlicing {
 		return 0;
 	}
 	
+	
+	/**
+	 * Consider the shape of the data when slicing the data. 
+	 * @param inputPath
+	 * @param outputPath
+	 * @param params
+	 * @return
+	 * @throws Exception
+	 */
+	public static int TemporalSliceMapReduce(Path inputPath, Path outputPath, OperationsParams params) throws Exception {
+		String spaceFormat = params.get("time");
+		switch (TimeFormat.valueOf(spaceFormat)) {
+		case minute:
+			spaceFormat = "yyyy-MM-dd HH:mm";
+			break;
+		case day:
+			spaceFormat = "yyyy-MM-dd";
+			break;
+		case week:
+			spaceFormat = "yyyy-MM-W";
+			break;
+		case month:
+			spaceFormat = "yyyy-MM";
+			break;
+		case year:
+			spaceFormat = "yyyy";
+			break;
+		default:
+			spaceFormat = "yyyy-MM-dd";
+			break;
+		}
+		sdf = new SimpleDateFormat(spaceFormat);
+		
+		JobConf conf = new JobConf(new Configuration(), TimeSlicing.class);
+		TextSerializable inObj = OperationsParams.getTextSerializable(conf, "shape", new Text2());
+		if(inObj instanceof STPoint )
+		{
+			System.out.println("Instance of STPoint !!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		}else{
+			System.out.println("Not Instance of STPoint");
+		}
+		/*
+		FileSystem outfs = outputPath.getFileSystem(conf);
+		outfs.delete(outputPath, true);
+		conf.setJobName("Temporal Space Slicing");
+		conf.set("time", spaceFormat);
+		conf.setOutputKeyClass(Text.class);
+		conf.setMapOutputKeyClass(Text.class);
+		conf.setOutputValueClass(Text.class);
+		// Mapper settings
+		conf.setMapperClass(TimeSlicing.Map.class);
+		ClusterStatus clusterStatus = new JobClient(conf).getClusterStatus();
+		conf.setNumMapTasks(10 * Math.max(1, clusterStatus.getMaxMapTasks()));
+		// Reducer Settings
+		conf.setNumReduceTasks(0);
+		conf.setReducerClass(TimeSlicing.Reduce.class);
+		conf.setCombinerClass(TimeSlicing.Reduce.class);
+
+		conf.setInputFormat(TextInputFormat.class);
+		conf.setOutputFormat(TimeSlicing.KeyBasedMultiFileOutput.class);
+
+		FileInputFormat.setInputPaths(conf, inputPath);
+		FileOutputFormat.setOutputPath(conf, outputPath);
+		JobClient.runJob(conf).waitForCompletion();
+		*/
+		return 0;
+	}
+	
 	public static void main(String[] args) throws Exception {
 		// check if arguments length is 3.
 		
@@ -169,7 +250,9 @@ public class TimeSlicing {
 			if (params.get("time") == null) {
 				printUsage();
 			}
-			TemporalSliceMapReduce(inputPath,outputPath,params.get("time"));
+			//TemporalSliceMapReduce(inputPath,outputPath,params.get("time"));
+
+			TemporalSliceMapReduce(inputPath,outputPath, params);
 
 	}
 

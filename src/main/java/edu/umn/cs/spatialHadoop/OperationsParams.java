@@ -46,6 +46,7 @@ import edu.umn.cs.spatialHadoop.operations.LocalSampler;
 import edu.umn.cs.spatialHadoop.osm.OSMEdge;
 import edu.umn.cs.spatialHadoop.osm.OSMPoint;
 import edu.umn.cs.spatialHadoop.osm.OSMPolygon;
+import edu.umn.cs.sthadoop.core.STPoint;
 
 /**
  * A class that encapsulates all parameters sent for an operations implemented
