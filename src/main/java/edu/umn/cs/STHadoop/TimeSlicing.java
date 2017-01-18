@@ -100,9 +100,11 @@ public class TimeSlicing {
 //				}
 				if (value.toString().contains(",")) {
 				Date date;
+				System.out.println(value.toString());
 				inputShape.fromText(value);
 				STPoint obj = (STPoint) inputShape;
 				String temp = obj.time;
+				System.out.println("time: "+ temp);
 				date = sdf.parse(temp);
 				keyDate = sdf.toPattern() + "/" + sdf.format(date);
 				keyDate = keyDate.replace(":", "-");
