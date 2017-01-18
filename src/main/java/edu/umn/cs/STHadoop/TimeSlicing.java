@@ -39,7 +39,7 @@ public class TimeSlicing {
 
 	private static final Log LOG = LogFactory.getLog(TimeSlicing.class);
 	public static SimpleDateFormat sdf;
-	public static Shape inputShape;
+	public Shape inputShape;
 
 	static enum TimeFormat {
 		year, month, week, day, minute;
