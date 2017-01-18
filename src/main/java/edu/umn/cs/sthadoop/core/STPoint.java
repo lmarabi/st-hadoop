@@ -52,6 +52,7 @@ public class STPoint extends Point {
 
 	@Override
 	public void fromText(Text text) {
+		System.out.println("FromText: "+text.toString());
 		String[] list = text.toString().split(",");
 		time = list[0];
 		super.fromText(new Text(list[1] + "," + list[2]));
