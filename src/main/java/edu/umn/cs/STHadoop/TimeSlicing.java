@@ -252,7 +252,8 @@ public class TimeSlicing {
 //		 args = new String[4];
 //		 args[0] = "/home/louai/nyc-taxi/yellow/output.txt";
 //		 args[1] = "/home/louai/nyc-taxi/result/" ;
-//		 args[2] = "shape:edu.umn.cs.sthadoop.core.STpointsTweets";
+//		 args[2] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+//				 //"shape:edu.umn.cs.sthadoop.core.STpointsTweets";
 //		 args[3] = "time:month";
 			OperationsParams params = new OperationsParams(
 					new GenericOptionsParser(args));
