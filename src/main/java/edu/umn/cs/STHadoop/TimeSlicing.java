@@ -36,7 +36,7 @@ import edu.umn.cs.sthadoop.core.STPoint;
 public class TimeSlicing {
 
 	public static SimpleDateFormat sdf;
-	public static STPoint inputShape;
+	public static Shape inputShape;
 
 	static enum TimeFormat {
 		year, month, week, day, minute;
@@ -101,7 +101,8 @@ public class TimeSlicing {
 				if (value.toString().contains(",")) {
 				Date date;
 				inputShape.fromText(value);
-				String temp = inputShape.time;
+				STPoint obj = (STPoint) inputShape;
+				String temp = obj.time;
 				date = sdf.parse(temp);
 				keyDate = sdf.toPattern() + "/" + sdf.format(date);
 				keyDate = keyDate.replace(":", "-");
@@ -214,7 +215,7 @@ public class TimeSlicing {
 		Shape inObj = params.getShape("shape");//OperationsParams.getTextSerializable(conf, "shape", null);
 		if(inObj instanceof STPoint )
 		{
-			//inputShape = (STPoint) inObj;
+			inputShape =  inObj;
 			FileSystem outfs = outputPath.getFileSystem(conf);
 			outfs.delete(outputPath, true);
 			conf.setJobName("Temporal Space Slicing");
