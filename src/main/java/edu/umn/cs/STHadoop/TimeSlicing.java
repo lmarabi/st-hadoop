@@ -27,17 +27,12 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.hadoop.mapred.lib.MultipleTextOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
-import org.mortbay.util.IntrospectionUtil;
-
 import edu.umn.cs.spatialHadoop.OperationsParams;
 import edu.umn.cs.spatialHadoop.core.Shape;
-import edu.umn.cs.spatialHadoop.io.Text2;
 import edu.umn.cs.spatialHadoop.io.TextSerializable;
 import edu.umn.cs.sthadoop.core.STPoint;
 
 public class TimeSlicing {
-
-	private static final Log LOG = LogFactory.getLog(TimeSlicing.class);
 	public static SimpleDateFormat sdf;
 	public static Shape inputShape;
 
@@ -59,14 +54,8 @@ public class TimeSlicing {
 				classShape = Class.forName(job.get("shape"));
 				inputShape = (Shape) classShape.newInstance();
 			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 			
 		}
@@ -118,11 +107,11 @@ public class TimeSlicing {
 //				}
 				if (value.toString().contains(",")) {
 				Date date;
-				LOG.info(value.toString());
+				System.out.println(value.toString());
 				inputShape.fromText(value);
 				STPoint obj = (STPoint) inputShape;
 				String temp = obj.time;
-				LOG.info("time: "+ temp);
+				System.out.println("time: "+ temp);
 				date = sdf.parse(temp);
 				keyDate = sdf.toPattern() + "/" + sdf.format(date);
 				keyDate = keyDate.replace(":", "-");
