@@ -39,7 +39,7 @@ public class TimeSlicing {
 
 	private static final Log LOG = LogFactory.getLog(TimeSlicing.class);
 	public static SimpleDateFormat sdf;
-	public Shape inputShape;
+	public static Shape inputShape;
 
 	static enum TimeFormat {
 		year, month, week, day, minute;
@@ -54,6 +54,21 @@ public class TimeSlicing {
 		public void configure(JobConf job) {
 			// TODO Auto-generated method stub
 			sdf = new SimpleDateFormat(job.get("time"));
+			Class<?> classShape;
+			try {
+				classShape = Class.forName(job.get("shape"));
+				inputShape = (Shape) classShape.newInstance();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 		}
 
 		@Override
@@ -217,14 +232,15 @@ public class TimeSlicing {
 		
 		JobConf conf = new JobConf(new Configuration(), TimeSlicing.class);
 //		TextSerializable inObj = params.getShape("shape");//OperationsParams.getTextSerializable(conf, "shape", null);
-		Shape inObj = params.getShape("shape");//OperationsParams.getTextSerializable(conf, "shape", null);
+		TextSerializable inObj = params.getShape("shape");//OperationsParams.getTextSerializable(conf, "shape", null);
 		if(inObj instanceof STPoint )
 		{
-			inputShape =  inObj;
+//			inputShape =  inObj;
 			FileSystem outfs = outputPath.getFileSystem(conf);
 			outfs.delete(outputPath, true);
 			conf.setJobName("Temporal Space Slicing");
 			conf.set("time", spaceFormat);
+			conf.set("shape", inObj.getClass().getName());
 			conf.setOutputKeyClass(Text.class);
 			conf.setMapOutputKeyClass(Text.class);
 			conf.setOutputValueClass(Text.class);
