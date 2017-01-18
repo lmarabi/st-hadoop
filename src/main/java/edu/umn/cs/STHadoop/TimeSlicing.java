@@ -6,6 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -35,6 +37,7 @@ import edu.umn.cs.sthadoop.core.STPoint;
 
 public class TimeSlicing {
 
+	private static final Log LOG = LogFactory.getLog(TimeSlicing.class);
 	public static SimpleDateFormat sdf;
 	public static Shape inputShape;
 
@@ -100,11 +103,11 @@ public class TimeSlicing {
 //				}
 				if (value.toString().contains(",")) {
 				Date date;
-				System.out.println(value.toString());
+				LOG.info(value.toString());
 				inputShape.fromText(value);
 				STPoint obj = (STPoint) inputShape;
 				String temp = obj.time;
-				System.out.println("time: "+ temp);
+				LOG.info("time: "+ temp);
 				date = sdf.parse(temp);
 				keyDate = sdf.toPattern() + "/" + sdf.format(date);
 				keyDate = keyDate.replace(":", "-");
