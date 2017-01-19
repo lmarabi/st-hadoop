@@ -105,7 +105,7 @@ public class TimeSlicing {
 //					keyDate = keyDate.replace(":", "-");
 //					keyDate = keyDate.replace(" ", "-");
 //				}
-				if (value.toString().contains(",") && value.toString().split(",").length >= 3) {
+				if (value.toString().contains(",")) {
 				Date date;
 				inputShape.fromText(value);
 				STPoint obj = (STPoint) inputShape;
