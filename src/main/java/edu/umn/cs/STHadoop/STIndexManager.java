@@ -37,7 +37,6 @@ public class STIndexManager {
 	private static final Log LOG = LogFactory.getLog(STIndexManager.class);
 
 	private TimeFormatST timeFormat;
-	private Shape inputShape;
 
 	private Path datasetPath;
 	private Path indexesPath;
@@ -51,20 +50,7 @@ public class STIndexManager {
 	public STIndexManager(Path datasetPath, Path indexesPath, OperationsParams params)
 			throws Exception {
 		try {
-			TextSerializable inObj = params.getShape("shape");
-			if(inObj instanceof STPoint ){
-				LOG.error("Shape is not instance of STPoint");
-				return;
-			}
-			// Invoke the the three dimension shape 
-			Class<?> classShape;
-			try {
-				classShape = Class.forName(inObj.getClass().getName());
-				inputShape = (Shape) classShape.newInstance();
-			} catch (ClassNotFoundException e) {
-			} catch (InstantiationException e) {
-			} catch (IllegalAccessException e) {
-			}
+			
 			String time = params.get("time");
 			this.timeFormat = new TimeFormatST(TimeFormatEnum.valueOf(time));
 
@@ -225,13 +211,17 @@ public class STIndexManager {
 			printUsage();
 		}
 
-
-		// This constructor will check for what is needed to be done in the
-		// spatiotemporal index.
-		STIndexManager temporalIndexManager = new STIndexManager(datasetPath,
-				indexesPath, params);
-		// This method physically create spatial partitions.
-		temporalIndexManager.repartitionResolution(params);
+		TextSerializable inObj = params.getShape("shape");
+		if (inObj instanceof STPoint) {
+			LOG.error("Shape is not instance of STPoint");
+			return;
+		} else {
+			// This constructor will check for what is needed to be done in the
+			// spatiotemporal index.
+			STIndexManager temporalIndexManager = new STIndexManager(datasetPath, indexesPath, params);
+			// This method physically create spatial partitions.
+			temporalIndexManager.repartitionResolution(params);
+		}
 
 	}
 
