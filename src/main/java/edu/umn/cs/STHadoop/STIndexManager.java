@@ -17,7 +17,10 @@ import org.apache.hadoop.util.GenericOptionsParser;
 
 import edu.umn.cs.STHadoop.TimeFormatST.TimeFormatEnum;
 import edu.umn.cs.spatialHadoop.OperationsParams;
+import edu.umn.cs.spatialHadoop.core.Shape;
 import edu.umn.cs.spatialHadoop.indexing.Indexer;
+import edu.umn.cs.spatialHadoop.io.TextSerializable;
+import edu.umn.cs.sthadoop.core.STPoint;
 
 /***
  * This index manager will check will play a role in spatio-temporal index
@@ -34,6 +37,7 @@ public class STIndexManager {
 	private static final Log LOG = LogFactory.getLog(STIndexManager.class);
 
 	private TimeFormatST timeFormat;
+	private Shape inputShape;
 
 	private Path datasetPath;
 	private Path indexesPath;
@@ -44,28 +48,41 @@ public class STIndexManager {
 
 	private HashMap<String, Boolean> existIndexes;
 
-	public STIndexManager(Path datasetPath, Path indexesPath, String time)
+	public STIndexManager(Path datasetPath, Path indexesPath, OperationsParams params)
 			throws Exception {
 		try {
+			TextSerializable inObj = params.getShape("shape");
+			if(inObj instanceof STPoint ){
+				LOG.error("Shape is not instance of STPoint");
+				return;
+			}
+			// Invoke the the three dimension shape 
+			Class<?> classShape;
+			try {
+				classShape = Class.forName(inObj.getClass().getName());
+				inputShape = (Shape) classShape.newInstance();
+			} catch (ClassNotFoundException e) {
+			} catch (InstantiationException e) {
+			} catch (IllegalAccessException e) {
+			}
+			String time = params.get("time");
 			this.timeFormat = new TimeFormatST(TimeFormatEnum.valueOf(time));
 
 			this.datasetPath = datasetPath;
 			this.indexesPath = indexesPath;
 
-			this.fileSystem = this.indexesPath
-					.getFileSystem(new Configuration());
+			this.fileSystem = this.indexesPath.getFileSystem(new Configuration());
 			// specify the index and temporal slice path.
-			indexesHomePath = new Path(this.indexesPath.toString() + "/"
-					+ this.timeFormat.getSimpleDateFormat());
+			indexesHomePath = new Path(this.indexesPath.toString() + "/" + this.timeFormat.getSimpleDateFormat());
 
-			sliceHomePath = new Path(this.datasetPath.getParent().toString() + "slice/"
-					+ this.timeFormat.getSimpleDateFormat());
+			sliceHomePath = new Path(
+					this.datasetPath.getParent().toString() + "slice/" + this.timeFormat.getSimpleDateFormat());
 
 			// check if there is a temporal slice otherwise input dataset need
 			// to be temporally sliced.
 			System.out.println("Slicing ..... start checking .... ");
-			temporalTimeSlicing(datasetPath, sliceHomePath, time);
-			
+			temporalTimeSlicing(datasetPath, sliceHomePath,params);
+
 			System.out.println("Init index hierarchy ...... ");
 			initializeIndexesHierarchy();
 
@@ -73,8 +90,7 @@ public class STIndexManager {
 
 			loadExistIndexesDictionary();
 		} catch (IOException e) {
-			LOG.error("Failed to initialize TemporalIndexManager: "
-					+ e.getMessage());
+			LOG.error("Failed to initialize TemporalIndexManager: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -85,13 +101,12 @@ public class STIndexManager {
 	 * 
 	 * @throws Exception
 	 */
-	private void temporalTimeSlicing(Path inputdata, Path outputdata,
-			String time) throws Exception {
+	private void temporalTimeSlicing(Path inputdata, Path outputdata, OperationsParams params) throws Exception {
 		System.out.println("The input data directory: "+ inputdata.toString()+
 				"The output directory: "+ outputdata.toString());
 		// check daily folder
 		if (!this.fileSystem.exists(outputdata)) {
-			TimeSlicing.TemporalSliceMapReduce(inputdata, outputdata.getParent(), time);
+			TimeSlicing.TemporalSliceMapReduce(inputdata, outputdata.getParent(), params);
 		}else{
 			System.out.println("The temporal sliced data exist");
 		}
@@ -210,12 +225,11 @@ public class STIndexManager {
 			printUsage();
 		}
 
-		String time = params.get("time");
 
 		// This constructor will check for what is needed to be done in the
 		// spatiotemporal index.
 		STIndexManager temporalIndexManager = new STIndexManager(datasetPath,
-				indexesPath, time);
+				indexesPath, params);
 		// This method physically create spatial partitions.
 		temporalIndexManager.repartitionResolution(params);
 
