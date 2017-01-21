@@ -212,7 +212,7 @@ public class STIndexManager {
 		}
 
 		TextSerializable inObj = params.getShape("shape");
-		if (inObj instanceof STPoint) {
+		if (!(inObj instanceof STPoint)) {
 			LOG.error("Shape is not instance of STPoint");
 			return;
 		} else {
