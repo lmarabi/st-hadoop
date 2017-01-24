@@ -1,4 +1,4 @@
-package edu.umn.cs.STHadoop;
+package edu.umn.cs.sthadoop.indexing;
 
 import java.io.DataInput;
 import java.io.DataOutput;

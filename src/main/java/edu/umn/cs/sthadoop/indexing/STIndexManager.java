@@ -1,4 +1,4 @@
-package edu.umn.cs.STHadoop;
+package edu.umn.cs.sthadoop.indexing;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -15,12 +15,12 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.GenericOptionsParser;
 
-import edu.umn.cs.STHadoop.TimeFormatST.TimeFormatEnum;
 import edu.umn.cs.spatialHadoop.OperationsParams;
 import edu.umn.cs.spatialHadoop.core.Shape;
 import edu.umn.cs.spatialHadoop.indexing.Indexer;
 import edu.umn.cs.spatialHadoop.io.TextSerializable;
 import edu.umn.cs.sthadoop.core.STPoint;
+import edu.umn.cs.sthadoop.indexing.TimeFormatST.TimeFormatEnum;
 
 /***
  * This index manager will check will play a role in spatio-temporal index

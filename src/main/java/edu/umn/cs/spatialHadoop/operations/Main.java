@@ -11,9 +11,6 @@ package edu.umn.cs.spatialHadoop.operations;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ProgramDriver;
 
-import edu.umn.cs.STHadoop.STIndexManager;
-import edu.umn.cs.STHadoop.TimeSlicing;
-import edu.umn.cs.STHadoop.TimeSlicing;
 import edu.umn.cs.spatialHadoop.RandomSpatialGenerator;
 import edu.umn.cs.spatialHadoop.ReadFile;
 import edu.umn.cs.spatialHadoop.indexing.Indexer;
@@ -28,6 +25,8 @@ import edu.umn.cs.spatialHadoop.visualization.HadoopvizServer;
 import edu.umn.cs.spatialHadoop.visualization.HeatMapPlot;
 import edu.umn.cs.spatialHadoop.visualization.LakesPlot;
 import edu.umn.cs.spatialHadoop.visualization.MagickPlot;
+import edu.umn.cs.sthadoop.indexing.STIndexManager;
+import edu.umn.cs.sthadoop.indexing.TimeSlicing;
 import edu.umn.cs.spatialHadoop.delaunay.DelaunayTriangulation;
 
 

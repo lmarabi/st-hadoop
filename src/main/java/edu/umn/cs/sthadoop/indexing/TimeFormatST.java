@@ -1,6 +1,6 @@
-package edu.umn.cs.STHadoop;
+package edu.umn.cs.sthadoop.indexing;
 
-import edu.umn.cs.STHadoop.TimeSlicing.TimeFormat;
+import edu.umn.cs.sthadoop.indexing.TimeSlicing.TimeFormat;
 
 /**
  * This class used to unified the naming of the folders and also used for SimpleDateFormat for the data. 
