@@ -1,6 +1,5 @@
-package edu.umn.cs.sthadoop.indexing;
+package edu.umn.cs.sthadoop.core;
 
-import edu.umn.cs.sthadoop.indexing.TimeSlicing.TimeFormat;
 
 /**
  * This class used to unified the naming of the folders and also used for SimpleDateFormat for the data. 
@@ -11,7 +10,7 @@ public class TimeFormatST {
 	
 	private TimeFormatEnum time; 
 	
-	static enum TimeFormatEnum {
+	public static enum TimeFormatEnum {
 		year, month, week, day, minute;
 	}
 	
