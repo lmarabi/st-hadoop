@@ -24,18 +24,20 @@ public class STRangeQuery {
 	private static final Log LOG = LogFactory.getLog(STRangeQuery.class);
 	private Path indexPath; 
 	private Path outputPath; 
-	private TimeFormatST fromTime;
-	private TimeFormatST toTime;
+	private String fromTime;
+	private String toTime;
 
 
 	public STRangeQuery(OperationsParams params) {
 		// code to handle the spatiotemporal range query.
 		 indexPath = params.getInputPath();
 		 outputPath = params.getOutputPath();
-		 String fromto = params.get("time");
+		 String fromto = params.get("interval");
 		 if(fromto.contains(",")){
 			 // query temporal range different date
 			 String[] time = fromto.split(",");
+			 fromTime = time[0];
+			 toTime = time[1];
 			 
 		 }else{
 			 // query temporal range same date
@@ -60,7 +62,7 @@ public class STRangeQuery {
 		System.out.println("shape:<STPoint> - (*) Type of shapes stored in input file");
 		System.out.println("rect:<x1,y1,x2,y2> - Spatial query range");
 		System.out
-				.println("time:<date1,date2> - Temporal query range. " + "Format of each date is yyyy-mm-dd HH:MM:SS");
+				.println("interval:<date1,date2> - Temporal query range. " + "Format of each date is yyyy-mm-dd HH:MM:SS");
 		GenericOptionsParser.printGenericCommandUsage(System.out);
 	}
 
@@ -78,7 +80,7 @@ public class STRangeQuery {
 			System.exit(1);
 		}
 
-		if (params.get("time") == null) {
+		if (params.get("interval") == null) {
 			System.err.println("Temporal range missing");
 			printUsage();
 			System.exit(1);
