@@ -61,10 +61,13 @@ public class QueryPlanner {
 	 * @throws ParseException
 	 */
 	public List<Path> getQueryPlan(String time1, String time2) throws ParseException{
-		List<String> plan = this.getMonth(time1, time2);
+		List<String> planY = this.getYear(time1, time2);
+		List<String> planM = this.getMonth(time1, time2);
+		List<String> planW = this.getWeek(time1, time2);
+		List<String> planD = this.getDay(time1, time2);
 		List<Path> result = new ArrayList<Path>();
-		this.timeFormat = new  TimeFormatST(TimeFormatEnum.month);
-		for(String dir : plan){
+		this.timeFormat = new  TimeFormatST(TimeFormatEnum.day);
+		for(String dir : planD){
 			result.add(new Path(this.indexPath.toString() + "/" + this.timeFormat.getSimpleDateFormat()+"/"+ dir));
 		}
 		return result;

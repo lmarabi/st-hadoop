@@ -43,9 +43,10 @@ public class STRangeQuery {
 			 fromTime = time[0];
 			 toTime = time[1];
 			 QueryPlanner plan = new QueryPlanner(params);
-			 List<Path> slices = plan.getQueryPlan(fromTime, toTime);
-			 for(Path slice : slices){
-				 RangeQuery.rangeQueryMapReduce(slice, null, params);
+			 List<Path> slices = plan.getQueryPlan(fromTime, toTime); 
+			 for(Path indexedslice : slices){
+				 RangeQuery.rangeQueryMapReduce(indexedslice, outputPath, params);
+				 
 			 }
 			 
 		 }else{
@@ -60,7 +61,7 @@ public class STRangeQuery {
 	
 
 	private static void printUsage() {
-		System.out.println("Runs a spatio-temporal aggregate query on indexed MODIS data");
+		System.out.println("Runs a spatio-temporal range query on indexed data");
 		System.out.println("Parameters: (* marks required parameters)");
 		System.out.println("<input file> - (*) Path to input file");
 		System.out.println("<output file> -  Path to input file");
@@ -72,23 +73,29 @@ public class STRangeQuery {
 	}
 
 	public static void main(String[] args) throws Exception {
-		 args = new String[4];
-		 args[0] = "/home/louai/nyc-taxi/result/" ;
-		 args[1] = "shape:edu.umn.cs.sthadoop.core.STPoint";
-		 args[2] = "rect:-180,-90,180,90";
-		 args[3] = "interval:2015-12-01,2015-12-01";
+		 args = new String[6];
+		 args[0] = "/home/louai/nyc-taxi/yellowindex" ;
+		 args[1] = "/home/louai/nyc-taxi/resultSTRQ" ;
+		 args[2] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+		 args[3] = "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
+		 args[4] = "interval:2015-01-02,2015-01-02";
+		 args[5] = "-overwrite";
 		final OperationsParams params = new OperationsParams(new GenericOptionsParser(args), false);
 		// Check input
-		if (!params.checkInput()) {
-			printUsage();
-			System.exit(1);
-		}
-
-		if (params.get("rect") == null) {
-			System.err.println("Spatial range missing");
-			printUsage();
-			System.exit(1);
-		}
+		 final Path[] paths = params.getPaths();
+		    if (paths.length <= 1 && !params.checkInput()) {
+		      printUsage();
+		      System.exit(1);
+		    }
+		    if (paths.length >= 2 && !params.checkInputOutput()) {
+		      printUsage();
+		      System.exit(1);
+		    }
+		    if (params.get("rect") == null) {
+		      System.err.println("You must provide a query range");
+		      printUsage();
+		      System.exit(1);
+		    }
 
 		if (params.get("interval") == null) {
 			System.err.println("Temporal range missing");
@@ -106,8 +113,7 @@ public class STRangeQuery {
 		    STRangeQuery query = new STRangeQuery(params);
 		    int result =0;
 		    long t2 = System.currentTimeMillis();
-			System.out.println("Final Result: "+result);
-		    System.out.println("Aggregate query finished in "+(t2-t1)+" millis");
+		    System.out.println("STRQ finished in "+(t2-t1)+" millis");
 		}
 		
 

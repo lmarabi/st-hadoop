@@ -27,6 +27,7 @@ import edu.umn.cs.spatialHadoop.visualization.LakesPlot;
 import edu.umn.cs.spatialHadoop.visualization.MagickPlot;
 import edu.umn.cs.sthadoop.indexing.STIndexManager;
 import edu.umn.cs.sthadoop.indexing.TimeSlicing;
+import edu.umn.cs.sthadoop.operations.STRangeQuery;
 import edu.umn.cs.spatialHadoop.delaunay.DelaunayTriangulation;
 
 
@@ -137,9 +138,10 @@ public class Main {
       pgd.addClass("mplot", MagickPlot.class, "Plot using ImageMagick");
       
       // STHadoop
-      pgd.addClass("timeslicing", TimeSlicing.class, "Time-based slicing");
+      pgd.addClass("timeslicing", TimeSlicing.class, "ST-TimeBasedSlicing");
       // This is for time manager to check indexes
-      pgd.addClass("stmanager", STIndexManager.class,"STManager");
+      pgd.addClass("stmanager", STIndexManager.class,"ST-Manager");
+      pgd.addClass("strangequery", STRangeQuery.class,"ST-RangeQuery");
       
       pgd.driver(args);
       
