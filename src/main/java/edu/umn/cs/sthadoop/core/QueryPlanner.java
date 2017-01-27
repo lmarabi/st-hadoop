@@ -4,21 +4,13 @@
  */
 package edu.umn.cs.sthadoop.core;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -33,33 +25,24 @@ import edu.umn.cs.sthadoop.core.TimeFormatST.TimeFormatEnum;
  *
  * @author louai
  */
-public class Lookup {
+public class QueryPlanner {
 	private Path indexPath;
 	private FileSystem fileSystem;
 	private TimeFormatST timeFormat;
 
-	// private List<String> yearDates = new ArrayList<String>();
-	private List<Path> yearPaths = new ArrayList<Path>();
-
-	// private List<String> dayDates = new ArrayList<String>();
-	private List<Path> dayPaths = new ArrayList<Path>();
-
-	// private List<String> monthDates = new ArrayList<String>();
-	private List<Path> monthPaths = new ArrayList<Path>();
-
-	// private List<Week> weekDates = new ArrayList<Week>();
-	private List<Path> weekPaths = new ArrayList<Path>();
-
-	public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-	private String dirPath;
+	private List<Path> yearPaths;
+	private List<Path> dayPaths;
+	private List<Path> monthPaths;
+	private List<Path> weekPaths;
+	private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 	/**
-	 * Constructor and load the Spatiotemporal Index direcotry.
+	 * Constructor and load the Spatiotemporal Index directory.
 	 * 
 	 * @param params
 	 * @throws Exception
 	 */
-	public Lookup(OperationsParams params) throws Exception {
+	public QueryPlanner(OperationsParams params) throws Exception {
 		indexPath = params.getInputPath();
 		this.fileSystem = this.indexPath.getFileSystem(new Configuration());
 		// load index lower resolution layers to high resolution layer.
@@ -68,6 +51,23 @@ public class Lookup {
 		this.monthPaths = getlistSlice(TimeFormatEnum.month);
 		this.weekPaths = getlistSlice(TimeFormatEnum.week);
 
+	}
+	
+	/**
+	 * This method return list of temporal slices that should be queried 
+	 * @param time1
+	 * @param time2
+	 * @return List<Path> , each path represent indexed spatio-temporal slice. 
+	 * @throws ParseException
+	 */
+	public List<Path> getQueryPlan(String time1, String time2) throws ParseException{
+		List<String> plan = this.getMonth(time1, time2);
+		List<Path> result = new ArrayList<Path>();
+		this.timeFormat = new  TimeFormatST(TimeFormatEnum.month);
+		for(String dir : plan){
+			result.add(new Path(this.indexPath.toString() + "/" + this.timeFormat.getSimpleDateFormat()+"/"+ dir));
+		}
+		return result;
 	}
 
 	/**
@@ -96,25 +96,15 @@ public class Lookup {
 		return result;
 	}
 
+	
+
 	/**
-	 * This method return paths of all dates between the start and the end date.
-	 *
+	 * This method return all days between time interval passed as parameter. 
 	 * @param startDate
 	 * @param endDate
-	 * @return
+	 * @return List<String> each in a format of yyyy-MM-dd 
 	 * @throws ParseException
 	 */
-	public List<Path> getTweetsDayIndex(String startDate, String endDate) throws ParseException {
-		ArrayList<Path> result = new ArrayList<Path>();
-		for (int i = 0; i < dayPaths.size(); i++) {
-			if (insideDaysBoundry(startDate, endDate, dayPaths.get(i).getName())) {
-				result.add(dayPaths.get(i));
-			}
-		}
-		return result;
-	}
-	
-	
 	public List<String> getDay(String startDate, String endDate) throws ParseException{
 		Date start = dateFormat.parse(startDate);
 		Date end = dateFormat.parse(endDate);
@@ -137,16 +127,27 @@ public class Lookup {
 			cstart.add(Calendar.DATE, 1);
 
 		}
+		
+		// add the last day 
+		String day = (cstart.get(Calendar.DAY_OF_MONTH) >= 10) ? String.valueOf(cstart.get(Calendar.DAY_OF_MONTH))
+				: "0" + String.valueOf(cstart.get(Calendar.DAY_OF_MONTH));
+		String month = ((cstart.get(Calendar.MONTH) + 1) >= 10) ? String.valueOf((cstart.get(Calendar.MONTH) + 1))
+				: "0" + String.valueOf((cstart.get(Calendar.MONTH) + 1));
+		String date = cstart.get(Calendar.YEAR) + "-" + month + "-" + day;
+		if (!intermediateResult.contains(date)) {
+			intermediateResult.add(date);
+		}
+		
 		return intermediateResult;
 	}
 
 	/**
-	 * This method return HashMap<Date,Path> to all dates between the start and
-	 * the end date.
+	 * This method return all weeks between the start and
+	 * the end date that represent time interval. 
 	 *
 	 * @param startDate
 	 * @param endDate
-	 * @return
+	 * @return List<String> each in a format of yyyy-MM-w
 	 * @throws ParseException
 	 */
 	public List<String> getWeek(String startDate, String endDate) throws ParseException {
@@ -173,6 +174,13 @@ public class Lookup {
 		return intermediateResult;
 	}
 
+	/***
+	 * This method return all months contains the time interval passed in the parameters. 
+	 * @param startDate
+	 * @param endDate
+	 * @return List<String> each in a format of yyyy-MM
+	 * @throws ParseException
+	 */
 	public List<String> getMonth(String startDate, String endDate) throws ParseException {
 		List<String> result = new ArrayList<String>();
 		Date start = dateFormat.parse(startDate);
@@ -193,40 +201,32 @@ public class Lookup {
 		result.add(c.get(Calendar.YEAR) + "-" + month);
 		return result;
 	}
-
-
-
-
-
-	/**
-	 * This method return true if lookupdate within start,end time window
-	 *
-	 * @param start
-	 * @param end
-	 * @param lookupDate
-	 * @return
+	
+	
+	/***
+	 * This method return all years contains the time interval passed in the parameters. 
+	 * @param startDate
+	 * @param endDate
+	 * @return List<String> each in a format of yyyy
 	 * @throws ParseException
 	 */
-	public static boolean insideDaysBoundry(String start, String end, String lookupStringDate) throws ParseException {
-		Date startDate = dateFormat.parse(start);
-		Date endDate = dateFormat.parse(end);
-		Date lookupDate = dateFormat.parse(lookupStringDate);
-		if ((lookupDate.compareTo(startDate) >= 0) && (lookupDate.compareTo(endDate) <= 0)) {
-			return true;
+	public List<String> getYear(String startDate, String endDate) throws ParseException {
+		List<String> result = new ArrayList<String>();
+		Date start = dateFormat.parse(startDate);
+		Date end = dateFormat.parse(endDate);
+		Calendar c = Calendar.getInstance();
+		c.setTime(start);
+		String month;
+		while (start.getYear() <= end.getYear()) {
+			result.add(String.valueOf(c.get(Calendar.YEAR)));
+			c.add(Calendar.YEAR, 1);
+			start = c.getTime();
+
 		}
-		return false;
+		return result;
 	}
 
-	// public static boolean insideWeekBoundry(String start, String end, Week
-	// range)
-	// throws ParseException {
-	// if (insideDaysBoundry(start, end, range.getStart())
-	// && insideDaysBoundry(start, end, range.getEnd())) {
-	// return true;
-	// }
-	// return false;
-	// }
-
+	
 	public static void main(String[] args) throws Exception {
 		args = new String[3];
 		args[0] = "/home/louai/nyc-taxi/result/";
@@ -234,22 +234,29 @@ public class Lookup {
 		// "shape:edu.umn.cs.sthadoop.core.STpointsTweets";
 		args[2] = "time:month";
 		final OperationsParams params = new OperationsParams(new GenericOptionsParser(args), false);
-		Lookup l = new Lookup(params);
+		QueryPlanner l = new QueryPlanner(params);
 		List<String> result = l.getMonth("2015-01-01", "2015-12-01");
-		System.out.println("Result month: \n");
-		for(String x : result)
-			System.out.println(x);
+//		System.out.println("Result month: \n");
+//		for(String x : result)
+//			System.out.println(x);
 		
-		
-		result = l.getWeek("2015-01-01", "2015-12-01");
-		System.out.println("Result week: \n");
-		for(String x : result)
-			System.out.println(x);
+//		
+//		result = l.getWeek("2015-01-01", "2015-12-01");
+//		System.out.println("Result week: \n");
+//		for(String x : result)
+//			System.out.println(x);
 		
 		result = l.getDay("2015-01-01", "2015-02-03");
 		System.out.println("Result Day: \n");
 		for(String x : result)
 			System.out.println(x);
+		
+		
+
+//		result = l.getYear("2015-01-01", "2020-02-03");
+//		System.out.println("Result year: \n");
+//		for(String x : result)
+//			System.out.println(x);
 
 	}
 }
