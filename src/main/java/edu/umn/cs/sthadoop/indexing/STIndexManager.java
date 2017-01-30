@@ -198,6 +198,7 @@ public class STIndexManager {
 		System.out.println("<dataset path> - (*) Path to input dataset");
 		System.out.println("<index path> - (*) Path to index output");
 		System.out.println("time:[hour,day,week,month,year] - (*) Time Format");
+		System.out.println("sindex:[hour,day,week,month,year] - (*) Time Format");
 		System.out.println("-overwrite - Overwrite output file without notice");
 		GenericOptionsParser.printGenericCommandUsage(System.out);
 	}
