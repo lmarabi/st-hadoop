@@ -46,6 +46,7 @@ public class STPoint extends Point {
 	public Text toText(Text text) {
 		byte[] separator = new String(",").getBytes();
 		text.append(time.getBytes(), 0, time.getBytes().length);
+		text.append(separator, 0,separator.length);
 		super.toText(text);
 		return text;
 	}
