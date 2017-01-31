@@ -66,8 +66,45 @@ public class QueryPlanner {
 		List<String> planW = this.getWeek(time1, time2);
 		List<String> planD = this.getDay(time1, time2);
 		List<Path> result = new ArrayList<Path>();
-		this.timeFormat = new  TimeFormatST(TimeFormatEnum.day);
-		for(String dir : planD){
+		int min =0; 
+		TimeFormatEnum resolution = null; 
+		if(this.dayPaths.size() > 0){
+			min = planD.size();
+			resolution = TimeFormatEnum.day;
+			if(this.weekPaths.size() > 0 && min > this.weekPaths.size()){
+				min = planW.size(); 
+				resolution = TimeFormatEnum.week;
+				if(this.monthPaths.size() > 0 && min > this.monthPaths.size()){
+					min = planM.size();
+					resolution = TimeFormatEnum.month;
+					if(this.yearPaths.size() > 1 && min > this.yearPaths.size()){
+						min = planY.size();
+						resolution = TimeFormatEnum.year;
+					}
+				}
+			}
+		}
+		this.timeFormat = new  TimeFormatST(resolution);
+		List<String> queryplan = null;
+		switch(resolution){
+		case day:
+			queryplan = planD;
+			break;
+		case week:
+			queryplan = planW;
+			break;
+		case month:
+			queryplan = planM;
+			break; 
+		case year:
+			queryplan = planY;
+			break;
+		default:
+			queryplan = planD;
+			break;
+			
+		}
+		for(String dir : queryplan){
 			result.add(new Path(this.indexPath.toString() + "/" + this.timeFormat.getSimpleDateFormat()+"/"+ dir));
 		}
 		return result;
@@ -231,17 +268,19 @@ public class QueryPlanner {
 
 	
 	public static void main(String[] args) throws Exception {
-		args = new String[3];
-		args[0] = "/home/louai/nyc-taxi/result/";
-		args[1] = "shape:edu.umn.cs.sthadoop.core.STPoint";
-		// "shape:edu.umn.cs.sthadoop.core.STpointsTweets";
-		args[2] = "time:month";
+		args = new String[6];
+		args[0] = "/home/louai/nyc-taxi/yellowIndex";
+		args[1] = "/home/louai/nyc-taxi/resultSTRQ";
+		args[2] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+		args[3] = "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
+		args[4] = "interval:2015-01-01,2015-01-02";
+		args[5] = "-overwrite";
 		final OperationsParams params = new OperationsParams(new GenericOptionsParser(args), false);
 		QueryPlanner l = new QueryPlanner(params);
-		List<String> result = l.getMonth("2015-01-01", "2015-12-01");
-//		System.out.println("Result month: \n");
-//		for(String x : result)
-//			System.out.println(x);
+		List<Path> result = l.getQueryPlan("2015-01-01", "2015-12-01");
+		System.out.println("Result: \n");
+		for(Path x : result)
+			System.out.println(x.toString());
 		
 //		
 //		result = l.getWeek("2015-01-01", "2015-12-01");
@@ -249,10 +288,10 @@ public class QueryPlanner {
 //		for(String x : result)
 //			System.out.println(x);
 		
-		result = l.getDay("2015-01-01", "2015-02-03");
-		System.out.println("Result Day: \n");
-		for(String x : result)
-			System.out.println(x);
+//		result = l.getDay("2015-01-01", "2015-02-03");
+//		System.out.println("Result Day: \n");
+//		for(String x : result)
+//			System.out.println(x);
 		
 		
 

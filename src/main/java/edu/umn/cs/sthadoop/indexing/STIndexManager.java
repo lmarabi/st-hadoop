@@ -188,6 +188,7 @@ public class STIndexManager {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
 		}
 	}
 
