@@ -105,7 +105,15 @@ public class QueryPlanner {
 			
 		}
 		for(String dir : queryplan){
-			result.add(new Path(this.indexPath.toString() + "/" + this.timeFormat.getSimpleDateFormat()+"/"+ dir));
+			Path sliceIndex = new Path(this.indexPath.toString() + "/" + this.timeFormat.getSimpleDateFormat()+"/"+ dir);
+			try {
+				if(fileSystem.exists(sliceIndex)){
+					result.add(sliceIndex);
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return result;
 	}
