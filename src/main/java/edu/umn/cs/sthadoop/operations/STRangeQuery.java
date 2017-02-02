@@ -214,13 +214,13 @@ public class STRangeQuery {
 	}
 
 	public static void main(String[] args) throws Exception {
-		args = new String[6];
-		args[0] = "/home/louai/nyc-taxi/yellowIndex";
-		args[1] = "/home/louai/nyc-taxi/resultSTRQ";
-		args[2] = "shape:edu.umn.cs.sthadoop.core.STPoint";
-		args[3] = "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
-		args[4] = "interval:2015-01-01,2015-01-03";
-		args[5] = "-overwrite";
+//		args = new String[6];
+//		args[0] = "/home/louai/nyc-taxi/yellowIndex";
+//		args[1] = "/home/louai/nyc-taxi/resultSTRQ";
+//		args[2] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+//		args[3] = "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
+//		args[4] = "interval:2015-01-01,2015-01-03";
+//		args[5] = "-overwrite";
 		final OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
 
 		final Path[] paths = params.getPaths();
