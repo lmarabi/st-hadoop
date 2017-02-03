@@ -219,7 +219,7 @@ public class STRangeQuery {
 //		args[1] = "/home/louai/nyc-taxi/resultSTRQ";
 //		args[2] = "shape:edu.umn.cs.sthadoop.core.STPoint";
 //		args[3] = "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
-//		args[4] = "interval:2015-01-01,2015-01-03";
+//		args[4] = "interval:2015-01-01,2015-01-02";
 //		args[5] = "-overwrite";
 //		args[6] = "-no-local";
 		final OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
@@ -322,8 +322,9 @@ public class STRangeQuery {
 					threads.add(thread);
 				} else {
 					// Run in MapReduce mode
+					Path outTempPath = outPath == null ? null : new Path(outPath, String.format("%05d", i)+"-"+inPath.getName());
 					queryParams.setBoolean("background", true);
-					Job job = rangeQueryMapReduce(inPath, outPath, queryParams);
+					Job job = rangeQueryMapReduce(inPath, outTempPath, queryParams);
 					jobs.add(job);
 				}
 			}
