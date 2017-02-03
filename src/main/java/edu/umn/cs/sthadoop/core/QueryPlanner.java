@@ -71,13 +71,13 @@ public class QueryPlanner {
 		if(this.dayPaths.size() > 0){
 			min = planD.size();
 			resolution = TimeFormatEnum.day;
-			if(this.weekPaths.size() > 0 && min > this.weekPaths.size()){
+			if(this.weekPaths.size() > 0 && min > planW.size()){
 				min = planW.size(); 
 				resolution = TimeFormatEnum.week;
-				if(this.monthPaths.size() > 0 && min > this.monthPaths.size()){
+				if(this.monthPaths.size() > 0 && min > planM.size()){
 					min = planM.size();
 					resolution = TimeFormatEnum.month;
-					if(this.yearPaths.size() > 1 && min > this.yearPaths.size()){
+					if(this.yearPaths.size() > 1 && min > planY.size()){
 						min = planY.size();
 						resolution = TimeFormatEnum.year;
 					}
