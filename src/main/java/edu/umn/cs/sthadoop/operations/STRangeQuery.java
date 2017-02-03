@@ -230,7 +230,7 @@ public class STRangeQuery {
 //		args[2] = "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
 //		args[3] = "interval:2015-01-01,2015-01-03";
 //		args[4] = "-overwrite";
-//		args[5] = "-no-local";
+//		args[5	] = "-no-local";
 		
 		final OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
 
@@ -365,7 +365,10 @@ public class STRangeQuery {
 			}
 		}
 		long t2 = System.currentTimeMillis();
-
+		System.out.println("QueryPlan:");
+		for (Path stPath : STPaths) {
+			System.out.println(stPath.getName());
+		}
 		System.out.println("Time for " + queryRanges.length + " jobs is " + (t2 - t1) + " millis");
 		System.out.println("Results counts: " + resultsCounts);
 	}
