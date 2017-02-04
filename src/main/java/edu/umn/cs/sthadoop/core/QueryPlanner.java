@@ -76,7 +76,7 @@ public class QueryPlanner {
 		List<Path> result = new ArrayList<Path>();
 
 		for (TimeFormatEnum resolution : TimeFormatEnum.values()) {
-			List<String> queryplan = null;
+			List<String> queryplan = new ArrayList<String>();
 			this.timeFormat = new TimeFormatST(resolution);
 			switch (resolution) {
 			case day:
@@ -130,7 +130,7 @@ public class QueryPlanner {
 
 		TimeFormatEnum resolution = TimeFormatEnum.valueOf(level);
 
-		List<String> queryplan = null;
+		List<String> queryplan = new ArrayList<String>();
 		this.timeFormat = new TimeFormatST(resolution);
 		switch (resolution) {
 		case day:
