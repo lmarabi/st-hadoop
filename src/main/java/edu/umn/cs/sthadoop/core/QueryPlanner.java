@@ -81,18 +81,22 @@ public class QueryPlanner {
 			switch (resolution) {
 			case day:
 				queryplan = planD;
+				this.timeFormat = new TimeFormatST(resolution);
 				break;
 			case week:
 				queryplan = planW;
+				this.timeFormat = new TimeFormatST(resolution);
 				break;
 			case month:
 				queryplan = planM;
+				this.timeFormat = new TimeFormatST(resolution);
 				break;
 			case year:
 				queryplan = planY;
+				this.timeFormat = new TimeFormatST(resolution);
 				break;
 			default:
-				queryplan = planD;
+				//do nothing This to support a higher resolution level. 
 				break;
 
 			}
