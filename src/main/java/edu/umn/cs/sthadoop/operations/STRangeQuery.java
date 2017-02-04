@@ -114,13 +114,18 @@ public class STRangeQuery {
 		Path indexPath = params.getInputPath();
 		Path outputPath = params.getOutputPath();
 		String fromto = params.get("interval");
+		String level = params.get("time");
 		if (fromto.contains(",")) {
 			// query temporal range different date
 			String[] time = fromto.split(",");
 			String fromTime = time[0];
 			String toTime = time[1];
 			QueryPlanner plan = new QueryPlanner(params);
-			slices = plan.getQueryPlan(fromTime, toTime);
+			if(level != null){
+				slices = plan.getQueryPlanFromResolution(fromTime, toTime, level);
+			}else{
+				slices = plan.getQueryPlan(fromTime, toTime);
+			}
 			return slices;
 
 		}
@@ -208,7 +213,8 @@ public class STRangeQuery {
 		System.out.println("shape:<STPoint> - (*) Type of shapes stored in input file");
 		System.out.println("rect:<x1,y1,x2,y2> - Spatial query range");
 		System.out.println(
-				"interval:<date1,date2> - Temporal query range. " + "Format of each date is yyyy-mm-dd HH:MM:SS");
+				"interval:<date1,date2> - Temporal query range. " + "Format of each date is yyyy-mm-dd");
+		System.out.println("time:[day,week,month,year] -  Time Format");
 		System.out.println("-overwrite - Overwrite output file without notice");
 		GenericOptionsParser.printGenericCommandUsage(System.out);
 	}
