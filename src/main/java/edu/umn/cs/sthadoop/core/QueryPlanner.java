@@ -35,6 +35,13 @@ public class QueryPlanner {
 	private List<Path> monthPaths;
 	private List<Path> weekPaths;
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	
+	// Temporary queryPlan of MonthContained. 
+	private List<String> yearContained;
+	private List<String> monthContained;
+	private List<String> weekContained;
+	private List<String> dayContained;
+	
 
 	/**
 	 * Constructor and load the Spatiotemporal Index directory.
@@ -52,41 +59,42 @@ public class QueryPlanner {
 		this.weekPaths = getlistSlice(TimeFormatEnum.week);
 
 	}
-	
+
 	/**
-	 * This method return list of temporal slices that should be queried 
+	 * This method return list of temporal slices that should be queried
+	 * 
 	 * @param time1
 	 * @param time2
-	 * @return List<Path> , each path represent indexed spatio-temporal slice. 
+	 * @return List<Path> , each path represent indexed spatio-temporal slice.
 	 * @throws ParseException
 	 */
-	public List<Path> getQueryPlan(String time1, String time2) throws ParseException{
+	public List<Path> getQueryPlan(String time1, String time2) throws ParseException {
 		List<String> planY = this.getYear(time1, time2);
 		List<String> planM = this.getMonth(time1, time2);
 		List<String> planW = this.getWeek(time1, time2);
 		List<String> planD = this.getDay(time1, time2);
 		List<Path> result = new ArrayList<Path>();
-		int min =0; 
-		TimeFormatEnum resolution = null; 
-		if(this.dayPaths.size() > 0){
+		int min = 0;
+		TimeFormatEnum resolution = null;
+		if (this.dayPaths.size() > 0) {
 			min = planD.size();
 			resolution = TimeFormatEnum.day;
-			if(this.weekPaths.size() > 0 && min > planW.size()){
-				min = planW.size(); 
+			if (this.weekPaths.size() > 0 && min > planW.size()) {
+				min = planW.size();
 				resolution = TimeFormatEnum.week;
-				if(this.monthPaths.size() > 0 && min > planM.size()){
+				if (this.monthPaths.size() > 0 && min > planM.size()) {
 					min = planM.size();
 					resolution = TimeFormatEnum.month;
-					if(this.yearPaths.size() > 0 && min > planY.size()){
+					if (this.yearPaths.size() > 0 && min > planY.size()) {
 						min = planY.size();
 						resolution = TimeFormatEnum.year;
 					}
 				}
 			}
 		}
-		this.timeFormat = new  TimeFormatST(resolution);
+		this.timeFormat = new TimeFormatST(resolution);
 		List<String> queryplan = null;
-		switch(resolution){
+		switch (resolution) {
 		case day:
 			queryplan = planD;
 			break;
@@ -95,19 +103,20 @@ public class QueryPlanner {
 			break;
 		case month:
 			queryplan = planM;
-			break; 
+			break;
 		case year:
 			queryplan = planY;
 			break;
 		default:
 			queryplan = planD;
 			break;
-			
+
 		}
-		for(String dir : queryplan){
-			Path sliceIndex = new Path(this.indexPath.toString() + "/" + this.timeFormat.getSimpleDateFormat()+"/"+ dir);
+		for (String dir : queryplan) {
+			Path sliceIndex = new Path(
+					this.indexPath.toString() + "/" + this.timeFormat.getSimpleDateFormat() + "/" + dir);
 			try {
-				if(fileSystem.exists(sliceIndex)){
+				if (fileSystem.exists(sliceIndex)) {
 					result.add(sliceIndex);
 				}
 			} catch (IOException e) {
@@ -138,22 +147,21 @@ public class QueryPlanner {
 					result.add(index.getPath());
 				}
 			}
-		}else{
-			System.out.println(parentindex.getName()+"  doesn't exist");
+		} else {
+			System.out.println(parentindex.getName() + "  doesn't exist");
 		}
 		return result;
 	}
 
-	
-
 	/**
-	 * This method return all days between time interval passed as parameter. 
+	 * This method return all days between time interval passed as parameter.
+	 * 
 	 * @param startDate
 	 * @param endDate
-	 * @return List<String> each in a format of yyyy-MM-dd 
+	 * @return List<String> each in a format of yyyy-MM-dd
 	 * @throws ParseException
 	 */
-	public List<String> getDay(String startDate, String endDate) throws ParseException{
+	public List<String> getDay(String startDate, String endDate) throws ParseException {
 		Date start = dateFormat.parse(startDate);
 		Date end = dateFormat.parse(endDate);
 		Calendar cstart = Calendar.getInstance();
@@ -175,8 +183,8 @@ public class QueryPlanner {
 			cstart.add(Calendar.DATE, 1);
 
 		}
-		
-		// add the last day 
+
+		// add the last day
 		String day = (cstart.get(Calendar.DAY_OF_MONTH) >= 10) ? String.valueOf(cstart.get(Calendar.DAY_OF_MONTH))
 				: "0" + String.valueOf(cstart.get(Calendar.DAY_OF_MONTH));
 		String month = ((cstart.get(Calendar.MONTH) + 1) >= 10) ? String.valueOf((cstart.get(Calendar.MONTH) + 1))
@@ -185,13 +193,13 @@ public class QueryPlanner {
 		if (!intermediateResult.contains(date)) {
 			intermediateResult.add(date);
 		}
-		
+
 		return intermediateResult;
 	}
 
 	/**
-	 * This method return all weeks between the start and
-	 * the end date that represent time interval. 
+	 * This method return all weeks between the start and the end date that
+	 * represent time interval.
 	 *
 	 * @param startDate
 	 * @param endDate
@@ -211,8 +219,7 @@ public class QueryPlanner {
 				&& (cstart.get(Calendar.DATE) == cend.get(Calendar.DATE)))) {
 			String month = ((cstart.get(Calendar.MONTH) + 1) >= 10) ? String.valueOf((cstart.get(Calendar.MONTH) + 1))
 					: "0" + String.valueOf((cstart.get(Calendar.MONTH) + 1));
-			String weekofDay = cstart.get(Calendar.YEAR) + "-" + month + "-"
-					+ cstart.get(Calendar.WEEK_OF_MONTH);
+			String weekofDay = cstart.get(Calendar.YEAR) + "-" + month + "-" + cstart.get(Calendar.WEEK_OF_MONTH);
 			if (!intermediateResult.contains(weekofDay)) {
 				intermediateResult.add(weekofDay);
 			}
@@ -221,9 +228,50 @@ public class QueryPlanner {
 		}
 		return intermediateResult;
 	}
+	
+	
+	/**
+	 * This method return all weeks fully contained between the start and the end date that
+	 * represent time interval.
+	 * This method should be called after these methods getYearContainedBy , and MonthContainedBy.
+	 * @param startDate
+	 * @param endDate
+	 * @return List<String> each in a format of yyyy-MM-w
+	 * @throws ParseException
+	 */
+	public List<String> getWeekContainedBy(String startDate, String endDate) throws ParseException {
+		Date start = dateFormat.parse(startDate);
+		Date end = dateFormat.parse(endDate);
+		Calendar cstart = Calendar.getInstance();
+		Calendar cend = Calendar.getInstance();
+		cstart.setTime(start);
+		cend.setTime(end);
+		List<String> intermediateResult = new ArrayList<String>();
+		while (!(cstart.get(Calendar.YEAR) == cend.get(Calendar.YEAR)
+				&& (cstart.get(Calendar.MONTH) == cend.get(Calendar.MONTH))
+				&& (cstart.get(Calendar.DATE) == cend.get(Calendar.DATE)))) {
+			String month = ((cstart.get(Calendar.MONTH) + 1) >= 10) ? String.valueOf((cstart.get(Calendar.MONTH) + 1))
+					: "0" + String.valueOf((cstart.get(Calendar.MONTH) + 1));
+			String weekofDay = cstart.get(Calendar.YEAR) + "-" + month + "-" + cstart.get(Calendar.WEEK_OF_MONTH);
+			String year = String.valueOf(cstart.get(Calendar.YEAR));
+			if (!this.yearContained.contains(year)
+					&& !this.monthContained.contains(year + "-" + month)) {
+				//
+				if (!intermediateResult.contains(weekofDay)) {
+					intermediateResult.add(weekofDay);
+				}
+			}
+			cstart.add(Calendar.DATE, 1);
+
+		}
+		this.weekContained = intermediateResult;
+		return intermediateResult;
+	}
 
 	/***
-	 * This method return all months contains the time interval passed in the parameters. 
+	 * This method return all months contains the time interval passed in the
+	 * parameters.
+	 * 
 	 * @param startDate
 	 * @param endDate
 	 * @return List<String> each in a format of yyyy-MM
@@ -249,11 +297,12 @@ public class QueryPlanner {
 		result.add(c.get(Calendar.YEAR) + "-" + month);
 		return result;
 	}
-	
+
 	/***
-	 * This method return all months fully inside two date time range . 
-	 * e.g., passing parameter 2017-02-01 , 2017-05-10
-	 * This method will return month 2017-02, 2017-03, 2017-04 
+	 * This method return all months fully inside two date time range . e.g.,
+	 * passing parameter 2017-02-01 , 2017-05-10 This method will return month
+	 * 2017-02, 2017-03, 2017-04
+	 * 
 	 * @param startDate
 	 * @param endDate
 	 * @return List<String> each in a format of yyyy-MM
@@ -264,25 +313,34 @@ public class QueryPlanner {
 		Date start = dateFormat.parse(startDate);
 		Date end = dateFormat.parse(endDate);
 		Calendar c = Calendar.getInstance();
-		// set start time one day before to make sure that the first datetime of month inside range
+		// set start time one day before to make sure that the first datetime of
+		// month inside range
 		c.setTime(start);
 		c.add(Calendar.DAY_OF_YEAR, -1);
 		start = c.getTime();
 		List<String> months = this.getMonth(startDate, endDate);
+//		List<String> yearsContained = this.getYearContainedBy(startDate, endDate);
 		Date monthStart;
 		Date monthEnd;
-		for(String month : months){
-			monthStart = dateFormat.parse(month+"-01");
-			c.setTime(monthStart);
-			c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
-			monthEnd = c.getTime();
-			if(start.before(monthStart) && end.after(monthEnd)){
-				result.add(month);
+
+		String yearCheck;
+		for (String month : months) {
+			monthStart = dateFormat.parse(month + "-01");
+			yearCheck = month.split("-")[0];
+			if (!this.yearContained.contains(yearCheck)) {
+				c.setTime(monthStart);
+				c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+				monthEnd = c.getTime();
+				if (start.before(monthStart) && end.after(monthEnd)) {
+					result.add(month);
+				}
+
 			}
 		}
+		this.monthContained = result;
 		return result;
 	}
-	
+
 	/**
 	 * This method return true if lookupdate within start,end time window
 	 *
@@ -292,21 +350,20 @@ public class QueryPlanner {
 	 * @return
 	 * @throws ParseException
 	 */
-	public static boolean insideDaysBoundry(String start, String end,
-			String lookupStringDate) throws ParseException {
+	public static boolean insideDaysBoundry(String start, String end, String lookupStringDate) throws ParseException {
 		Date startDate = dateFormat.parse(start);
 		Date endDate = dateFormat.parse(end);
 		Date lookupDate = dateFormat.parse(lookupStringDate);
-		if ((lookupDate.compareTo(startDate) >= 0)
-				&& (lookupDate.compareTo(endDate) <= 0)) {
+		if ((lookupDate.compareTo(startDate) >= 0) && (lookupDate.compareTo(endDate) <= 0)) {
 			return true;
 		}
 		return false;
 	}
-	
-	
+
 	/***
-	 * This method return all years contains the time interval passed in the parameters. 
+	 * This method return all years contains the time interval passed in the
+	 * parameters.
+	 * 
 	 * @param startDate
 	 * @param endDate
 	 * @return List<String> each in a format of yyyy
@@ -326,9 +383,11 @@ public class QueryPlanner {
 		}
 		return result;
 	}
-	
+
 	/***
-	 * This method return all years contains the time interval passed in the parameters. 
+	 * This method return all years contains the time interval passed in the
+	 * parameters.
+	 * 
 	 * @param startDate
 	 * @param endDate
 	 * @return List<String> each in a format of yyyy
@@ -339,25 +398,29 @@ public class QueryPlanner {
 		Date start = dateFormat.parse(startDate);
 		Date end = dateFormat.parse(endDate);
 		List<String> years = this.getYear(startDate, endDate);
-		Date yearStart; 
-		Date yearEnd; 
-		for(String year : years){
-			yearStart = dateFormat.parse(year+"-01-01");
-			 Calendar cld = Calendar.getInstance();
-			 cld.setTime(yearStart);
-			 cld.add(Calendar.YEAR,1);
-			 //cld.set(Calendar.DAY_OF_YEAR,1);
-			 cld.add(Calendar.DAY_OF_YEAR,-1);   //last day of the year.
-			 yearEnd = cld.getTime();
-			 if(yearEnd.before(end) && yearStart.after(start) ){
-				 result.add(String.valueOf(cld.get(Calendar.YEAR)));
-			 }
-			
+		Date yearStart;
+		Date yearEnd;
+		for (String year : years) {
+			yearStart = dateFormat.parse(year + "-01-01");
+			Calendar cld = Calendar.getInstance();
+			cld.setTime(yearStart);
+			cld.add(Calendar.YEAR, 1);
+			// cld.set(Calendar.DAY_OF_YEAR,1);
+			cld.add(Calendar.DAY_OF_YEAR, -1); // last day of the year.
+			yearEnd = cld.getTime();
+			if (yearEnd.before(end) && yearStart.after(start)) {
+				result.add(String.valueOf(cld.get(Calendar.YEAR)));
+			}
+
 		}
+		// Finally Calculate if the %months in the beginning of time range is more than %40 
+		// This is will be to do in the future. After developing the SpatioTemporal Record Reader.
+		this.yearContained = result;
 		return result;
 	}
-
 	
+	
+
 	public static void main(String[] args) throws Exception {
 		args = new String[6];
 		args[0] = "/home/louai/nyc-taxi/yellowIndex";
@@ -368,48 +431,50 @@ public class QueryPlanner {
 		args[5] = "-overwrite";
 		final OperationsParams params = new OperationsParams(new GenericOptionsParser(args), false);
 		QueryPlanner l = new QueryPlanner(params);
-		
-//		List<Path> result = l.getQueryPlan("2015-01-01", "2015-12-01");
-//		System.out.println("Result: \n");
-//		for(Path x : result)
-//			System.out.println(x.toString());
-		String from = "2014-02-05";
-		String to =  "2017-05-04"; 
-		List<String> result = null;
-		
-		result = l.getYear(from,to);
-		System.out.println("Result year:");
-		for(String x : result)
-			System.out.println(x);
-		
-		result = l.getMonth(from,to);
-		System.out.println("Result month:");
-		for(String x : result)
-			System.out.println(x);
-		
-		result = l.getWeek(from,to);
-		System.out.println("Result week:");
-		for(String x : result)
-			System.out.println(x);
-		
-		result = l.getDay(from,to);
-		System.out.println("Result Day: \n");
-		for(String x : result)
-			System.out.println(x);
-		
-		System.out.println("*****************************");
-		result = l.getMonthsContainedBy(from,to);
-		System.out.println("Result monthContain: \n");
-		for(String x : result)
-			System.out.println(x);
-		
-		result = l.getYearContainedBy(from,to);
-		System.out.println("Result Year Contained: \n");
-		for(String x : result)
-			System.out.println(x);
-		
-		
 
+		// List<Path> result = l.getQueryPlan("2015-01-01", "2015-12-01");
+		// System.out.println("Result: \n");
+		// for(Path x : result)
+		// System.out.println(x.toString());
+		String from = "2014-02-05";
+		String to = "2017-05-04";
+		List<String> result = null;
+
+		result = l.getYear(from, to);
+		System.out.println("Result year:");
+		for (String x : result)
+			System.out.println(x);
+
+		result = l.getMonth(from, to);
+		System.out.println("Result month:");
+		for (String x : result)
+			System.out.println(x);
+
+		result = l.getWeek(from, to);
+		System.out.println("Result week:");
+		for (String x : result)
+			System.out.println(x);
+
+		result = l.getDay(from, to);
+		System.out.println("Result Day: \n");
+		for (String x : result)
+			System.out.println(x);
+
+		System.out.println("*****************************");
+		result = l.getYearContainedBy(from, to);
+		System.out.println("Result Year Contained: \n");
+		for (String x : result)
+			System.out.println(x);
+		
+		result = l.getMonthsContainedBy(from, to);
+		System.out.println("Result monthContain: \n");
+		for (String x : result)
+			System.out.println(x);
+
+		result = l.getWeekContainedBy(from, to);
+		System.out.println("Result Weeks Contained: \n");
+		for (String x : result)
+			System.out.println(x);
 		
 
 	}
