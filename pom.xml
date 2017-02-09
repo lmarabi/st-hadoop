@@ -8,14 +8,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>edu.umn.cs.spatialhadoop</groupId>
-  <artifactId>spatialhadoop</artifactId>
+  <groupId>edu.umn.cs.sthadoop</groupId>
   <packaging>jar</packaging>
   <version>2.4.1-SNAPSHOT</version>
   
-  <name>SpatialHadoop</name>
-  <description>An extension to Apache Hadoop for better support of spatial data</description>
-  <url>http://spatialhadoop.cs.umn.edu/</url>
+  <name>ST-Hadoop</name>
+  <description>An extension to Apache Hadoop for better support of spatio-temporal data</description>
+  <url>http://st-hadoop.cs.umn.edu/</url>
   
   <licenses>
     <license>
@@ -25,9 +24,9 @@
   </licenses>
   
   <scm>
-    <connection>scm:git:git@github.com:aseldawy/spatialhadoop2.git</connection>
-    <developerConnection>scm:git:git@github.com:aseldawy/spatialhadoop2.git</developerConnection>
-    <url>git@github.com:aseldawy/spatialhadoop2.git</url>
+    <connection>scm:git:git@github.com:lmarabi/st-hadoop.git</connection>
+    <developerConnection>scm:git:git@github.com:lmarabi/st-hadoop.git</developerConnection>
+    <url>git@github.com:lmarabi/st-hadoop.git</url>
   </scm>
 
  <developers>
@@ -225,4 +224,5 @@
     </repository>
   </distributionManagement>
 	
+  <artifactId>sthadoop</artifactId>
 </project>

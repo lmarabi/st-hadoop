@@ -6,8 +6,8 @@
  http://www.opensource.org/licenses/apache2.0.php.
 -->
 
-<project name="SpatialHadoop" default="compile1" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
-  <description>Compiles SpatialHadoop and builds packages to be installed on an existing Hadoop cluster</description>
+<project name="sthadoop" default="compile1" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+  <description>Compiles sthadoop and builds packages to be installed on an existing Hadoop cluster</description>
   <!-- set global properties for this build -->
   <property name="src" location="src/main/java"/>
 	<property name="res" location="src/main/resources"/>
@@ -62,8 +62,8 @@
     <!-- Create the distribution directory -->
     <mkdir dir="${dist}"/>
 
-    <!-- Put everything in ${build} into the spatialhadoop-${version}.jar file -->
-    <jar jarfile="${dist}/spatialhadoop-${version}.jar" basedir="${build}">
+    <!-- Put everything in ${build} into the sthadoop-${version}.jar file -->
+    <jar jarfile="${dist}/sthadoop-${version}.jar" basedir="${build}">
       <manifest>
         <attribute name="Manifest-Version" value="1.0"/>
         <attribute name="Main-Class" value="edu.umn.cs.spatialHadoop.operations.Main"/>
@@ -71,7 +71,7 @@
     </jar>
 
     <!-- For backward compatibility, provide a jar that contains just the main class-->
-    <jar jarfile="${dist}/spatialhadoop-main.jar">
+    <jar jarfile="${dist}/sthadoop-main.jar">
       <fileset dir="${build}" includes="edu/umn/cs/spatialHadoop/operations/Main.class"/>
       <manifest>
         <attribute name="Manifest-Version" value="1.0"/>
@@ -82,14 +82,14 @@
 
 	 <target name="emr-jar" depends="dist"
 	      description="Creates a JAR file that can run on Amazon EMR for Hadoop 2.x">
-    <zip destfile="${dist}/spatialhadoop-${version}-emr.jar">
+    <zip destfile="${dist}/sthadoop-${version}-emr.jar">
       <zipgroupfileset dir="lib/ivy/common">
         <include name="esri-geometry-api-*.jar"/>
         <exclude name="*sources.jar"/>
         <exclude name="*javadoc.jar"/>
         <include name="jts-*.jar"/>
       </zipgroupfileset>
-      <zipgroupfileset dir="${dist}" includes="spatialhadoop-${version}.jar"/>
+      <zipgroupfileset dir="${dist}" includes="sthadoop-${version}.jar"/>
     </zip>
   </target>
 
@@ -97,7 +97,7 @@
 
 	<target name="package" depends="dist">
     <!-- Build the tar file -->
-    <tar destfile="${dist}/package/spatialhadoop-${version}.tar.gz"
+    <tar destfile="${dist}/package/sthadoop-${version}.tar.gz"
          compression="gzip">
       <tarfileset dir=".">
         <include name="README.md"/>
@@ -125,20 +125,20 @@
       </tarfileset>
 
       <tarfileset dir="${dist}" prefix="share/hadoop/common/lib/">
-        <include name="spatialhadoop-${version}.jar"/>
+        <include name="sthadoop-${version}.jar"/>
       </tarfileset>
 
       <tarfileset dir="${dist}">
-        <include name="spatialhadoop-main.jar"/>
+        <include name="sthadoop-main.jar"/>
       </tarfileset>
     </tar>
 	</target>
 	
   <target name="install" depends="package"
-    description="Install SpatialHadoop on an existing Hadoop 2 installation">
+    description="Install sthadoop on an existing Hadoop 2 installation">
   	<echo message="Installing on a Hadoop 2.x installation"/>
     <!-- Extract the constructed package file (tar) in the destination directory -->
-    <untar src="${dist}/package/spatialhadoop-${version}.tar.gz"
+    <untar src="${dist}/package/sthadoop-${version}.tar.gz"
            dest="${hadoop.dir}" compression="gzip"/>
   </target>
 	

@@ -512,23 +512,23 @@ public class QueryPlanner {
 	}
 
 	public static void main(String[] args) throws Exception {
-		args = new String[6];
-		args[0] = "/home/louai/nyc-taxi/yellowIndex";
-		args[1] = "/home/louai/nyc-taxi/resultSTRQ";
-		args[2] = "shape:edu.umn.cs.sthadoop.core.STPoint";
-		args[3] = "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
-		args[4] = "interval:2015-01-01,2015-01-02";
-		args[5] = "-overwrite";
-		final OperationsParams params = new OperationsParams(new GenericOptionsParser(args), false);
-		QueryPlanner l = new QueryPlanner(params);
-
-		String from = "2014-02-05";
-		String to = "2017-05-04";
-
-		List<Path> result = l.getQueryPlan(from, to);
-		System.out.println("Result: \n");
-		for (Path x : result)
-			System.out.println(x.toString());
+//		args = new String[6];
+//		args[0] = "/home/louai/nyc-taxi/yellowIndex";
+//		args[1] = "/home/louai/nyc-taxi/resultSTRQ";
+//		args[2] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+//		args[3] = "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
+//		args[4] = "interval:2015-01-01,2015-01-02";
+//		args[5] = "-overwrite";
+//		final OperationsParams params = new OperationsParams(new GenericOptionsParser(args), false);
+//		QueryPlanner l = new QueryPlanner(params);
+//
+//		String from = "2014-01-01";
+//		String to = "2014-01-04";
+//
+//		List<Path> result = l.getQueryPlan(from, to);
+//		System.out.println("Result: \n");
+//		for (Path x : result)
+//			System.out.println(x.toString());
 
 		// List<String> result = null;
 		//
