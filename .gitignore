@@ -1,1 +1,8 @@
-/target/
+/bin
+lib/ivy/**/*.jar
+/dist
+/target
+.idea
+*.iml
+louai-compile-sh
+localpush.sh
