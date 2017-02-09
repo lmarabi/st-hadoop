@@ -4,5 +4,9 @@ lib/ivy/**/*.jar
 /target
 .idea
 *.iml
-louai-compile-sh
-localpush.sh
+/louai-compile-sh
+/localpush.sh
+/.classes
+/.settings
+/bin1
+/.project
