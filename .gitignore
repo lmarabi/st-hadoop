@@ -10,3 +10,4 @@ lib/ivy/**/*.jar
 /.settings
 /bin1
 /.project
+/lib
