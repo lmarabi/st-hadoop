@@ -554,10 +554,10 @@ public class STSampler {
 
 	  public static void main(String[] args) throws IOException {
 		  
-			args = new String[3];
-		    args[0] = "/export/scratch/louai/scratch1/workspace/dataset/sthadoop/input";
-		    args[1] = "shape:edu.umn.cs.STHadoop.STpointsTweets";//"shape:edu.umn.cs.STHadoop.TemporalTweets";
-		    args[2] = "ratio:0.1";
+//			args = new String[3];
+//		    args[0] = "/home/louai/nyc-taxi/yellow";
+//		    args[1] = "shape:edu.umn.cs.sthadoop.core.STPoint";//"shape:edu.umn.cs.STHadoop.STpointsTweets"
+//		    args[2] = "ratio:0.1";
 		  
 	    OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
 	    Path[] inputFiles = params.getPaths();

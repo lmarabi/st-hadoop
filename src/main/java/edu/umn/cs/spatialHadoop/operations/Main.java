@@ -26,6 +26,7 @@ import edu.umn.cs.spatialHadoop.visualization.HeatMapPlot;
 import edu.umn.cs.spatialHadoop.visualization.LakesPlot;
 import edu.umn.cs.spatialHadoop.visualization.MagickPlot;
 import edu.umn.cs.sthadoop.indexing.STIndexManager;
+import edu.umn.cs.sthadoop.indexing.STSampler;
 import edu.umn.cs.sthadoop.indexing.TimeSlicing;
 import edu.umn.cs.sthadoop.operations.STRangeQuery;
 import edu.umn.cs.sthadoop.operations.TestSTRQ;
@@ -143,6 +144,7 @@ public class Main {
       // This is for time manager to check indexes
       pgd.addClass("stmanager", STIndexManager.class,"ST-Manager");
       pgd.addClass("strangequery", STRangeQuery.class,"ST-RangeQuery");
+      pgd.addClass("stsampler", STSampler.class,"ST-Sample");
       
       pgd.driver(args);
       
