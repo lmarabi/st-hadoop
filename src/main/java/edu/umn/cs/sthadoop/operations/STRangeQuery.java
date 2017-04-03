@@ -250,9 +250,15 @@ public class STRangeQuery {
 			System.exit(1);
 		}
 		if (params.get("rect") == null) {
-			System.err.println("You must provide a query range");
-			printUsage();
-			System.exit(1);
+			String x1 = "-"+ Double.toString(Double.MAX_VALUE);
+			String y1 = "-"+ Double.toString(Double.MAX_VALUE);
+			String x2 = Double.toString(Double.MAX_VALUE);
+			String y2 = Double.toString(Double.MAX_VALUE);
+			System.out.println(x1 + "," + y1 + ","+ x2 + "," + y2);
+			params.set("rect", x1+","+y1+","+x2+","+y2);
+//			System.err.println("You must provide a query range");
+//			printUsage();
+//			System.exit(1);
 		}
 
 		if (params.get("interval") == null) {
