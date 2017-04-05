@@ -153,7 +153,7 @@ public class STJoin {
     for(Path input : inputPaths){
     	args = new String[7];
 		args[0] = input.toString();
-		args[1] = outputPath.getParent().toString()+"/candidatebuckets/"+input.getName();
+		args[1] = outputPath.getParent().toString()+"candidatebuckets/"+input.getName();
 		args[2] = "shape:"+params.get("shape");
 		args[3] = "rect:"+params.get("rect");
 		args[4] = "interval:"+params.get("interval");
