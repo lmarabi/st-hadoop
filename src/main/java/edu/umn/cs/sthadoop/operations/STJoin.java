@@ -42,105 +42,104 @@ import edu.umn.cs.spatialHadoop.core.SpatialAlgorithms;
 import edu.umn.cs.spatialHadoop.util.Progressable;
 
 /**
- * Implementation of Spatio-temporal Join, takes two dataset and joins them based on 
- * Spatial and temporal predicates. 
- * For example, Join birds and human at area A during time interval T. 
+ * Implementation of Spatio-temporal Join, takes two dataset and joins them
+ * based on Spatial and temporal predicates. For example, Join birds and human
+ * at area A during time interval T.
+ * 
  * @author Louai Alarabi
  *
  */
 public class STJoin {
-  
-  /**Class logger*/
-  private static final Log LOG = LogFactory.getLog(STJoin.class);
-  
-  static class STJoinMap extends MapReduceBase
-  implements Mapper<Rectangle, Shape, IntWritable, Shape> {
-	  
-	  private GridInfo gridInfo;
-	    private IntWritable cellId = new IntWritable();
-	    
-	    @Override
-	    public void map(Rectangle key, Shape shape,
-	        OutputCollector<IntWritable, Shape> output, Reporter reporter)
-	        throws IOException {
-	      java.awt.Rectangle cells = gridInfo.getOverlappingCells(shape.getMBR());
-	      
-	      for (int col = cells.x; col < cells.x + cells.width; col++) {
-	        for (int row = cells.y; row < cells.y + cells.height; row++) {
-	          cellId.set(row * gridInfo.columns + col + 1);
-	          output.collect(cellId, shape);
-	        }
-	      }
-	    }
-	  }
-  
-  
-  static class STJoinReduce<S extends Shape> extends MapReduceBase implements
-  Reducer<IntWritable, S, S, S> {
-	    /**List of cells used by the reducer*/
-	    private GridInfo grid;
 
-	    @Override
-	    public void configure(JobConf job) {
-	      super.configure(job);
-	      grid = (GridInfo) OperationsParams.getShape(job, "PartitionGrid");
-	    }
+	/** Class logger */
+	private static final Log LOG = LogFactory.getLog(STJoin.class);
 
-	    @Override
-	    public void reduce(IntWritable cellId, Iterator<S> values,
-	        final OutputCollector<S, S> output, Reporter reporter) throws IOException {
-	      // Extract CellInfo (MBR) for duplicate avoidance checking
-	      final CellInfo cellInfo = grid.getCell(cellId.get());
-	      
-	      Vector<S> shapes = new Vector<S>();
-	      
-	      while (values.hasNext()) {
-	        S s = values.next();
-	        shapes.add((S) s.clone());
-	      }
-	      
-	      SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), true, new OutputCollector<Shape, Shape>() {
+	static class STJoinMap extends MapReduceBase implements Mapper<Rectangle, Shape, IntWritable, Shape> {
 
-	        @Override
-	        public void collect(Shape r, Shape s) throws IOException {
-	          // Perform a reference point duplicate avoidance technique
-	          Rectangle intersectionMBR = r.getMBR().getIntersection(s.getMBR());
-	          // Error: intersectionMBR may be null.
-	          if (intersectionMBR != null) {
-	            if (cellInfo.contains(intersectionMBR.x1, intersectionMBR.y1)) {
-	              // Report to the reduce result collector
-	              output.collect((S)r, (S)s);
-	            }
-	          }
-	        }
-	      }, new Progressable.ReporterProgressable(reporter));
-	    }
-	  }
-  
-  
-  
-  
-  
-  
-  /**
-   * 
-   * @param inputPath
-   * @param outputPath
-   * @param params
-   * @return
-   * @throws IOException
-   * @throws Exception
-   * @throws InterruptedException
-   */
-  private static long stJoin(Path inputPath, Path outputPath, OperationsParams params) throws IOException, Exception, InterruptedException {
-	  JobConf conf = new JobConf(new Configuration(), STJoin.class);
-	  Job job = Job.getInstance(conf);
+		private GridInfo gridInfo;
+		private IntWritable cellId = new IntWritable();
+
+		@Override
+		public void map(Rectangle key, Shape shape, OutputCollector<IntWritable, Shape> output, Reporter reporter)
+				throws IOException {
+			LOG.error("<Log>---->  I'm in mapper: " + shape.toString());
+			System.out.println("<println>-------> I'm in mapper: " + shape.toString());
+			java.awt.Rectangle cells = gridInfo.getOverlappingCells(shape.getMBR());
+
+			for (int col = cells.x; col < cells.x + cells.width; col++) {
+				for (int row = cells.y; row < cells.y + cells.height; row++) {
+					cellId.set(row * gridInfo.columns + col + 1);
+					output.collect(cellId, shape);
+				}
+			}
+		}
+	}
+
+	static class STJoinReduce<S extends Shape> extends MapReduceBase implements Reducer<IntWritable, S, S, S> {
+		/** List of cells used by the reducer */
+		private GridInfo grid;
+
+		@Override
+		public void configure(JobConf job) {
+			super.configure(job);
+			grid = (GridInfo) OperationsParams.getShape(job, "PartitionGrid");
+		}
+
+		@Override
+		public void reduce(IntWritable cellId, Iterator<S> values, final OutputCollector<S, S> output,
+				Reporter reporter) throws IOException {
+			// Extract CellInfo (MBR) for duplicate avoidance checking
+			LOG.error("<Log>---->  I'm in reducer: ");
+			System.out.println("<println>-------> I'm in reducer: ");
+			final CellInfo cellInfo = grid.getCell(cellId.get());
+
+			Vector<S> shapes = new Vector<S>();
+
+			while (values.hasNext()) {
+				S s = values.next();
+				shapes.add((S) s.clone());
+			}
+
+			SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), true,
+					new OutputCollector<Shape, Shape>() {
+
+						@Override
+						public void collect(Shape r, Shape s) throws IOException {
+							// Perform a reference point duplicate avoidance
+							// technique
+							Rectangle intersectionMBR = r.getMBR().getIntersection(s.getMBR());
+							// Error: intersectionMBR may be null.
+							if (intersectionMBR != null) {
+								if (cellInfo.contains(intersectionMBR.x1, intersectionMBR.y1)) {
+									// Report to the reduce result collector
+									output.collect((S) r, (S) s);
+								}
+							}
+						}
+					}, new Progressable.ReporterProgressable(reporter));
+		}
+	}
+
+	/**
+	 * 
+	 * @param inputPath
+	 * @param outputPath
+	 * @param params
+	 * @return
+	 * @throws IOException
+	 * @throws Exception
+	 * @throws InterruptedException
+	 */
+	private static long stJoin(Path inputPath, Path outputPath, OperationsParams params)
+			throws IOException, Exception, InterruptedException {
+		JobConf conf = new JobConf(new Configuration(), STJoin.class);
+		Job job = Job.getInstance(conf);
 		FileSystem outfs = outputPath.getFileSystem(conf);
 		outfs.delete(outputPath, true);
 		conf.setJobName("STJoin Query");
-		conf.setOutputKeyClass(Shape.class);
-		conf.setMapOutputKeyClass(Shape.class);
-		conf.setOutputValueClass(Text.class);
+		conf.setOutputKeyClass(Text.class);
+		conf.setMapOutputKeyClass(Text.class);
+		conf.setOutputValueClass(Shape.class);
 		// Mapper settings
 		conf.setMapperClass(STJoinMap.class);
 		conf.setReducerClass(STJoinReduce.class);
@@ -150,15 +149,16 @@ public class STJoin {
 		conf.setOutputFormat(TextOutputFormat.class);
 		FileInputFormat.setInputPaths(conf, inputPath);
 		FileOutputFormat.setOutputPath(conf, outputPath);
-		// grid partition. 
+		// grid partition.
 		GridInfo gridInfo = new GridInfo(-Double.MAX_VALUE, -Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-	    gridInfo.calculateCellDimensions(20);
-	    OperationsParams.setShape(conf, "PartitionGrid", gridInfo);
-		JobClient.runJob(conf).waitForCompletion();;
+		gridInfo.calculateCellDimensions(20);
+		OperationsParams.setShape(conf, "PartitionGrid", gridInfo);
+		JobClient.runJob(conf).waitForCompletion();
+		;
 		System.out.println("Job1 finish");
 		return 0;
 	}
-  
+
 	private static void printUsage() {
 		System.out.println("Runs a spatio-temporal range query on indexed data");
 		System.out.println("Parameters: (* marks required parameters)");
@@ -166,77 +166,72 @@ public class STJoin {
 		System.out.println("<output file> -  Path to input file");
 		System.out.println("shape:<STPoint> - (*) Type of shapes stored in input file");
 		System.out.println("rect:<x1,y1,x2,y2> - Spatial query range");
-		System.out.println(
-				"interval:<date1,date2> - Temporal query range. " + "Format of each date is yyyy-mm-dd");
+		System.out.println("interval:<date1,date2> - Temporal query range. " + "Format of each date is yyyy-mm-dd");
 		System.out.println("time:[day,week,month,year] -  Time Format");
 		System.out.println("-overwrite - Overwrite output file without notice");
 		GenericOptionsParser.printGenericCommandUsage(System.out);
 	}
-  
-  /**
-   * @param args
- * @throws Exception 
-   */
-  public static void main(String[] args) throws Exception {
-	  
-//		args = new String[8];
-//		args[0] = "/home/louai/nyc-taxi/yellowIndex";
-//		args[1] = "/home/louai/nyc-taxi/humanIndex";
-//		args[2] = "/home/louai/nyc-taxi/resultSTJoin";
-//		args[3] = "shape:edu.umn.cs.sthadoop.core.STPoint";
-//		args[4] = "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
-//		args[5] = "interval:2015-01-01,2015-01-02";
-//		args[6] = "-overwrite";
-//		args[7] = "-no-local";
-	  
-    OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
-    Path[] allFiles = params.getPaths();
-    if (allFiles.length < 2) {
-      System.err
-          .println("This operation requires at least two input files");
-      printUsage();
-      System.exit(1);
-    }
-    if (allFiles.length == 2 && !params.checkInput()) {
-      // One of the input files does not exist
-      printUsage();
-      System.exit(1);
-    }
-    if (allFiles.length > 2 && !params.checkInputOutput()) {
-      printUsage();
-      System.exit(1);
-    }
 
-    Path[] inputPaths = allFiles.length == 2 ? allFiles : params.getInputPaths();
-    Path outputPath = allFiles.length == 2 ? null : params.getOutputPath();
-    
-    // Query from the dataset. 
-    for(Path input : inputPaths){
-    	args = new String[7];
-		args[0] = input.toString();
-		args[1] = outputPath.getParent().toString()+"candidatebuckets/"+input.getName();
-		args[2] = "shape:"+params.get("shape");
-		args[3] = "rect:"+params.get("rect");
-		args[4] = "interval:"+params.get("interval");
-		args[5] = "-overwrite";
-		args[6] = "-no-local";
-		for(String x: args)
-			System.out.println(x);
-		STRangeQuery.main(args);
-	    System.out.println("done with the STQuery from: "+input.toString()+ "\n"+
-		"candidate:" + args[1]);
-	
-    }
-    // invoke the map-hash and reduce-join . 
+	/**
+	 * @param args
+	 * @throws Exception
+	 */
+	public static void main(String[] args) throws Exception {
 
-    long t1 = System.currentTimeMillis();
-    long resultSize = stJoin(new Path(outputPath.getParent().toString()+"candidatebuckets/")
-    		, outputPath, params);
-    long t2 = System.currentTimeMillis();
-    System.out.println("Total time: "+(t2-t1)+" millis");
-    System.out.println("Result size: "+resultSize);
-  }
+		// args = new String[8];
+		// args[0] = "/home/louai/nyc-taxi/yellowIndex";
+		// args[1] = "/home/louai/nyc-taxi/humanIndex";
+		// args[2] = "/home/louai/nyc-taxi/resultSTJoin";
+		// args[3] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+		// args[4] =
+		// "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
+		// args[5] = "interval:2015-01-01,2015-01-02";
+		// args[6] = "-overwrite";
+		// args[7] = "-no-local";
 
+		OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
+		Path[] allFiles = params.getPaths();
+		if (allFiles.length < 2) {
+			System.err.println("This operation requires at least two input files");
+			printUsage();
+			System.exit(1);
+		}
+		if (allFiles.length == 2 && !params.checkInput()) {
+			// One of the input files does not exist
+			printUsage();
+			System.exit(1);
+		}
+		if (allFiles.length > 2 && !params.checkInputOutput()) {
+			printUsage();
+			System.exit(1);
+		}
 
+		Path[] inputPaths = allFiles.length == 2 ? allFiles : params.getInputPaths();
+		Path outputPath = allFiles.length == 2 ? null : params.getOutputPath();
+
+		// Query from the dataset.
+		for (Path input : inputPaths) {
+			args = new String[7];
+			args[0] = input.toString();
+			args[1] = outputPath.getParent().toString() + "candidatebuckets/" + input.getName();
+			args[2] = "shape:" + params.get("shape");
+			args[3] = "rect:" + params.get("rect");
+			args[4] = "interval:" + params.get("interval");
+			args[5] = "-overwrite";
+			args[6] = "-no-local";
+			for (String x : args)
+				System.out.println(x);
+			STRangeQuery.main(args);
+			System.out.println("done with the STQuery from: " + input.toString() + "\n" + "candidate:" + args[1]);
+
+		}
+		// invoke the map-hash and reduce-join .
+
+		long t1 = System.currentTimeMillis();
+		long resultSize = stJoin(new Path(outputPath.getParent().toString() + "candidatebuckets/"), outputPath, params);
+		long t2 = System.currentTimeMillis();
+		System.out.println("Total time: " + (t2 - t1) + " millis");
+		System.out.println("Result size: " + resultSize);
+	}
 
 }
