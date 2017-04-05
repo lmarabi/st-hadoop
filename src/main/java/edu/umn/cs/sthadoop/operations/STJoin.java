@@ -154,9 +154,9 @@ public class STJoin {
     	args = new String[7];
 		args[0] = input.toString();
 		args[1] = outputPath.getParent().toString()+"/candidatebuckets/"+input.getName();
-		args[2] = params.get("shape");
-		args[3] = params.get("rect");
-		args[4] = params.get("interval");
+		args[2] = "shape:"+params.get("shape");
+		args[3] = "rect:"+params.get("rect");
+		args[4] = "interval:"+params.get("interval");
 		args[5] = "-overwrite";
 		args[6] = "-no-local";
 		for(String x: args)
