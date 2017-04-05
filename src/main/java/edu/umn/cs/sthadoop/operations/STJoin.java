@@ -169,7 +169,7 @@ public class STJoin {
     // invoke the map-hash and reduce-join . 
 
     long t1 = System.currentTimeMillis();
-    long resultSize = stJoin(new Path(outputPath.getParent().toString()+"/candidatebuckets/")
+    long resultSize = stJoin(new Path(outputPath.getParent().toString()+"candidatebuckets/")
     		, outputPath, params);
     long t2 = System.currentTimeMillis();
     System.out.println("Total time: "+(t2-t1)+" millis");
