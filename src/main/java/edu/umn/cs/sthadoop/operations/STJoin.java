@@ -10,12 +10,14 @@ package edu.umn.cs.sthadoop.operations;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
@@ -32,6 +34,12 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 import edu.umn.cs.spatialHadoop.OperationsParams;
+import edu.umn.cs.spatialHadoop.core.CellInfo;
+import edu.umn.cs.spatialHadoop.core.GridInfo;
+import edu.umn.cs.spatialHadoop.core.Rectangle;
+import edu.umn.cs.spatialHadoop.core.Shape;
+import edu.umn.cs.spatialHadoop.core.SpatialAlgorithms;
+import edu.umn.cs.spatialHadoop.util.Progressable;
 
 /**
  * Implementation of Spatio-temporal Join, takes two dataset and joins them based on 
@@ -45,44 +53,93 @@ public class STJoin {
   /**Class logger*/
   private static final Log LOG = LogFactory.getLog(STJoin.class);
   
-  static class STJoinMap extends MapReduceBase implements
-  Mapper<Text, Text, Text, Text>{
+  static class STJoinMap extends MapReduceBase
+  implements Mapper<Rectangle, Shape, IntWritable, Shape> {
 	  
+	  private GridInfo gridInfo;
+	    private IntWritable cellId = new IntWritable();
+	    
+	    @Override
+	    public void map(Rectangle key, Shape shape,
+	        OutputCollector<IntWritable, Shape> output, Reporter reporter)
+	        throws IOException {
+	      java.awt.Rectangle cells = gridInfo.getOverlappingCells(shape.getMBR());
+	      
+	      for (int col = cells.x; col < cells.x + cells.width; col++) {
+	        for (int row = cells.y; row < cells.y + cells.height; row++) {
+	          cellId.set(row * gridInfo.columns + col + 1);
+	          output.collect(cellId, shape);
+	        }
+	      }
+	    }
+	  }
+  
+  
+  static class STJoinReduce<S extends Shape> extends MapReduceBase implements
+  Reducer<IntWritable, S, S, S> {
+	    /**List of cells used by the reducer*/
+	    private GridInfo grid;
 
-	@Override
-	public void map(Text key, Text value,
-			OutputCollector<Text, Text> output, Reporter reporter) throws IOException {
-		// TODO Auto-generated method stub
-		Text word = new Text("1");
-		output.collect(word, value);
-	}
-	 
-  }
-  
-  
-  static class STJoinReduce extends MapReduceBase implements
-  Reducer<Text, Text, Text, Text>{
+	    @Override
+	    public void configure(JobConf job) {
+	      super.configure(job);
+	      grid = (GridInfo) OperationsParams.getShape(job, "PartitionGrid");
+	    }
 
-	@Override
-	public void reduce(Text key, Iterator<Text> values, OutputCollector<Text, Text> output, Reporter reporter)
-			throws IOException {
-		// TODO Auto-generated method stub
-		while(values.hasNext()){
-		  output.collect(key, values.next());
-		}
-		
-	}
-	  
-  }
+	    @Override
+	    public void reduce(IntWritable cellId, Iterator<S> values,
+	        final OutputCollector<S, S> output, Reporter reporter) throws IOException {
+	      // Extract CellInfo (MBR) for duplicate avoidance checking
+	      final CellInfo cellInfo = grid.getCell(cellId.get());
+	      
+	      Vector<S> shapes = new Vector<S>();
+	      
+	      while (values.hasNext()) {
+	        S s = values.next();
+	        shapes.add((S) s.clone());
+	      }
+	      
+	      SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), true, new OutputCollector<Shape, Shape>() {
+
+	        @Override
+	        public void collect(Shape r, Shape s) throws IOException {
+	          // Perform a reference point duplicate avoidance technique
+	          Rectangle intersectionMBR = r.getMBR().getIntersection(s.getMBR());
+	          // Error: intersectionMBR may be null.
+	          if (intersectionMBR != null) {
+	            if (cellInfo.contains(intersectionMBR.x1, intersectionMBR.y1)) {
+	              // Report to the reduce result collector
+	              output.collect((S)r, (S)s);
+	            }
+	          }
+	        }
+	      }, new Progressable.ReporterProgressable(reporter));
+	    }
+	  }
   
+  
+  
+  
+  
+  
+  /**
+   * 
+   * @param inputPath
+   * @param outputPath
+   * @param params
+   * @return
+   * @throws IOException
+   * @throws Exception
+   * @throws InterruptedException
+   */
   private static long stJoin(Path inputPath, Path outputPath, OperationsParams params) throws IOException, Exception, InterruptedException {
 	  JobConf conf = new JobConf(new Configuration(), STJoin.class);
 	  Job job = Job.getInstance(conf);
 		FileSystem outfs = outputPath.getFileSystem(conf);
 		outfs.delete(outputPath, true);
 		conf.setJobName("STJoin Query");
-		conf.setOutputKeyClass(Text.class);
-		conf.setMapOutputKeyClass(Text.class);
+		conf.setOutputKeyClass(Shape.class);
+		conf.setMapOutputKeyClass(Shape.class);
 		conf.setOutputValueClass(Text.class);
 		// Mapper settings
 		conf.setMapperClass(STJoinMap.class);
@@ -93,6 +150,10 @@ public class STJoin {
 		conf.setOutputFormat(TextOutputFormat.class);
 		FileInputFormat.setInputPaths(conf, inputPath);
 		FileOutputFormat.setOutputPath(conf, outputPath);
+		// grid partition. 
+		GridInfo gridInfo = new GridInfo(-Double.MAX_VALUE, -Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+	    gridInfo.calculateCellDimensions(20);
+	    OperationsParams.setShape(conf, "PartitionGrid", gridInfo);
 		JobClient.runJob(conf).waitForCompletion();;
 		System.out.println("Job1 finish");
 		return 0;
