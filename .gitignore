@@ -11,3 +11,5 @@ lib/ivy/**/*.jar
 /bin1
 /.project
 /lib/* 
+.classpath
+st-hadoop-uber.jar
