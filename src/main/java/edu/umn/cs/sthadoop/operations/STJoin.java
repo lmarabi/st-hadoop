@@ -238,6 +238,9 @@ public class STJoin {
 	    }else{
 	    	inputstjoin = new Path(outputPath.getParent().toString() + "/candidatebuckets");
 	    }
+	    if(fs.exists(outputPath)){
+	    	fs.delete(outputPath);
+	    }
 		long t1 = System.currentTimeMillis();
 		long resultSize = stJoin(inputstjoin, outputPath, params);
 		long t2 = System.currentTimeMillis();
