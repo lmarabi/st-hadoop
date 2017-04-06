@@ -182,16 +182,16 @@ public class STJoin {
 	 */
 	public static void main(String[] args) throws Exception {
 
-		 args = new String[8];
-		 args[0] = "/home/louai/nyc-taxi/yellowIndex";
-		 args[1] = "/home/louai/nyc-taxi/humanIndex";
-		 args[2] = "/home/louai/nyc-taxi/resultSTJoin";
-		 args[3] = "shape:edu.umn.cs.sthadoop.core.STPoint";
-		 args[4] =
-		 "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
-		 args[5] = "interval:2015-01-01,2015-01-02";
-		 args[6] = "-overwrite";
-		 args[7] = "-no-local";
+//		 args = new String[8];
+//		 args[0] = "/home/louai/nyc-taxi/yellowIndex";
+//		 args[1] = "/home/louai/nyc-taxi/humanIndex";
+//		 args[2] = "/home/louai/nyc-taxi/resultSTJoin";
+//		 args[3] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+//		 args[4] =
+//		 "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
+//		 args[5] = "interval:2015-01-01,2015-01-02";
+//		 args[6] = "-overwrite";
+//		 args[7] = "-no-local";
 
 		OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
 		Path[] allFiles = params.getPaths();
