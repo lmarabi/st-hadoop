@@ -57,19 +57,18 @@ public class STJoin {
 		@Override
 		public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter)
 				throws IOException {
-//			STPoint shape = new STPoint();
-//			shape.fromText(value);
-//			LOG.info("<Log>---->  I'm in mapper: " + shape.toString());
-//			System.out.println("<println>-------> I'm in mapper: " + shape.toString());
-//			java.awt.Rectangle cells = gridInfo.getOverlappingCells(shape.getMBR());
-//
-//			for (int col = cells.x; col < cells.x + cells.width; col++) {
-//				for (int row = cells.y; row < cells.y + cells.height; row++) {
-//					cellId.set(row * gridInfo.columns + col + 1);
-//					output.collect(new Text(cellId.toString()), new Text(shape.toString()));
-//				}
-//			}
-			output.collect(new Text("1"), value);
+			STPoint shape = new STPoint();
+			shape.fromText(value);
+			LOG.info("<Log>---->  I'm in mapper: " + shape.toString());
+			System.out.println("<println>-------> I'm in mapper: " + shape.toString());
+			java.awt.Rectangle cells = gridInfo.getOverlappingCells(shape.getMBR());
+
+			for (int col = cells.x; col < cells.x + cells.width; col++) {
+				for (int row = cells.y; row < cells.y + cells.height; row++) {
+					cellId.set(row * gridInfo.columns + col + 1);
+					output.collect(new Text(cellId.toString()), new Text(shape.toString()));
+				}
+			}
 		}
 	}
 
