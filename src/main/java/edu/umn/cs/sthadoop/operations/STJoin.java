@@ -55,13 +55,13 @@ public class STJoin {
 	/** Class logger */
 	private static final Log LOG = LogFactory.getLog(STJoin.class);
 
-	static class STJoinMap extends MapReduceBase implements Mapper<Text, Text, IntWritable, Text> {
+	static class STJoinMap extends MapReduceBase implements Mapper<Text, Text, Text, Text> {
 
 		private GridInfo gridInfo;
 		private IntWritable cellId = new IntWritable();
 
 		@Override
-		public void map(Text key, Text value, OutputCollector<IntWritable, Text> output, Reporter reporter)
+		public void map(Text key, Text value, OutputCollector<Text, Text> output, Reporter reporter)
 				throws IOException {
 			STPoint shape = new STPoint();
 			shape.fromText(value);
@@ -72,14 +72,14 @@ public class STJoin {
 			for (int col = cells.x; col < cells.x + cells.width; col++) {
 				for (int row = cells.y; row < cells.y + cells.height; row++) {
 					cellId.set(row * gridInfo.columns + col + 1);
-					output.collect(cellId, new Text(shape.toString()));
+					output.collect(new Text(cellId.toString()), new Text(shape.toString()));
 				}
 			}
 		}
 	}
 
 	static class STJoinReduce extends MapReduceBase implements 
-	Reducer<IntWritable, Text, Text, Text> {		/** List of cells used by the reducer */
+	Reducer<Text, Text, Text, Text> {		/** List of cells used by the reducer */
 		private GridInfo grid;
 
 		@Override
@@ -89,7 +89,7 @@ public class STJoin {
 		}
 
 		@Override
-		public void reduce(IntWritable cellId, Iterator<Text> values, final OutputCollector<Text,Text> output,
+		public void reduce(Text cellId, Iterator<Text> values, final OutputCollector<Text,Text> output,
 				Reporter reporter) throws IOException {
 			// Extract CellInfo (MBR) for duplicate avoidance checking
 			LOG.info("<Log>---->  I'm in reducer: ");
