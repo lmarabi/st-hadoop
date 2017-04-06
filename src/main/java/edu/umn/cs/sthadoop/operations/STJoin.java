@@ -10,7 +10,6 @@ package edu.umn.cs.sthadoop.operations;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,16 +29,10 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.hadoop.mapred.TextOutputFormat;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 import edu.umn.cs.spatialHadoop.OperationsParams;
-import edu.umn.cs.spatialHadoop.core.CellInfo;
 import edu.umn.cs.spatialHadoop.core.GridInfo;
-import edu.umn.cs.spatialHadoop.core.Rectangle;
-import edu.umn.cs.spatialHadoop.core.Shape;
-import edu.umn.cs.spatialHadoop.core.SpatialAlgorithms;
-import edu.umn.cs.spatialHadoop.util.Progressable;
 import edu.umn.cs.sthadoop.core.STPoint;
 
 /**
@@ -142,17 +135,18 @@ public class STJoin {
 	private static long stJoin(Path inputPath, Path outputPath, OperationsParams params)
 			throws IOException, Exception, InterruptedException {
 		JobConf conf = new JobConf(new Configuration(), STJoin.class);
-		Job job = Job.getInstance(conf);
 		FileSystem outfs = outputPath.getFileSystem(conf);
 		outfs.delete(outputPath, true);
 		conf.setJobName("STJoin Query");
 		conf.setOutputKeyClass(Text.class);
+		conf.setMapOutputKeyClass(Text.class);
+		conf.setMapOutputValueClass(Text.class);
 		conf.setOutputValueClass(Text.class);
 		// Mapper settings
 		conf.setMapperClass(STJoinMap.class);
 		conf.setReducerClass(STJoinReduce.class);
 		conf.setCombinerClass(STJoinReduce.class);
-		conf.setBoolean("mapreduce.input.fileinputformat.input.dir.recursive", true);
+		//conf.setBoolean("mapreduce.input.fileinputformat.input.dir.recursive", true);
 		conf.setInputFormat(TextInputFormat.class);
 		conf.setOutputFormat(TextOutputFormat.class);
 		FileInputFormat.setInputPaths(conf, inputPath);
@@ -166,6 +160,8 @@ public class STJoin {
 		System.out.println("Job1 finish");
 		return 0;
 	}
+	
+	
 
 	private static void printUsage() {
 		System.out.println("Runs a spatio-temporal range query on indexed data");
@@ -186,16 +182,16 @@ public class STJoin {
 	 */
 	public static void main(String[] args) throws Exception {
 
-		// args = new String[8];
-		// args[0] = "/home/louai/nyc-taxi/yellowIndex";
-		// args[1] = "/home/louai/nyc-taxi/humanIndex";
-		// args[2] = "/home/louai/nyc-taxi/resultSTJoin";
-		// args[3] = "shape:edu.umn.cs.sthadoop.core.STPoint";
-		// args[4] =
-		// "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
-		// args[5] = "interval:2015-01-01,2015-01-02";
-		// args[6] = "-overwrite";
-		// args[7] = "-no-local";
+		 args = new String[8];
+		 args[0] = "/home/louai/nyc-taxi/yellowIndex";
+		 args[1] = "/home/louai/nyc-taxi/humanIndex";
+		 args[2] = "/home/louai/nyc-taxi/resultSTJoin";
+		 args[3] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+		 args[4] =
+		 "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
+		 args[5] = "interval:2015-01-01,2015-01-02";
+		 args[6] = "-overwrite";
+		 args[7] = "-no-local";
 
 		OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
 		Path[] allFiles = params.getPaths();
@@ -229,14 +225,20 @@ public class STJoin {
 			args[6] = "-no-local";
 			for (String x : args)
 				System.out.println(x);
-			STRangeQuery.main(args);
+//			STRangeQuery.main(args);
 			System.out.println("done with the STQuery from: " + input.toString() + "\n" + "candidate:" + args[1]);
 
 		}
 		// invoke the map-hash and reduce-join .
-
+	    FileSystem fs = outputPath.getFileSystem(new Configuration());
+	    Path inputstjoin;
+	    if(fs.exists(new Path(outputPath.getParent().toString() + "candidatebuckets/"))){
+	    	inputstjoin = new Path(outputPath.getParent().toString() + "candidatebuckets/");
+	    }else{
+	    	inputstjoin = new Path(outputPath.getParent().toString() + "/candidatebuckets/*/*");
+	    }
 		long t1 = System.currentTimeMillis();
-		long resultSize = stJoin(new Path(outputPath.getParent().toString() + "candidatebuckets/"), outputPath, params);
+		long resultSize = stJoin(inputstjoin, outputPath, params);
 		long t2 = System.currentTimeMillis();
 		System.out.println("Total time: " + (t2 - t1) + " millis");
 		System.out.println("Result size: " + resultSize);
