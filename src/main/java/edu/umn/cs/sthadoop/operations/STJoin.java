@@ -143,9 +143,8 @@ public class STJoin {
 		FileSystem outfs = outputPath.getFileSystem(conf);
 		outfs.delete(outputPath, true);
 		conf.setJobName("STJoin Query");
-		conf.setOutputKeyClass(Text.class);
-		conf.setMapOutputKeyClass(Text.class);
-		conf.setOutputValueClass(Shape.class);
+		conf.setOutputKeyClass(IntWritable.class);
+		conf.setOutputValueClass(Text.class);
 		// Mapper settings
 		conf.setMapperClass(STJoinMap.class);
 		conf.setReducerClass(STJoinReduce.class);
