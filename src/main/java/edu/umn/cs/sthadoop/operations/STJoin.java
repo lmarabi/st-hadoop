@@ -79,7 +79,7 @@ public class STJoin {
 	}
 
 	static class STJoinReduce extends MapReduceBase implements 
-	Reducer<IntWritable, Text, IntWritable, Text> {		/** List of cells used by the reducer */
+	Reducer<IntWritable, Text, Text, Text> {		/** List of cells used by the reducer */
 		private GridInfo grid;
 
 		@Override
@@ -89,13 +89,13 @@ public class STJoin {
 		}
 
 		@Override
-		public void reduce(IntWritable cellId, Iterator<Text> values, final OutputCollector<IntWritable,Text> output,
+		public void reduce(IntWritable cellId, Iterator<Text> values, final OutputCollector<Text,Text> output,
 				Reporter reporter) throws IOException {
 			// Extract CellInfo (MBR) for duplicate avoidance checking
 			LOG.info("<Log>---->  I'm in reducer: ");
 			System.out.println("<println>-------> I'm in reducer: ");
 			while(values.hasNext()){
-				output.collect(cellId, values.next());
+				output.collect(new Text(cellId.toString()), values.next());
 				LOG.info("<Log>---->  I'm in reducer: ");
 				System.out.println("<println>-------> I'm in reducer: ");
 			}
@@ -146,7 +146,7 @@ public class STJoin {
 		FileSystem outfs = outputPath.getFileSystem(conf);
 		outfs.delete(outputPath, true);
 		conf.setJobName("STJoin Query");
-		conf.setOutputKeyClass(IntWritable.class);
+		conf.setOutputKeyClass(Text.class);
 		conf.setOutputValueClass(Text.class);
 		// Mapper settings
 		conf.setMapperClass(STJoinMap.class);
