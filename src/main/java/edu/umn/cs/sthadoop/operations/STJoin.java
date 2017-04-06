@@ -56,18 +56,19 @@ public class STJoin {
 		@Override
 		public void map(Text key, Text value, OutputCollector<Text, Text> output, Reporter reporter)
 				throws IOException {
-			STPoint shape = new STPoint();
-			shape.fromText(value);
-			LOG.info("<Log>---->  I'm in mapper: " + shape.toString());
-			System.out.println("<println>-------> I'm in mapper: " + shape.toString());
-			java.awt.Rectangle cells = gridInfo.getOverlappingCells(shape.getMBR());
-
-			for (int col = cells.x; col < cells.x + cells.width; col++) {
-				for (int row = cells.y; row < cells.y + cells.height; row++) {
-					cellId.set(row * gridInfo.columns + col + 1);
-					output.collect(new Text(cellId.toString()), new Text(shape.toString()));
-				}
-			}
+//			STPoint shape = new STPoint();
+//			shape.fromText(value);
+//			LOG.info("<Log>---->  I'm in mapper: " + shape.toString());
+//			System.out.println("<println>-------> I'm in mapper: " + shape.toString());
+//			java.awt.Rectangle cells = gridInfo.getOverlappingCells(shape.getMBR());
+//
+//			for (int col = cells.x; col < cells.x + cells.width; col++) {
+//				for (int row = cells.y; row < cells.y + cells.height; row++) {
+//					cellId.set(row * gridInfo.columns + col + 1);
+//					output.collect(new Text(cellId.toString()), new Text(shape.toString()));
+//				}
+//			}
+			output.collect(new Text("1"), value);
 		}
 	}
 
@@ -88,7 +89,7 @@ public class STJoin {
 			LOG.info("<Log>---->  I'm in reducer: ");
 			System.out.println("<println>-------> I'm in reducer: ");
 			while(values.hasNext()){
-				output.collect(new Text(cellId.toString()), values.next());
+				output.collect(cellId, values.next());
 				LOG.info("<Log>---->  I'm in reducer: ");
 				System.out.println("<println>-------> I'm in reducer: ");
 			}
@@ -146,7 +147,7 @@ public class STJoin {
 		conf.setMapperClass(STJoinMap.class);
 		conf.setReducerClass(STJoinReduce.class);
 		conf.setCombinerClass(STJoinReduce.class);
-		//conf.setBoolean("mapreduce.input.fileinputformat.input.dir.recursive", true);
+		conf.setBoolean("mapreduce.input.fileinputformat.input.dir.recursive", true);
 		conf.setInputFormat(TextInputFormat.class);
 		conf.setOutputFormat(TextOutputFormat.class);
 		FileInputFormat.setInputPaths(conf, inputPath);
@@ -182,16 +183,16 @@ public class STJoin {
 	 */
 	public static void main(String[] args) throws Exception {
 
-//		 args = new String[8];
-//		 args[0] = "/home/louai/nyc-taxi/yellowIndex";
-//		 args[1] = "/home/louai/nyc-taxi/humanIndex";
-//		 args[2] = "/home/louai/nyc-taxi/resultSTJoin";
-//		 args[3] = "shape:edu.umn.cs.sthadoop.core.STPoint";
-//		 args[4] =
-//		 "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
-//		 args[5] = "interval:2015-01-01,2015-01-02";
-//		 args[6] = "-overwrite";
-//		 args[7] = "-no-local";
+		 args = new String[8];
+		 args[0] = "/home/louai/nyc-taxi/yellowIndex";
+		 args[1] = "/home/louai/nyc-taxi/humanIndex";
+		 args[2] = "/home/louai/nyc-taxi/resultSTJoin";
+		 args[3] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+		 args[4] =
+		 "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
+		 args[5] = "interval:2015-01-01,2015-01-02";
+		 args[6] = "-overwrite";
+		 args[7] = "-no-local";
 
 		OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
 		Path[] allFiles = params.getPaths();
@@ -233,9 +234,9 @@ public class STJoin {
 	    FileSystem fs = outputPath.getFileSystem(new Configuration());
 	    Path inputstjoin;
 	    if(fs.exists(new Path(outputPath.getParent().toString() + "candidatebuckets/"))){
-	    	inputstjoin = new Path(outputPath.getParent().toString() + "candidatebuckets/*/*/*");
+	    	inputstjoin = new Path(outputPath.getParent().toString() + "candidatebuckets");
 	    }else{
-	    	inputstjoin = new Path(outputPath.getParent().toString() + "/candidatebuckets/*/*/*");
+	    	inputstjoin = new Path(outputPath.getParent().toString() + "/candidatebuckets");
 	    }
 		long t1 = System.currentTimeMillis();
 		long resultSize = stJoin(inputstjoin, outputPath, params);
