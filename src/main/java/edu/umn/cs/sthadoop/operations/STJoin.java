@@ -40,6 +40,7 @@ import edu.umn.cs.spatialHadoop.core.Rectangle;
 import edu.umn.cs.spatialHadoop.core.Shape;
 import edu.umn.cs.spatialHadoop.core.SpatialAlgorithms;
 import edu.umn.cs.spatialHadoop.util.Progressable;
+import edu.umn.cs.sthadoop.core.STPoint;
 
 /**
  * Implementation of Spatio-temporal Join, takes two dataset and joins them
@@ -54,14 +55,16 @@ public class STJoin {
 	/** Class logger */
 	private static final Log LOG = LogFactory.getLog(STJoin.class);
 
-	static class STJoinMap extends MapReduceBase implements Mapper<Text, Shape, IntWritable, Text> {
+	static class STJoinMap extends MapReduceBase implements Mapper<Text, Text, IntWritable, Text> {
 
 		private GridInfo gridInfo;
 		private IntWritable cellId = new IntWritable();
 
 		@Override
-		public void map(Text key, Shape shape, OutputCollector<IntWritable, Text> output, Reporter reporter)
+		public void map(Text key, Text value, OutputCollector<IntWritable, Text> output, Reporter reporter)
 				throws IOException {
+			STPoint shape = new STPoint();
+			shape.fromText(value);
 			LOG.info("<Log>---->  I'm in mapper: " + shape.toString());
 			System.out.println("<println>-------> I'm in mapper: " + shape.toString());
 			java.awt.Rectangle cells = gridInfo.getOverlappingCells(shape.getMBR());
