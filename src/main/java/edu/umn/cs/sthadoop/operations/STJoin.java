@@ -17,6 +17,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
@@ -48,13 +49,13 @@ public class STJoin {
 	/** Class logger */
 	private static final Log LOG = LogFactory.getLog(STJoin.class);
 
-	static class STJoinMap extends MapReduceBase implements Mapper<Text, Text, Text, Text> {
+	static class STJoinMap extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
 
 		private GridInfo gridInfo;
 		private IntWritable cellId = new IntWritable();
 
 		@Override
-		public void map(Text key, Text value, OutputCollector<Text, Text> output, Reporter reporter)
+		public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter)
 				throws IOException {
 //			STPoint shape = new STPoint();
 //			shape.fromText(value);
