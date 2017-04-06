@@ -53,6 +53,13 @@ public class STJoin {
 
 		private GridInfo gridInfo;
 		private IntWritable cellId = new IntWritable();
+		
+		@Override
+		public void configure(JobConf job) {
+			// TODO Auto-generated method stub
+			super.configure(job);
+			gridInfo = (GridInfo) OperationsParams.getShape(job, "PartitionGrid");
+		}
 
 		@Override
 		public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter)
@@ -238,9 +245,7 @@ public class STJoin {
 	    }else{
 	    	inputstjoin = new Path(outputPath.getParent().toString() + "/candidatebuckets");
 	    }
-	    if(fs.exists(outputPath)){
-	    	fs.delete(outputPath);
-	    }
+	    
 		long t1 = System.currentTimeMillis();
 		long resultSize = stJoin(inputstjoin, outputPath, params);
 		long t2 = System.currentTimeMillis();
