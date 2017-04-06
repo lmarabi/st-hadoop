@@ -54,29 +54,29 @@ public class STJoin {
 	/** Class logger */
 	private static final Log LOG = LogFactory.getLog(STJoin.class);
 
-	static class STJoinMap extends MapReduceBase implements Mapper<Rectangle, Shape, IntWritable, Shape> {
+	static class STJoinMap extends MapReduceBase implements Mapper<Text, Shape, IntWritable, Text> {
 
 		private GridInfo gridInfo;
 		private IntWritable cellId = new IntWritable();
 
 		@Override
-		public void map(Rectangle key, Shape shape, OutputCollector<IntWritable, Shape> output, Reporter reporter)
+		public void map(Text key, Shape shape, OutputCollector<IntWritable, Text> output, Reporter reporter)
 				throws IOException {
-			LOG.error("<Log>---->  I'm in mapper: " + shape.toString());
+			LOG.info("<Log>---->  I'm in mapper: " + shape.toString());
 			System.out.println("<println>-------> I'm in mapper: " + shape.toString());
 			java.awt.Rectangle cells = gridInfo.getOverlappingCells(shape.getMBR());
 
 			for (int col = cells.x; col < cells.x + cells.width; col++) {
 				for (int row = cells.y; row < cells.y + cells.height; row++) {
 					cellId.set(row * gridInfo.columns + col + 1);
-					output.collect(cellId, shape);
+					output.collect(cellId, new Text(shape.toString()));
 				}
 			}
 		}
 	}
 
-	static class STJoinReduce<S extends Shape> extends MapReduceBase implements Reducer<IntWritable, S, S, S> {
-		/** List of cells used by the reducer */
+	static class STJoinReduce extends MapReduceBase implements 
+	Reducer<IntWritable, Text, IntWritable, Text> {		/** List of cells used by the reducer */
 		private GridInfo grid;
 
 		@Override
@@ -86,37 +86,43 @@ public class STJoin {
 		}
 
 		@Override
-		public void reduce(IntWritable cellId, Iterator<S> values, final OutputCollector<S, S> output,
+		public void reduce(IntWritable cellId, Iterator<Text> values, final OutputCollector<IntWritable,Text> output,
 				Reporter reporter) throws IOException {
 			// Extract CellInfo (MBR) for duplicate avoidance checking
-			LOG.error("<Log>---->  I'm in reducer: ");
+			LOG.info("<Log>---->  I'm in reducer: ");
 			System.out.println("<println>-------> I'm in reducer: ");
-			final CellInfo cellInfo = grid.getCell(cellId.get());
-
-			Vector<S> shapes = new Vector<S>();
-
-			while (values.hasNext()) {
-				S s = values.next();
-				shapes.add((S) s.clone());
+			while(values.hasNext()){
+				output.collect(cellId, values.next());
+				LOG.info("<Log>---->  I'm in reducer: ");
+				System.out.println("<println>-------> I'm in reducer: ");
 			}
-
-			SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), true,
-					new OutputCollector<Shape, Shape>() {
-
-						@Override
-						public void collect(Shape r, Shape s) throws IOException {
-							// Perform a reference point duplicate avoidance
-							// technique
-							Rectangle intersectionMBR = r.getMBR().getIntersection(s.getMBR());
-							// Error: intersectionMBR may be null.
-							if (intersectionMBR != null) {
-								if (cellInfo.contains(intersectionMBR.x1, intersectionMBR.y1)) {
-									// Report to the reduce result collector
-									output.collect((S) r, (S) s);
-								}
-							}
-						}
-					}, new Progressable.ReporterProgressable(reporter));
+			
+//			final CellInfo cellInfo = grid.getCell(cellId.get());
+//
+//			Vector<S> shapes = new Vector<S>();
+//
+//			while (values.hasNext()) {
+//				S s = values.next();
+//				shapes.add((S) s.clone());
+//			}
+//
+//			SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), true,
+//					new OutputCollector<Shape, Shape>() {
+//
+//						@Override
+//						public void collect(Shape r, Shape s) throws IOException {
+//							// Perform a reference point duplicate avoidance
+//							// technique
+//							Rectangle intersectionMBR = r.getMBR().getIntersection(s.getMBR());
+//							// Error: intersectionMBR may be null.
+//							if (intersectionMBR != null) {
+//								if (cellInfo.contains(intersectionMBR.x1, intersectionMBR.y1)) {
+//									// Report to the reduce result collector
+//									output.collect((S) r, (S) s);
+//								}
+//							}
+//						}
+//					}, new Progressable.ReporterProgressable(reporter));
 		}
 	}
 
