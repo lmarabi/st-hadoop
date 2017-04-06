@@ -233,9 +233,9 @@ public class STJoin {
 	    FileSystem fs = outputPath.getFileSystem(new Configuration());
 	    Path inputstjoin;
 	    if(fs.exists(new Path(outputPath.getParent().toString() + "candidatebuckets/"))){
-	    	inputstjoin = new Path(outputPath.getParent().toString() + "candidatebuckets/");
+	    	inputstjoin = new Path(outputPath.getParent().toString() + "candidatebuckets/*/*/*");
 	    }else{
-	    	inputstjoin = new Path(outputPath.getParent().toString() + "/candidatebuckets/*/*");
+	    	inputstjoin = new Path(outputPath.getParent().toString() + "/candidatebuckets/*/*/*");
 	    }
 		long t1 = System.currentTimeMillis();
 		long resultSize = stJoin(inputstjoin, outputPath, params);
