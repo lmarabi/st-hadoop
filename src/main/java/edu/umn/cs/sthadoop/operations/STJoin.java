@@ -11,8 +11,11 @@ package edu.umn.cs.sthadoop.operations;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -76,7 +79,7 @@ public class STJoin {
 		private Text pair2 = new Text();
 		private Text joinResult = new Text();
 		int distance = 0; 
-		String time = "";
+		String timeresolution = "";
 		int interval = 0;	
 		
 		
@@ -86,7 +89,7 @@ public class STJoin {
 			super.configure(job);
 			String value = job.get("timedistance");
 			String[] temp = value.split(",");
-			this.time = temp[1];
+			this.timeresolution = temp[1];
 			this.interval = Integer.parseInt(temp[0]);
 			this.distance = Integer.parseInt(job.get("spacedistance"));
 		}
@@ -106,9 +109,24 @@ public class STJoin {
 				shape.fromText(temp);
 				shapes.add(shape);
 			}
-			
+			Collections.sort(shapes);
+			int candidateIndex = 0;
+			int i = candidateIndex;
+			ArrayList<STPoint> candidates = shapes;
+			for(STPoint current : shapes){
+				// shrink the candidate
+				candidateIndex = i++;
+				while((current.distanceTo(shapes.get(candidateIndex))) <= distance){
+					//candidates.remove(candidates.get(candidateIndex));
+					if(getTimeDistance(current.time, shapes.get(candidateIndex).time, timeresolution, interval)){
+						joinResult.set(current.toText(new Text()).toString()+"\t"+shapes.get(candidateIndex).toText(new Text()).toString());
+						output.collect(cellId, joinResult);
+					}
+					candidateIndex++;
+				}
+			}
 			// find nested join result. 
-			for(STPoint point : shapes){
+//			for(STPoint point : shapes){
 //				for(STPoint x : shapes){
 //					if(point.equals(x))
 //						continue;
@@ -120,8 +138,8 @@ public class STJoin {
 //						output.collect(cellId, joinResult);
 //					}
 //				}
-				output.collect(cellId, point.toText(new Text()));
-			}
+//				output.collect(cellId, point.toText(new Text()));
+//			}
 			
 		}
 		
