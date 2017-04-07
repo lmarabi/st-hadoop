@@ -115,17 +115,27 @@ public class STJoin {
 				shapes.add(shape);
 			}
 			
-		      SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), true, new OutputCollector<Shape, Shape>() {
 
-		    	  STPoint s1;
-		    	  STPoint s2;
-		          @Override
-		          public void collect(Shape r, Shape s) throws IOException {
-		      		joinResult.set(r.toText(new Text()).toString()+"\t"+s.toText(new Text()).toString());
-					output.collect(cellId, joinResult);
-		          }
-		        }, new Progressable.ReporterProgressable(reporter));
-			
+			SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), true,
+					new OutputCollector<Shape, Shape>() {
+
+						@Override
+						public void collect(Shape r, Shape s) throws IOException {
+							if (!r.equals(s)) {
+								STPoint s1;
+								STPoint s2;
+								s1 = (STPoint) r;
+								s2 = (STPoint) s;
+								if (s1.distanceTo(s2) <= distance) {
+									if (getTimeDistance(s1.time, s2.time, timeresolution, interval)) {
+										joinResult.set(r.toText(new Text()).toString() + "\t"
+												+ s.toText(new Text()).toString());
+										output.collect(cellId, joinResult);
+									}
+								}
+							}
+						}
+					}, new Progressable.ReporterProgressable(reporter));			
 			
 //			int candidateIndex = 0;
 //			int i = candidateIndex;
