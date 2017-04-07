@@ -9,8 +9,12 @@
 package edu.umn.cs.sthadoop.operations;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 
+import org.apache.commons.io.output.NullWriter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -18,6 +22,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
@@ -50,84 +55,116 @@ public class STJoin {
 	private static final Log LOG = LogFactory.getLog(STJoin.class);
 
 	static class STJoinMap extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
-
-		private GridInfo gridInfo;
-		private IntWritable cellId = new IntWritable();
+		private double degree = 0.01;
+		private double x1 = -180;
+		private double y1 = -90;
 		
-		@Override
-		public void configure(JobConf job) {
-			// TODO Auto-generated method stub
-			super.configure(job);
-			gridInfo = (GridInfo) OperationsParams.getShape(job, "PartitionGrid");
-		}
-
 		@Override
 		public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter)
 				throws IOException {
 			STPoint shape = new STPoint();
 			shape.fromText(value);
-			LOG.info("<Log>---->  I'm in mapper: " + shape.toString());
-			System.out.println("<println>-------> I'm in mapper: " + shape.toString());
-			java.awt.Rectangle cells = gridInfo.getOverlappingCells(shape.getMBR());
-
-			for (int col = cells.x; col < cells.x + cells.width; col++) {
-				for (int row = cells.y; row < cells.y + cells.height; row++) {
-					cellId.set(row * gridInfo.columns + col + 1);
-					output.collect(new Text(cellId.toString()), new Text(shape.toString()));
-				}
-			}
+			// Hasing objects to the grid. 
+			int columnID = (int)((shape.x - x1)/ degree);
+			int rowID = (int)((shape.y - y1)/ degree);
+			output.collect(new Text(columnID+","+rowID), new Text(shape.toString()));
 		}
 	}
 
 	static class STJoinReduce extends MapReduceBase implements 
-	Reducer<Text, Text, Text, Text> {		/** List of cells used by the reducer */
-		private GridInfo grid;
-
-		@Override
+	Reducer<Text, Text, Text, Text> {		
+		private static final Text NullWritable = null;
+		private Text pair1 = new Text();
+		private Text pair2 = new Text();
+		private Text joinResult = new Text();
+		int distance = 0; 
+		String time = "";
+		int interval = 0;	
+		
+		
+		 @Override
 		public void configure(JobConf job) {
+			// TODO Auto-generated method stub
 			super.configure(job);
-			grid = (GridInfo) OperationsParams.getShape(job, "PartitionGrid");
+			String[] temp = job.get("timeDistance").split(".");
+			this.time = temp[1];
+			this.interval = Integer.parseInt(temp[0]);
+			this.distance = Integer.parseInt(job.get("spaceDistance"));
 		}
+
+
+	/** List of cells used by the reducer */
+		
 
 		@Override
 		public void reduce(Text cellId, Iterator<Text> values, final OutputCollector<Text,Text> output,
 				Reporter reporter) throws IOException {
-			// Extract CellInfo (MBR) for duplicate avoidance checking
-			LOG.info("<Log>---->  I'm in reducer: ");
-			System.out.println("<println>-------> I'm in reducer: ");
+			ArrayList<STPoint> shapes = new ArrayList<STPoint>();
+			STPoint shape = null;
 			while(values.hasNext()){
-				output.collect(cellId, values.next());
-				LOG.info("<Log>---->  I'm in reducer: ");
-				System.out.println("<println>-------> I'm in reducer: ");
+				shape = new STPoint();
+				shape.fromText(values.next());
+				shapes.add(shape);
 			}
 			
-//			final CellInfo cellInfo = grid.getCell(cellId.get());
-//
-//			Vector<S> shapes = new Vector<S>();
-//
-//			while (values.hasNext()) {
-//				S s = values.next();
-//				shapes.add((S) s.clone());
-//			}
-//
-//			SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), true,
-//					new OutputCollector<Shape, Shape>() {
-//
-//						@Override
-//						public void collect(Shape r, Shape s) throws IOException {
-//							// Perform a reference point duplicate avoidance
-//							// technique
-//							Rectangle intersectionMBR = r.getMBR().getIntersection(s.getMBR());
-//							// Error: intersectionMBR may be null.
-//							if (intersectionMBR != null) {
-//								if (cellInfo.contains(intersectionMBR.x1, intersectionMBR.y1)) {
-//									// Report to the reduce result collector
-//									output.collect((S) r, (S) s);
-//								}
-//							}
-//						}
-//					}, new Progressable.ReporterProgressable(reporter));
+			// find nested join result. 
+			for(STPoint point : shapes){
+				for(STPoint x : shapes){
+					if(point.equals(x))
+						continue;
+					if(point.distanceTo(x) <= distance && 
+							getTimeDistance(point.time, x.time, time, interval)){
+						point.toText(pair1);
+						x.toText(pair2);
+						joinResult.set(pair1.toString()+"\t"+pair2.toString());
+						output.collect(NullWritable, joinResult);
+					}
+				}
+			}
+			
 		}
+		
+		
+		 private boolean getTimeDistance(String time1 , String time2, String flag, int interval) {
+				SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+				boolean result = false;
+				try {
+					Date d1 = format.parse(time1);
+					Date d2 = format.parse(time2);
+
+					//in milliseconds
+					long diff = d2.getTime() - d1.getTime();
+					
+					switch (flag) {
+					case "day":
+						if(interval <= (diff / (24 * 60 * 60 * 1000)))
+							result = true;
+						break;
+					case "hour":
+						if(interval <= (diff / (60 * 60 * 1000) % 24))
+							result = true;
+						break;
+					case "minute":
+						if(interval <= (diff / (60 * 1000) % 60))
+							result = true;
+						break;
+					case "second":
+						if(interval <= (diff / 1000 % 60))
+							result = true;
+						break;
+
+					default:
+						break;
+					}
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				return result;
+			}
+		
+		
 	}
 
 	/**
@@ -159,10 +196,9 @@ public class STJoin {
 		conf.setOutputFormat(TextOutputFormat.class);
 		FileInputFormat.setInputPaths(conf, inputPath);
 		FileOutputFormat.setOutputPath(conf, outputPath);
-		// grid partition.
-		GridInfo gridInfo = new GridInfo(-Double.MAX_VALUE, -Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-		gridInfo.calculateCellDimensions(20);
-		OperationsParams.setShape(conf, "PartitionGrid", gridInfo);
+		// pass params to the join map-reduce 
+		conf.set("timeDistance", params.get("timeDistance"));
+		conf.set("spaceDistance", params.get("spaceDistance"));
 		JobClient.runJob(conf).waitForCompletion();
 		;
 		System.out.println("Job1 finish");
@@ -179,7 +215,8 @@ public class STJoin {
 		System.out.println("shape:<STPoint> - (*) Type of shapes stored in input file");
 		System.out.println("rect:<x1,y1,x2,y2> - Spatial query range");
 		System.out.println("interval:<date1,date2> - Temporal query range. " + "Format of each date is yyyy-mm-dd");
-		System.out.println("time:[day,week,month,year] -  Time Format");
+		System.out.println("timeDistance:[1.day,1.hour,30.minute,120.second] -  time distance degree");
+		System.out.println("spaceDistance:integer -  time distance degree");
 		System.out.println("-overwrite - Overwrite output file without notice");
 		GenericOptionsParser.printGenericCommandUsage(System.out);
 	}
@@ -214,6 +251,20 @@ public class STJoin {
 			System.exit(1);
 		}
 		if (allFiles.length > 2 && !params.checkInputOutput()) {
+			printUsage();
+			System.exit(1);
+		}
+		
+		if (params.get("timeDistance") == null) {
+			String[] temp = params.get("timeDistance").split(".");
+			if (temp.length != 2) {
+				System.err.println("time distance is missing");
+				printUsage();
+				System.exit(1);
+			}
+		}
+		if (params.get("spaceDistance") == null) {
+			System.err.println("space distance is missing");
 			printUsage();
 			System.exit(1);
 		}
