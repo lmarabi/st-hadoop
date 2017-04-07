@@ -184,13 +184,15 @@ public class STJoin {
 	 */
 	private static long stJoin(Path inputPath, Path outputPath, OperationsParams params)
 			throws IOException, Exception, InterruptedException {
-		JobConf conf = new JobConf(new Configuration(), STJoin.class);
+		Configuration con = new Configuration();
+		con.set("timedistance", params.get("timedistance"));
+		con.set("spacedistance", params.get("spacedistance"));
+		JobConf conf = new JobConf(con, STJoin.class);
 		FileSystem outfs = outputPath.getFileSystem(conf);
 		outfs.delete(outputPath, true);
 		conf.setJobName("STJoin Query");
 		// pass params to the join map-reduce 
-		conf.set("timedistance", params.get("timedistance"));
-		conf.set("spacedistance", params.get("spacedistance"));
+		
 		
 		conf.setOutputKeyClass(Text.class);
 		conf.setMapOutputKeyClass(Text.class);
