@@ -175,6 +175,10 @@ public class STJoin {
 		FileSystem outfs = outputPath.getFileSystem(conf);
 		outfs.delete(outputPath, true);
 		conf.setJobName("STJoin Query");
+		// pass params to the join map-reduce 
+		conf.set("timedistance", params.get("timedistance"));
+		conf.set("spacedistance", params.get("spacedistance"));
+		
 		conf.setOutputKeyClass(Text.class);
 		conf.setMapOutputKeyClass(Text.class);
 		conf.setMapOutputValueClass(Text.class);
@@ -188,9 +192,6 @@ public class STJoin {
 		conf.setOutputFormat(TextOutputFormat.class);
 		FileInputFormat.setInputPaths(conf, inputPath);
 		FileOutputFormat.setOutputPath(conf, outputPath);
-		// pass params to the join map-reduce 
-		conf.set("timedistance", params.get("timedistance"));
-		conf.set("spacedistance", params.get("spacedistance"));
 		JobClient.runJob(conf).waitForCompletion();
 //		outfs = inputPath.getFileSystem(conf);
 //		outfs.delete(inputPath);
