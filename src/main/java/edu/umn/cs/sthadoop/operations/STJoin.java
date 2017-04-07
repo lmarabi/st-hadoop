@@ -193,8 +193,8 @@ public class STJoin {
 		FileInputFormat.setInputPaths(conf, inputPath);
 		FileOutputFormat.setOutputPath(conf, outputPath);
 		JobClient.runJob(conf).waitForCompletion();
-//		outfs = inputPath.getFileSystem(conf);
-//		outfs.delete(inputPath);
+		outfs = inputPath.getFileSystem(conf);
+		outfs.delete(inputPath);
 		return 0;
 	}
 	
@@ -277,7 +277,7 @@ public class STJoin {
 			args[6] = "-no-local";
 			for (String x : args)
 				System.out.println(x);
-//			STRangeQuery.main(args);
+			STRangeQuery.main(args);
 			System.out.println("done with the STQuery from: " + input.toString() + "\n" + "candidate:" + args[1]);
 
 		}
