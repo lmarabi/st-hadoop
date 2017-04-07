@@ -38,6 +38,10 @@ import org.apache.hadoop.mapred.TextOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 import edu.umn.cs.spatialHadoop.OperationsParams;
+import edu.umn.cs.spatialHadoop.core.Rectangle;
+import edu.umn.cs.spatialHadoop.core.Shape;
+import edu.umn.cs.spatialHadoop.core.SpatialAlgorithms;
+import edu.umn.cs.spatialHadoop.util.Progressable;
 import edu.umn.cs.sthadoop.core.STPoint;
 
 /**
@@ -99,48 +103,46 @@ public class STJoin {
 		
 
 		@Override
-		public void reduce(LongWritable cellId, Iterator<Text> values, 
+		public void reduce(final LongWritable cellId, Iterator<Text> values, 
 				final OutputCollector<LongWritable,Text> output,Reporter reporter) throws IOException {
 			ArrayList<STPoint> shapes = new ArrayList<STPoint>();
-			ArrayList<STPoint> candidates = new ArrayList<STPoint>();
+		
 			STPoint shape = null;
 			while(values.hasNext()){
 				shape = new STPoint();
 				Text temp = values.next();
 				shape.fromText(temp);
 				shapes.add(shape);
-				candidates.add(shape);
 			}
-			Collections.sort(shapes);
-			int candidateIndex = 0;
-			int i = candidateIndex;
-			for(STPoint current : shapes){
-				// shrink the candidate
-				candidateIndex = 1;
-				while(candidateIndex < shapes.size() && (current.distanceTo(shapes.get(candidateIndex))) <= distance){
-					if(getTimeDistance(current.time, shapes.get(candidateIndex).time, timeresolution, interval)){
-						joinResult.set(current.toText(new Text()).toString()+"\t"+shapes.get(candidateIndex).toText(new Text()).toString());
-						output.collect(cellId, joinResult);
-					}
-					candidateIndex++;
-				}
-				candidates.remove(candidates.get(0));
-			}
-			// find nested join result. 
-//			for(STPoint point : shapes){
-//				for(STPoint x : shapes){
-//					if(point.equals(x))
-//						continue;
-//					if(point.distanceTo(x) <= distance && 
-//							getTimeDistance(point.time, x.time, time, interval)){
-//						point.toText(pair1);
-//						x.toText(pair2);
-//						joinResult.set(pair1.toString()+"\t"+pair2.toString());
+			
+		      SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), true, new OutputCollector<Shape, Shape>() {
+
+		    	  STPoint s1;
+		    	  STPoint s2;
+		          @Override
+		          public void collect(Shape r, Shape s) throws IOException {
+		      		joinResult.set(r.toText(new Text()).toString()+"\t"+s.toText(new Text()).toString());
+					output.collect(cellId, joinResult);
+		          }
+		        }, new Progressable.ReporterProgressable(reporter));
+			
+			
+//			int candidateIndex = 0;
+//			int i = candidateIndex;
+//			for(STPoint current : shapes){
+//				// shrink the candidate
+//				candidateIndex = 1;
+//				while(  && (current.distanceTo(shapes.get(candidateIndex)) <= distance)){
+//					if(getTimeDistance(current.time, shapes.get(candidateIndex).time, timeresolution, interval)){
+//						joinResult.set(current.toText(new Text()).toString()+"\t"+shapes.get(candidateIndex).toText(new Text()).toString());
 //						output.collect(cellId, joinResult);
 //					}
+//					candidateIndex++;
 //				}
-//				output.collect(cellId, point.toText(new Text()));
+//				candidates.remove(candidates.get(0));
 //			}
+			
+
 			
 		}
 		
