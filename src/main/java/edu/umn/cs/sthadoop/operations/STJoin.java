@@ -88,10 +88,10 @@ public class STJoin {
 		public void configure(JobConf job) {
 			// TODO Auto-generated method stub
 			super.configure(job);
-			String[] temp = job.get("timeDistance").split(".");
+			String[] temp = job.get("timedistance").split(".");
 			this.time = temp[1];
 			this.interval = Integer.parseInt(temp[0]);
-			this.distance = Integer.parseInt(job.get("spaceDistance"));
+			this.distance = Integer.parseInt(job.get("spacedistance"));
 		}
 
 
@@ -191,8 +191,8 @@ public class STJoin {
 		FileInputFormat.setInputPaths(conf, inputPath);
 		FileOutputFormat.setOutputPath(conf, outputPath);
 		// pass params to the join map-reduce 
-		conf.set("timeDistance", params.get("timeDistance"));
-		conf.set("spaceDistance", params.get("spaceDistance"));
+		conf.set("timedistance", params.get("timedistance"));
+		conf.set("spacedistance", params.get("spacedistance"));
 		JobClient.runJob(conf).waitForCompletion();
 		;
 		System.out.println("Job1 finish");
@@ -221,7 +221,7 @@ public class STJoin {
 	 */
 	public static void main(String[] args) throws Exception {
 
-//		 args = new String[8];
+//		 args = new String[10];
 //		 args[0] = "/home/louai/nyc-taxi/yellowIndex";
 //		 args[1] = "/home/louai/nyc-taxi/humanIndex";
 //		 args[2] = "/home/louai/nyc-taxi/resultSTJoin";
@@ -229,8 +229,10 @@ public class STJoin {
 //		 args[4] =
 //		 "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
 //		 args[5] = "interval:2015-01-01,2015-01-02";
-//		 args[6] = "-overwrite";
-//		 args[7] = "-no-local";
+//		 args[6] = "timeDistance:1.day";
+//		 args[7] = "spaceDistance:2";
+//		 args[8] = "-overwrite";
+//		 args[9] = "-no-local";
 
 		OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
 		Path[] allFiles = params.getPaths();
@@ -249,15 +251,13 @@ public class STJoin {
 			System.exit(1);
 		}
 		
-		if (params.get("timeDistance") == null) {
-			String[] temp = params.get("timeDistance").split(".");
-			if (temp.length != 2) {
-				System.err.println("time distance is missing");
-				printUsage();
-				System.exit(1);
-			}
+		if (params.get("timedistance") == null) {
+			System.err.println("time distance is missing");
+			printUsage();
+			System.exit(1);
 		}
-		if (params.get("spaceDistance") == null) {
+		
+		if (params.get("spacedistance") == null) {
 			System.err.println("space distance is missing");
 			printUsage();
 			System.exit(1);
