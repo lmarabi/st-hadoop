@@ -109,17 +109,18 @@ public class STJoin {
 			
 			// find nested join result. 
 			for(STPoint point : shapes){
-				for(STPoint x : shapes){
-					if(point.equals(x))
-						continue;
-					if(point.distanceTo(x) <= distance && 
-							getTimeDistance(point.time, x.time, time, interval)){
-						point.toText(pair1);
-						x.toText(pair2);
-						joinResult.set(pair1.toString()+"\t"+pair2.toString());
-						output.collect(cellId, joinResult);
-					}
-				}
+//				for(STPoint x : shapes){
+//					if(point.equals(x))
+//						continue;
+//					if(point.distanceTo(x) <= distance && 
+//							getTimeDistance(point.time, x.time, time, interval)){
+//						point.toText(pair1);
+//						x.toText(pair2);
+//						joinResult.set(pair1.toString()+"\t"+pair2.toString());
+//						output.collect(cellId, joinResult);
+//					}
+//				}
+				output.collect(cellId, point.toText(new Text()));
 			}
 			
 		}
