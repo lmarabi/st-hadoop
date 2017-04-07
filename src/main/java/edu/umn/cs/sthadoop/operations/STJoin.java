@@ -112,7 +112,10 @@ public class STJoin {
 			Collections.sort(shapes);
 			int candidateIndex = 0;
 			int i = candidateIndex;
-			ArrayList<STPoint> candidates = shapes;
+			ArrayList<STPoint> candidates = new ArrayList<STPoint>();
+			for(STPoint x: shapes){
+				candidates.add(x);
+			}
 			for(STPoint current : shapes){
 				// shrink the candidate
 				candidateIndex = 1;
