@@ -54,20 +54,7 @@ public class STJoin {
 		private double degree = 0.01;
 		private double x1 = -180;
 		private double y1 = -90;
-		int distance = 0; 
-		String time = "";
-		int interval = 0;	
-		
-		 @Override
-			public void configure(JobConf job) {
-				// TODO Auto-generated method stub
-				super.configure(job);
-				String value = job.get("timedistance","2.day");
-				String[] temp = value.split(",");
-				this.time = temp[1];
-				this.interval = Integer.parseInt(temp[0]);
-				this.distance = Integer.parseInt(job.get("spacedistance","1"));
-			}
+	
 		
 		@Override
 		public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter)
@@ -97,11 +84,11 @@ public class STJoin {
 		public void configure(JobConf job) {
 			// TODO Auto-generated method stub
 			super.configure(job);
-			String value = job.get("timedistance","2.day");
+			String value = job.get("timedistance");
 			String[] temp = value.split(",");
 			this.time = temp[1];
 			this.interval = Integer.parseInt(temp[0]);
-			this.distance = Integer.parseInt(job.get("spacedistance","1"));
+			this.distance = Integer.parseInt(job.get("spacedistance"));
 		}
 
 
@@ -184,16 +171,14 @@ public class STJoin {
 	 */
 	private static long stJoin(Path inputPath, Path outputPath, OperationsParams params)
 			throws IOException, Exception, InterruptedException {
-		Configuration con = new Configuration();
-		con.set("timedistance", params.get("timedistance"));
-		con.set("spacedistance", params.get("spacedistance"));
-		JobConf conf = new JobConf(con, STJoin.class);
+		
+		JobConf conf = new JobConf(new Configuration(), STJoin.class);
 		FileSystem outfs = outputPath.getFileSystem(conf);
 		outfs.delete(outputPath, true);
 		conf.setJobName("STJoin Query");
 		// pass params to the join map-reduce 
-		
-		
+		conf.set("timedistance", params.get("timedistance"));
+		conf.set("spacedistance", params.get("spacedistance"));
 		conf.setOutputKeyClass(Text.class);
 		conf.setMapOutputKeyClass(Text.class);
 		conf.setMapOutputValueClass(Text.class);
