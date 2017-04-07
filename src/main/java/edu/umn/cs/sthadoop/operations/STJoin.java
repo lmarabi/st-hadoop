@@ -135,16 +135,16 @@ public class STJoin {
 					//in milliseconds
 					long diff = d2.getTime() - d1.getTime();
 					if(flag.equals("day")){
-						if(interval <= (diff / (24 * 60 * 60 * 1000)))
+						if(interval <= (int)(diff / (24 * 60 * 60 * 1000)))
 							result = true;
 					}else if(flag.equals("hour")){
-						if(interval <= (diff / (60 * 60 * 1000) % 24))
+						if(interval <= (int)(diff / (60 * 60 * 1000) % 24))
 							result = true;
 					}else if(flag.equals("minute")){
-						if(interval <= (diff / (60 * 1000) % 60))
+						if(interval <= (int)(diff / (60 * 1000) % 60))
 							result = true;
 					}else if(flag.equals("second")){
-						if(interval <= (diff / 1000 % 60))
+						if(interval <= (int)(diff / 1000 % 60))
 							result = true;
 					}else{
 						return result;
