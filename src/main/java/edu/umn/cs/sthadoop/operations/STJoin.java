@@ -88,7 +88,8 @@ public class STJoin {
 		public void configure(JobConf job) {
 			// TODO Auto-generated method stub
 			super.configure(job);
-			String[] temp = job.get("timedistance").split(",");
+			String value = job.get("timedistance");
+			String[] temp = value.split(",");
 			this.time = temp[1];
 			this.interval = Integer.parseInt(temp[0]);
 			this.distance = Integer.parseInt(job.get("spacedistance"));
