@@ -54,6 +54,20 @@ public class STJoin {
 		private double degree = 0.01;
 		private double x1 = -180;
 		private double y1 = -90;
+		int distance = 0; 
+		String time = "";
+		int interval = 0;	
+		
+		 @Override
+			public void configure(JobConf job) {
+				// TODO Auto-generated method stub
+				super.configure(job);
+				String value = job.get("timedistance","2.day");
+				String[] temp = value.split(",");
+				this.time = temp[1];
+				this.interval = Integer.parseInt(temp[0]);
+				this.distance = Integer.parseInt(job.get("spacedistance","1"));
+			}
 		
 		@Override
 		public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter)
@@ -83,7 +97,6 @@ public class STJoin {
 		public void configure(JobConf job) {
 			// TODO Auto-generated method stub
 			super.configure(job);
-			
 			String value = job.get("timedistance","2.day");
 			String[] temp = value.split(",");
 			this.time = temp[1];
