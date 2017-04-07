@@ -88,7 +88,7 @@ public class STJoin {
 		public void configure(JobConf job) {
 			// TODO Auto-generated method stub
 			super.configure(job);
-			String[] temp = job.get("timedistance").split(".");
+			String[] temp = job.get("timedistance").split(",");
 			this.time = temp[1];
 			this.interval = Integer.parseInt(temp[0]);
 			this.distance = Integer.parseInt(job.get("spacedistance"));
@@ -194,8 +194,8 @@ public class STJoin {
 		conf.set("timedistance", params.get("timedistance"));
 		conf.set("spacedistance", params.get("spacedistance"));
 		JobClient.runJob(conf).waitForCompletion();
-		;
-		System.out.println("Job1 finish");
+		outfs = inputPath.getFileSystem(conf);
+		outfs.delete(inputPath);
 		return 0;
 	}
 	
@@ -209,7 +209,7 @@ public class STJoin {
 		System.out.println("shape:<STPoint> - (*) Type of shapes stored in input file");
 		System.out.println("rect:<x1,y1,x2,y2> - Spatial query range");
 		System.out.println("interval:<date1,date2> - Temporal query range. " + "Format of each date is yyyy-mm-dd");
-		System.out.println("timeDistance:[1.day,1.hour,30.minute,120.second] -  time distance degree");
+		System.out.println("timeDistance:[1,day - 1,hour - 30,minute - 120,second] -  time distance degree");
 		System.out.println("spaceDistance:integer -  time distance degree");
 		System.out.println("-overwrite - Overwrite output file without notice");
 		GenericOptionsParser.printGenericCommandUsage(System.out);
@@ -229,7 +229,7 @@ public class STJoin {
 //		 args[4] =
 //		 "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
 //		 args[5] = "interval:2015-01-01,2015-01-02";
-//		 args[6] = "timeDistance:1.day";
+//		 args[6] = "timeDistance:1,day";
 //		 args[7] = "spaceDistance:2";
 //		 args[8] = "-overwrite";
 //		 args[9] = "-no-local";
@@ -278,7 +278,7 @@ public class STJoin {
 			args[6] = "-no-local";
 			for (String x : args)
 				System.out.println(x);
-//			STRangeQuery.main(args);
+			STRangeQuery.main(args);
 			System.out.println("done with the STQuery from: " + input.toString() + "\n" + "candidate:" + args[1]);
 
 		}
