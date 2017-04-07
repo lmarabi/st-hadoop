@@ -50,14 +50,14 @@ public class STJoin {
 	/** Class logger */
 	private static final Log LOG = LogFactory.getLog(STJoin.class);
 
-	static class STJoinMap extends MapReduceBase implements Mapper<LongWritable, Text, Text, Text> {
+	static class STJoinMap extends MapReduceBase implements Mapper<LongWritable, Text, LongWritable, Text> {
 		private double degree = 0.01;
 		private double x1 = -180;
 		private double y1 = -90;
 	
 		
 		@Override
-		public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter)
+		public void map(LongWritable key, Text value, OutputCollector<LongWritable, Text> output, Reporter reporter)
 				throws IOException {
 			if(value != null){
 			STPoint shape = new STPoint();
@@ -65,13 +65,13 @@ public class STJoin {
 			// Hasing objects to the grid. 
 			int columnID = (int)((shape.x - x1)/ degree);
 			int rowID = (int)((shape.y - y1)/ degree);
-			output.collect(new Text(columnID+","+rowID), shape.toText(new Text()));
+			output.collect(new LongWritable(columnID*rowID), shape.toText(new Text()));
 			}
 		}
 	}
 
 	static class STJoinReduce extends MapReduceBase implements 
-	Reducer<Text, Text, Text, Text> {		
+	Reducer<LongWritable, Text, LongWritable, Text> {		
 		private Text pair1 = new Text();
 		private Text pair2 = new Text();
 		private Text joinResult = new Text();
@@ -96,8 +96,8 @@ public class STJoin {
 		
 
 		@Override
-		public void reduce(Text cellId, Iterator<Text> values, final OutputCollector<Text,Text> output,
-				Reporter reporter) throws IOException {
+		public void reduce(LongWritable cellId, Iterator<Text> values, 
+				final OutputCollector<LongWritable,Text> output,Reporter reporter) throws IOException {
 			ArrayList<STPoint> shapes = new ArrayList<STPoint>();
 			STPoint shape = null;
 			while(values.hasNext()){
@@ -179,9 +179,9 @@ public class STJoin {
 		// pass params to the join map-reduce 
 		conf.set("timedistance", params.get("timedistance"));
 		conf.set("spacedistance", params.get("spacedistance"));
-		conf.setOutputKeyClass(Text.class);
-		conf.setMapOutputKeyClass(Text.class);
+		conf.setMapOutputKeyClass(LongWritable.class);
 		conf.setMapOutputValueClass(Text.class);
+		conf.setOutputKeyClass(LongWritable.class);
 		conf.setOutputValueClass(Text.class);
 		// Mapper settings
 		conf.setMapperClass(STJoinMap.class);
