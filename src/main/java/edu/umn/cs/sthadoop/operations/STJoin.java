@@ -115,15 +115,15 @@ public class STJoin {
 			ArrayList<STPoint> candidates = shapes;
 			for(STPoint current : shapes){
 				// shrink the candidate
-				candidateIndex = i++;
-				while((current.distanceTo(shapes.get(candidateIndex))) <= distance){
-					//candidates.remove(candidates.get(candidateIndex));
+				candidateIndex = 1;
+				while(candidateIndex < shapes.size() && (current.distanceTo(shapes.get(candidateIndex))) <= distance){
 					if(getTimeDistance(current.time, shapes.get(candidateIndex).time, timeresolution, interval)){
 						joinResult.set(current.toText(new Text()).toString()+"\t"+shapes.get(candidateIndex).toText(new Text()).toString());
 						output.collect(cellId, joinResult);
 					}
 					candidateIndex++;
 				}
+				candidates.remove(candidates.get(0));
 			}
 			// find nested join result. 
 //			for(STPoint point : shapes){
