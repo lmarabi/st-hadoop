@@ -68,7 +68,7 @@ public class STJoin {
 			// Hasing objects to the grid. 
 			int columnID = (int)((shape.x - x1)/ degree);
 			int rowID = (int)((shape.y - y1)/ degree);
-			output.collect(new Text(columnID+","+rowID), new Text(shape.toString()));
+			output.collect(new Text(columnID+","+rowID), shape.toText(new Text()));
 			}
 		}
 	}
@@ -106,7 +106,8 @@ public class STJoin {
 			STPoint shape = null;
 			while(values.hasNext()){
 				shape = new STPoint();
-				shape.fromText(values.next());
+				Text temp = values.next();
+				shape.fromText(temp);
 				shapes.add(shape);
 			}
 			
@@ -222,18 +223,18 @@ public class STJoin {
 	 */
 	public static void main(String[] args) throws Exception {
 
-//		 args = new String[10];
-//		 args[0] = "/home/louai/nyc-taxi/yellowIndex";
-//		 args[1] = "/home/louai/nyc-taxi/humanIndex";
-//		 args[2] = "/home/louai/nyc-taxi/resultSTJoin";
-//		 args[3] = "shape:edu.umn.cs.sthadoop.core.STPoint";
-//		 args[4] =
-//		 "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
-//		 args[5] = "interval:2015-01-01,2015-01-02";
-//		 args[6] = "timeDistance:1,day";
-//		 args[7] = "spaceDistance:2";
-//		 args[8] = "-overwrite";
-//		 args[9] = "-no-local";
+		 args = new String[10];
+		 args[0] = "/home/louai/nyc-taxi/yellowIndex";
+		 args[1] = "/home/louai/nyc-taxi/humanIndex";
+		 args[2] = "/home/louai/nyc-taxi/resultSTJoin";
+		 args[3] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+		 args[4] =
+		 "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
+		 args[5] = "interval:2015-01-01,2015-01-02";
+		 args[6] = "timeDistance:1,day";
+		 args[7] = "spaceDistance:2";
+		 args[8] = "-overwrite";
+		 args[9] = "-no-local";
 
 		OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
 		Path[] allFiles = params.getPaths();
@@ -279,7 +280,7 @@ public class STJoin {
 			args[6] = "-no-local";
 			for (String x : args)
 				System.out.println(x);
-			STRangeQuery.main(args);
+//			STRangeQuery.main(args);
 			System.out.println("done with the STQuery from: " + input.toString() + "\n" + "candidate:" + args[1]);
 
 		}
