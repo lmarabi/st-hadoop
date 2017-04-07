@@ -14,15 +14,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.apache.commons.io.output.NullWriter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
@@ -38,7 +35,6 @@ import org.apache.hadoop.mapred.TextOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 import edu.umn.cs.spatialHadoop.OperationsParams;
-import edu.umn.cs.spatialHadoop.core.GridInfo;
 import edu.umn.cs.sthadoop.core.STPoint;
 
 /**
@@ -88,11 +84,11 @@ public class STJoin {
 			// TODO Auto-generated method stub
 			super.configure(job);
 			
-			String value = job.get("timedistance");
+			String value = job.get("timedistance","2.day");
 			String[] temp = value.split(",");
 			this.time = temp[1];
 			this.interval = Integer.parseInt(temp[0]);
-			this.distance = Integer.parseInt(job.get("spacedistance"));
+			this.distance = Integer.parseInt(job.get("spacedistance","1"));
 		}
 
 
