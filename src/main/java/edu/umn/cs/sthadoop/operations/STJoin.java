@@ -75,7 +75,6 @@ public class STJoin {
 
 	static class STJoinReduce extends MapReduceBase implements 
 	Reducer<Text, Text, Text, Text> {		
-		private static final Text NullWritable = null;
 		private Text pair1 = new Text();
 		private Text pair2 = new Text();
 		private Text joinResult = new Text();
@@ -88,10 +87,11 @@ public class STJoin {
 		public void configure(JobConf job) {
 			// TODO Auto-generated method stub
 			super.configure(job);
-			String value = job.get("timedistance");
-			String[] temp = value.split(",");
-			this.time = temp[1];
-			this.interval = Integer.parseInt(temp[0]);
+//			
+//			String value = job.get("timedistance");
+//			String[] temp = value.split(",");
+//			this.time = temp[1];
+//			this.interval = Integer.parseInt(temp[0]);
 			this.distance = Integer.parseInt(job.get("spacedistance"));
 		}
 
