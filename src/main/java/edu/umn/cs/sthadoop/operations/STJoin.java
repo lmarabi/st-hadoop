@@ -102,20 +102,18 @@ public class STJoin {
 		public void reduce(LongWritable cellId, Iterator<Text> values, 
 				final OutputCollector<LongWritable,Text> output,Reporter reporter) throws IOException {
 			ArrayList<STPoint> shapes = new ArrayList<STPoint>();
+			ArrayList<STPoint> candidates = new ArrayList<STPoint>();
 			STPoint shape = null;
 			while(values.hasNext()){
 				shape = new STPoint();
 				Text temp = values.next();
 				shape.fromText(temp);
 				shapes.add(shape);
+				candidates.add(shape);
 			}
 			Collections.sort(shapes);
 			int candidateIndex = 0;
 			int i = candidateIndex;
-			ArrayList<STPoint> candidates = new ArrayList<STPoint>();
-			for(STPoint x: shapes){
-				candidates.add(x);
-			}
 			for(STPoint current : shapes){
 				// shrink the candidate
 				candidateIndex = 1;
