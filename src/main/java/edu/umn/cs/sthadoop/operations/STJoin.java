@@ -87,11 +87,11 @@ public class STJoin {
 		public void configure(JobConf job) {
 			// TODO Auto-generated method stub
 			super.configure(job);
-//			
-//			String value = job.get("timedistance");
-//			String[] temp = value.split(",");
-//			this.time = temp[1];
-//			this.interval = Integer.parseInt(temp[0]);
+			
+			String value = job.get("timedistance");
+			String[] temp = value.split(",");
+			this.time = temp[1];
+			this.interval = Integer.parseInt(temp[0]);
 			this.distance = Integer.parseInt(job.get("spacedistance"));
 		}
 
@@ -195,8 +195,8 @@ public class STJoin {
 		conf.set("timedistance", params.get("timedistance"));
 		conf.set("spacedistance", params.get("spacedistance"));
 		JobClient.runJob(conf).waitForCompletion();
-		outfs = inputPath.getFileSystem(conf);
-		outfs.delete(inputPath);
+//		outfs = inputPath.getFileSystem(conf);
+//		outfs.delete(inputPath);
 		return 0;
 	}
 	
