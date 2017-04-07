@@ -62,12 +62,14 @@ public class STJoin {
 		@Override
 		public void map(LongWritable key, Text value, OutputCollector<Text, Text> output, Reporter reporter)
 				throws IOException {
+			if(value != null){
 			STPoint shape = new STPoint();
 			shape.fromText(value);
 			// Hasing objects to the grid. 
 			int columnID = (int)((shape.x - x1)/ degree);
 			int rowID = (int)((shape.y - y1)/ degree);
 			output.collect(new Text(columnID+","+rowID), new Text(shape.toString()));
+			}
 		}
 	}
 
@@ -117,7 +119,7 @@ public class STJoin {
 						point.toText(pair1);
 						x.toText(pair2);
 						joinResult.set(pair1.toString()+"\t"+pair2.toString());
-						output.collect(NullWritable, joinResult);
+						output.collect(cellId, joinResult);
 					}
 				}
 			}
