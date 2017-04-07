@@ -73,38 +73,38 @@ public class testsjoin {
 	static private boolean getTimeDistance(String time1 , String time2, String flag, int interval) {
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		boolean result = false;
-		try {
-			Date d1 = format.parse(time1);
-			Date d2 = format.parse(time2);
-
-			//in milliseconds
-			long diff = d2.getTime() - d1.getTime();
-			
-			switch (flag) {
-			case "day":
-				if(interval <= (diff / (24 * 60 * 60 * 1000)))
-					result = true;
-				break;
-			case "hour":
-				if(interval <= (diff / (60 * 60 * 1000) % 24))
-					result = true;
-				break;
-			case "minute":
-				if(interval <= (diff / (60 * 1000) % 60))
-					result = true;
-				break;
-			case "second":
-				if(interval <= (diff / 1000 % 60))
-					result = true;
-				break;
-
-			default:
-				break;
-			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		try {
+//			Date d1 = format.parse(time1);
+//			Date d2 = format.parse(time2);
+//
+//			//in milliseconds
+//			long diff = d2.getTime() - d1.getTime();
+//			
+//			switch (flag) {
+//			case "day":
+//				if(interval <= (diff / (24 * 60 * 60 * 1000)))
+//					result = true;
+//				break;
+//			case "hour":
+//				if(interval <= (diff / (60 * 60 * 1000) % 24))
+//					result = true;
+//				break;
+//			case "minute":
+//				if(interval <= (diff / (60 * 1000) % 60))
+//					result = true;
+//				break;
+//			case "second":
+//				if(interval <= (diff / 1000 % 60))
+//					result = true;
+//				break;
+//
+//			default:
+//				break;
+//			}
+//			
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 
 		return result;
 	}
