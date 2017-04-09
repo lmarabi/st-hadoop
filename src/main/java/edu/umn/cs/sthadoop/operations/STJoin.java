@@ -218,6 +218,7 @@ public class STJoin {
 		conf.setBoolean("mapreduce.input.fileinputformat.input.dir.recursive", true);
 		conf.setInputFormat(TextInputFormat.class);
 		conf.setOutputFormat(TextOutputFormat.class);
+		conf.setNumReduceTasks(20);
 		FileInputFormat.setInputPaths(conf, inputPath);
 		FileOutputFormat.setOutputPath(conf, outputPath);
 		JobClient.runJob(conf).waitForCompletion();
