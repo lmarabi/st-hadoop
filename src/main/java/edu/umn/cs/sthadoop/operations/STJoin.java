@@ -215,6 +215,7 @@ public class STJoin {
 		conf.setOutputFormat(TextOutputFormat.class);
 		FileInputFormat.setInputPaths(conf, inputPath);
 		FileOutputFormat.setOutputPath(conf, outputPath);
+		conf.setNumReduceTasks(30);
 		JobClient.runJob(conf).waitForCompletion();
 		outfs = inputPath.getFileSystem(conf);
 		outfs.delete(inputPath);
