@@ -102,9 +102,9 @@ public class STJoin {
 			LinkedList<STPoint> shapes = new LinkedList<STPoint>();
 			STPoint shape = new STPoint();
 			
-			Text temp = null; 
+			Text temp = new Text(); 
 			while(values.hasNext()){
-				temp.set(values.next());
+				temp = values.next();
 				shape.fromText(temp);
 				shapes.add(shape);
 			}
