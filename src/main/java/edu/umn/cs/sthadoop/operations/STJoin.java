@@ -116,11 +116,11 @@ public class STJoin {
 			}
 			
 
-			SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), true,
-					new OutputCollector<Shape, Shape>() {
+			SpatialAlgorithms.SelfSTJoin_planeSweep(shapes.toArray(new STPoint[shapes.size()]), true,
+					new OutputCollector<STPoint, STPoint>() {
 
 						@Override
-						public void collect(Shape r, Shape s) throws IOException {
+						public void collect(STPoint r, STPoint s) throws IOException {
 							if (!r.equals(s)) {
 								STPoint s1;
 								STPoint s2;

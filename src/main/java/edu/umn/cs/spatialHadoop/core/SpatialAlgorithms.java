@@ -592,42 +592,17 @@ public class SpatialAlgorithms {
    */
   public static <S extends STPoint> int SelfSTJoin_planeSweep(final S[] R,
       boolean refine, final OutputCollector<S, S> output, Progressable reporter) throws IOException {
-    // Use a two-phase filter and refine approach
-    // 1- Use MBRs as a first filter
-    // 2- Use ConvexHull as a second filter
-    // 3- Use the exact shape for refinement
-    final RectangleID[] mbrs = new RectangleID[R.length];
-    for (int i = 0; i < R.length; i++) {
-      mbrs[i] = new RectangleID(i, R[i].getMBR());
-    }
     
-    if (refine) {
-      final IntWritable count = new IntWritable();
-      int filterCount = SelfJoin_rectangles(mbrs, new OutputCollector<RectangleID, RectangleID>() {
-        @Override
-        public void collect(RectangleID r1, RectangleID r2)
-            throws IOException {
-          if (R[r1.id].isIntersected(R[r2.id])) {
-            if (output != null)
-              output.collect(R[r1.id], R[r2.id]);
-            count.set(count.get() + 1);
-          }
-        }
-      }, reporter);
-      
-      LOG.info("Filtered result size "+filterCount+", refined result size "+count.get());
-      
-      return count.get();
-    } else {
-      return SelfJoin_rectangles(mbrs, new OutputCollector<RectangleID, RectangleID>() {
-        @Override
-        public void collect(RectangleID r1, RectangleID r2)
-            throws IOException {
-          if (output != null)
-            output.collect(R[r1.id], R[r2.id]);
-        }
-      }, reporter);
-    }
+	 Rectangle mbrs = new Rectangle(-Double.MAX_VALUE,-Double.MAX_VALUE,Double.MAX_VALUE,Double.MAX_VALUE);
+  
+	 
+      for(int i=0; i< R.length; i++){
+    	  for(int j=(i+1) ; j < R.length; j++){
+    		  output.collect(R[i],R[j]);
+    	  }
+      }
+	return 0;
+    
   }
   
   /**
