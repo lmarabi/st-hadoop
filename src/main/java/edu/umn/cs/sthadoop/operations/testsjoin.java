@@ -1,7 +1,9 @@
 package edu.umn.cs.sthadoop.operations;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -17,31 +19,45 @@ import edu.umn.cs.sthadoop.core.STPoint;
 public class testsjoin {
 
 	public static void main(String[] args) throws Exception {
-		String fileName = "/home/louai/nyc-taxi/candidatebuckets/yellowIndex/00000-2015-01-02/part-m-00000";
+		String fileName = "/home/louai/nyc-taxi/candidatebuckets/output.txt";
+		String outputFile = "/home/louai/nyc-taxi/candidatebuckets/result.txt";
 		BufferedReader br =  new BufferedReader(new FileReader(fileName));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
+		
+		
+		
 		String line;
-//		double x1 = -180;
-//		double y1 = -90;
-//		double x2 = 180;
-//		double y2 = 90;
-//		double interval = 0.01;
+		double x1 = -180;
+		double y1 = -90;
+		double x2 = 180;
+		double y2 = 90;
+		double interval = 0.1;
+		
+		//
+	
+		
+		
+		//
+		
 //		int column = (int)((x2 - x1)/ interval) +1;
 //		int row = (int)((y2 - y1)/ interval) +1;
 //		GridInfo grid = new GridInfo(-180, -90, 180, 90);
 //		IntWritable cellId = new IntWritable();
 		ArrayList<STPoint> shapes = new ArrayList<STPoint>();
 		while ((line = br.readLine()) != null) {
-			System.out.println(line);
-			
+//			System.out.println(line);
+			String[] text = line.split(",");
 			STPoint shape = new STPoint();
 			shape.fromText(new Text(line));
 			shapes.add(shape);
 //			Rectangle mbr = shape.getMBR();
 //			int cellID = grid.getOverlappingCell(shape.x, shape.y);
-//			// find row column 
-//			int columnID = (int)((shape.x - x1)/ interval);
-//			int rowID = (int)((shape.y - y1)/ interval);
+			// find row column 
+			int columnID = (int)((shape.x - x1)/ interval);
+			int rowID = (int)((shape.y - y1)/ interval);
 //			System.out.println("ID("+columnID+","+rowID+") ------>"+shape.toString());
+			writer.write((columnID*rowID)+"\t"+shape.y+","+shape.x+"\t"+shape.time+"\n");
+			
 //			
 //			
 //			java.awt.Rectangle cells = grid.getOverlappingCells(shape.getMBR());
@@ -53,20 +69,22 @@ public class testsjoin {
 //		        }
 			
 		}//endwhile
-		int distance = 1; 
-		String time = "hour";
-		int interval = 2;		
-		// find nested join result. 
-		for(STPoint point : shapes){
-			for(STPoint x : shapes){
-				if(point.equals(x))
-					continue;
-				if(point.distanceTo(x) <= distance && 
-						getTimeDistance(point.time, x.time, time, interval)){
-					System.out.println("<"+point.toString()+"\t"+x.toString()+">");
-				}
-			}
-		}
+//		int distance = 1; 
+//		String time = "hour";
+//		int interval = 2;		
+//		// find nested join result. 
+//		for(STPoint point : shapes){
+//			for(STPoint x : shapes){
+//				if(point.equals(x))
+//					continue;
+//				if(point.distanceTo(x) <= distance && 
+//						getTimeDistance(point.time, x.time, time, interval)){
+//					System.out.println("<"+point.toString()+"\t"+x.toString()+">");
+//				}
+//			}
+//		}
+		br.close();
+		writer.close();
 
 	}
 	

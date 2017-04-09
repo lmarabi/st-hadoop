@@ -46,6 +46,7 @@ import edu.umn.cs.spatialHadoop.mapreduce.SpatialRecordReader3;
 import edu.umn.cs.spatialHadoop.nasa.HDFRecordReader;
 import edu.umn.cs.spatialHadoop.util.BitArray;
 import edu.umn.cs.spatialHadoop.util.Progressable;
+import edu.umn.cs.sthadoop.core.STPoint;
 
 /**
  * Performs simple algorithms for spatial data.
@@ -537,6 +538,59 @@ public class SpatialAlgorithms {
    * @throws IOException
    */
   public static <S extends Shape> int SelfJoin_planeSweep(final S[] R,
+      boolean refine, final OutputCollector<S, S> output, Progressable reporter) throws IOException {
+    // Use a two-phase filter and refine approach
+    // 1- Use MBRs as a first filter
+    // 2- Use ConvexHull as a second filter
+    // 3- Use the exact shape for refinement
+    final RectangleID[] mbrs = new RectangleID[R.length];
+    for (int i = 0; i < R.length; i++) {
+      mbrs[i] = new RectangleID(i, R[i].getMBR());
+    }
+    
+    if (refine) {
+      final IntWritable count = new IntWritable();
+      int filterCount = SelfJoin_rectangles(mbrs, new OutputCollector<RectangleID, RectangleID>() {
+        @Override
+        public void collect(RectangleID r1, RectangleID r2)
+            throws IOException {
+          if (R[r1.id].isIntersected(R[r2.id])) {
+            if (output != null)
+              output.collect(R[r1.id], R[r2.id]);
+            count.set(count.get() + 1);
+          }
+        }
+      }, reporter);
+      
+      LOG.info("Filtered result size "+filterCount+", refined result size "+count.get());
+      
+      return count.get();
+    } else {
+      return SelfJoin_rectangles(mbrs, new OutputCollector<RectangleID, RectangleID>() {
+        @Override
+        public void collect(RectangleID r1, RectangleID r2)
+            throws IOException {
+          if (output != null)
+            output.collect(R[r1.id], R[r2.id]);
+        }
+      }, reporter);
+    }
+  }
+  
+  
+  /**
+   * The general 3D  self join algorithm which works with arbitrary
+   * STPoint shape. First, it performs a filter step where it finds shapes with
+   * overlapping MBRs. Second, an optional refine step can be executed to
+   * return only shapes which actually overlap.
+   * @param R - input set of shapes
+   * @param refine - Whether or not to run a refine step
+   * @param output - output collector where the results are reported
+   * @return - number of pairs returned by the planesweep algorithm
+   * @throws IOException
+   * @author louai alarabi
+   */
+  public static <S extends STPoint> int SelfSTJoin_planeSweep(final S[] R,
       boolean refine, final OutputCollector<S, S> output, Progressable reporter) throws IOException {
     // Use a two-phase filter and refine approach
     // 1- Use MBRs as a first filter

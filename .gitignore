@@ -6,7 +6,7 @@ lib/ivy/**/*.jar
 *.iml
 /louai-compile-sh
 /localpush.sh
-/.classes
+.classes
 /.settings
 /bin1
 /.project

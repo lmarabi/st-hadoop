@@ -58,7 +58,7 @@ public class STJoin {
 	private static final Log LOG = LogFactory.getLog(STJoin.class);
 
 	static class STJoinMap extends MapReduceBase implements Mapper<LongWritable, Text, LongWritable, Text> {
-		private double degree = 0.01;
+		private double degree = 0.1;
 		private double x1 = -180;
 		private double y1 = -90;
 	
@@ -72,7 +72,7 @@ public class STJoin {
 			// Hasing objects to the grid. 
 			int columnID = (int)((shape.x - x1)/ degree);
 			int rowID = (int)((shape.y - y1)/ degree);
-			output.collect(new LongWritable(columnID*rowID), shape.toText(new Text()));
+			output.collect(new LongWritable((columnID*rowID+1)), shape.toText(new Text()));
 			}
 		}
 	}
@@ -116,42 +116,38 @@ public class STJoin {
 			}
 			
 
-			SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), true,
-					new OutputCollector<Shape, Shape>() {
-
-						@Override
-						public void collect(Shape r, Shape s) throws IOException {
-							if (!r.equals(s)) {
-								STPoint s1;
-								STPoint s2;
-								s1 = (STPoint) r;
-								s2 = (STPoint) s;
-								if (s1.distanceTo(s2) <= distance) {
-									if (getTimeDistance(s1.time, s2.time, timeresolution, interval)) {
-										joinResult.set(r.toText(new Text()).toString() + "\t"
-												+ s.toText(new Text()).toString());
-										output.collect(cellId, joinResult);
-									}
-								}
-							}
+//			SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), true,
+//					new OutputCollector<Shape, Shape>() {
+//
+//						@Override
+//						public void collect(Shape r, Shape s) throws IOException {
+//							if (!r.equals(s)) {
+//								STPoint s1;
+//								STPoint s2;
+//								s1 = (STPoint) r;
+//								s2 = (STPoint) s;
+//								if (s1.distanceTo(s2) <= distance) {
+//									if (getTimeDistance(s1.time, s2.time, timeresolution, interval)) {
+//										joinResult.set(r.toText(new Text()).toString() + "\t"
+//												+ s.toText(new Text()).toString());
+//										output.collect(cellId, joinResult);
+//									}
+//								}
+//							}
+//						}
+//					}, new Progressable.ReporterProgressable(reporter));			
+			
+			for(int i=0 ; i< shapes.size(); i++){
+				for(int j=i+1; j< shapes.size(); j++){
+					if(shapes.get(i).distanceTo(shapes.get(j)) <= distance){
+						if(getTimeDistance(shapes.get(i).time,shapes.get(j).time, timeresolution, interval)){
+							joinResult.set(shapes.get(i).toText(new Text()).toString() + "\t"
+									+ shapes.get(j).toText(new Text()).toString());
+							output.collect(cellId, joinResult);
 						}
-					}, new Progressable.ReporterProgressable(reporter));			
-			
-//			int candidateIndex = 0;
-//			int i = candidateIndex;
-//			for(STPoint current : shapes){
-//				// shrink the candidate
-//				candidateIndex = 1;
-//				while(  && (current.distanceTo(shapes.get(candidateIndex)) <= distance)){
-//					if(getTimeDistance(current.time, shapes.get(candidateIndex).time, timeresolution, interval)){
-//						joinResult.set(current.toText(new Text()).toString()+"\t"+shapes.get(candidateIndex).toText(new Text()).toString());
-//						output.collect(cellId, joinResult);
-//					}
-//					candidateIndex++;
-//				}
-//				candidates.remove(candidates.get(0));
-//			}
-			
+					}
+				}
+			}
 
 			
 		}
