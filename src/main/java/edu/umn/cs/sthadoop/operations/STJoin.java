@@ -116,38 +116,38 @@ public class STJoin {
 			}
 			
 
-//			SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), true,
-//					new OutputCollector<Shape, Shape>() {
-//
-//						@Override
-//						public void collect(Shape r, Shape s) throws IOException {
-//							if (!r.equals(s)) {
-//								STPoint s1;
-//								STPoint s2;
-//								s1 = (STPoint) r;
-//								s2 = (STPoint) s;
-//								if (s1.distanceTo(s2) <= distance) {
-//									if (getTimeDistance(s1.time, s2.time, timeresolution, interval)) {
-//										joinResult.set(r.toText(new Text()).toString() + "\t"
-//												+ s.toText(new Text()).toString());
-//										output.collect(cellId, joinResult);
-//									}
+			SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), true,
+					new OutputCollector<Shape, Shape>() {
+
+						@Override
+						public void collect(Shape r, Shape s) throws IOException {
+							if (!r.equals(s)) {
+								STPoint s1;
+								STPoint s2;
+								s1 = (STPoint) r;
+								s2 = (STPoint) s;
+//								if (s1.distanceTo(s2) <= (double)distance) {
+									if (getTimeDistance(s1.time, s2.time, timeresolution, interval)) {
+										joinResult.set(r.toText(new Text()).toString() + "\t"
+												+ s.toText(new Text()).toString());
+										output.collect(cellId, joinResult);
+									}
 //								}
-//							}
-//						}
-//					}, new Progressable.ReporterProgressable(reporter));			
-			
-			for(int i=0 ; i< shapes.size(); i++){
-				for(int j=i+1; j< shapes.size(); j++){
-//					if(shapes.get(i).distanceTo(shapes.get(j)) <= (double)distance){
-						if(getTimeDistance(shapes.get(i).time,shapes.get(j).time, timeresolution, interval)){
-							joinResult.set(shapes.get(i).toText(new Text()).toString() + "\t"
-									+ shapes.get(j).toText(new Text()).toString());
-							output.collect(cellId, joinResult);
+							}
 						}
+					}, new Progressable.ReporterProgressable(reporter));			
+			
+//			for(int i=0 ; i< shapes.size(); i++){
+//				for(int j=i+1; j< shapes.size(); j++){
+//					if(shapes.get(i).distanceTo(shapes.get(j)) <= (double)distance){
+//						if(getTimeDistance(shapes.get(i).time,shapes.get(j).time, timeresolution, interval)){
+//							joinResult.set(shapes.get(i).toText(new Text()).toString() + "\t"
+//									+ shapes.get(j).toText(new Text()).toString());
+//							output.collect(cellId, joinResult);
+//						}
 //					}
-				}
-			}
+//				}
+//			}
 
 			
 		}
@@ -218,7 +218,6 @@ public class STJoin {
 		conf.setBoolean("mapreduce.input.fileinputformat.input.dir.recursive", true);
 		conf.setInputFormat(TextInputFormat.class);
 		conf.setOutputFormat(TextOutputFormat.class);
-		conf.setNumReduceTasks(20);
 		FileInputFormat.setInputPaths(conf, inputPath);
 		FileOutputFormat.setOutputPath(conf, outputPath);
 		JobClient.runJob(conf).waitForCompletion();
