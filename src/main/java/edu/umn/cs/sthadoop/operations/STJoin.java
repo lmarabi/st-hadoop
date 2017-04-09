@@ -11,11 +11,9 @@ package edu.umn.cs.sthadoop.operations;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.LinkedList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,10 +36,6 @@ import org.apache.hadoop.mapred.TextOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 import edu.umn.cs.spatialHadoop.OperationsParams;
-import edu.umn.cs.spatialHadoop.core.Rectangle;
-import edu.umn.cs.spatialHadoop.core.Shape;
-import edu.umn.cs.spatialHadoop.core.SpatialAlgorithms;
-import edu.umn.cs.spatialHadoop.util.Progressable;
 import edu.umn.cs.sthadoop.core.STPoint;
 
 /**
@@ -105,49 +99,49 @@ public class STJoin {
 		@Override
 		public void reduce(final LongWritable cellId, Iterator<Text> values, 
 				final OutputCollector<LongWritable,Text> output,Reporter reporter) throws IOException {
-			ArrayList<STPoint> shapes = new ArrayList<STPoint>();
-		
-			STPoint shape = null;
+			LinkedList<STPoint> shapes = new LinkedList<STPoint>();
+			STPoint shape = new STPoint();
+			
+			Text temp = null; 
 			while(values.hasNext()){
-				shape = new STPoint();
-				Text temp = values.next();
+				temp.set(values.next());
 				shape.fromText(temp);
 				shapes.add(shape);
 			}
 			
 
-			SpatialAlgorithms.SelfSTJoin_planeSweep(shapes.toArray(new STPoint[shapes.size()]), true,
-					new OutputCollector<STPoint, STPoint>() {
-
-						@Override
-						public void collect(STPoint r, STPoint s) throws IOException {
-							if (!r.equals(s)) {
-								STPoint s1;
-								STPoint s2;
-								s1 = (STPoint) r;
-								s2 = (STPoint) s;
-//								if (s1.distanceTo(s2) <= (double)distance) {
-									if (getTimeDistance(s1.time, s2.time, timeresolution, interval)) {
-										joinResult.set(r.toText(new Text()).toString() + "\t"
-												+ s.toText(new Text()).toString());
-										output.collect(cellId, joinResult);
-									}
+//			SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new STPoint[shapes.size()]), true,
+//					new OutputCollector<STPoint, STPoint>() {
+//
+//						@Override
+//						public void collect(STPoint r, STPoint s) throws IOException {
+//							if (!r.equals(s)) {
+//								STPoint s1;
+//								STPoint s2;
+//								s1 = (STPoint) r;
+//								s2 = (STPoint) s;
+////			C					if (s1.distanceTo(s2) <= (double)distance) {
+//									if (getTimeDistance(s1.time, s2.time, timeresolution, interval)) {
+//										joinResult.set(r.toText(new Text()).toString() + "\t"
+//												+ s.toText(new Text()).toString());
+//										output.collect(cellId, joinResult);
+//									}
 //								}
-							}
-						}
-					}, new Progressable.ReporterProgressable(reporter));			
-			
-//			for(int i=0 ; i< shapes.size(); i++){
-//				for(int j=i+1; j< shapes.size(); j++){
-//					if(shapes.get(i).distanceTo(shapes.get(j)) <= (double)distance){
-//						if(getTimeDistance(shapes.get(i).time,shapes.get(j).time, timeresolution, interval)){
-//							joinResult.set(shapes.get(i).toText(new Text()).toString() + "\t"
-//									+ shapes.get(j).toText(new Text()).toString());
-//							output.collect(cellId, joinResult);
+//							}
 //						}
+//					}, new Progressable.ReporterProgressable(reporter));			
+			
+			for(int i=0 ; i< shapes.size(); i++){
+				for(int j=i+1; j< shapes.size(); j++){
+//					if(shapes.get(i).distanceTo(shapes.get(j)) <= (double)distance){
+						if(getTimeDistance(shapes.get(i).time,shapes.get(j).time, timeresolution, interval)){
+							joinResult.set(shapes.get(i).toText(new Text()).toString() + "\t"
+									+ shapes.get(j).toText(new Text()).toString());
+							output.collect(cellId, joinResult);
+						}
 //					}
-//				}
-//			}
+				}
+			}
 
 			
 		}

@@ -578,32 +578,6 @@ public class SpatialAlgorithms {
   }
   
   
-  /**
-   * The general 3D  self join algorithm which works with arbitrary
-   * STPoint shape. First, it performs a filter step where it finds shapes with
-   * overlapping MBRs. Second, an optional refine step can be executed to
-   * return only shapes which actually overlap.
-   * @param R - input set of shapes
-   * @param refine - Whether or not to run a refine step
-   * @param output - output collector where the results are reported
-   * @return - number of pairs returned by the planesweep algorithm
-   * @throws IOException
-   * @author louai alarabi
-   */
-  public static <S extends STPoint> int SelfSTJoin_planeSweep(final S[] R,
-      boolean refine, final OutputCollector<S, S> output, Progressable reporter) throws IOException {
-    
-	 Rectangle mbrs = new Rectangle(-Double.MAX_VALUE,-Double.MAX_VALUE,Double.MAX_VALUE,Double.MAX_VALUE);
-  
-	 
-      for(int i=0; i< R.length; i++){
-    	  for(int j=(i+1) ; j < R.length; j++){
-    		  output.collect(R[i],R[j]);
-    	  }
-      }
-	return 0;
-    
-  }
   
   /**
    * Remove duplicate points from an array of points. Two points are considered
