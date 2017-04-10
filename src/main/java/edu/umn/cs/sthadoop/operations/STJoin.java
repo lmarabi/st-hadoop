@@ -88,6 +88,8 @@ public class STJoin {
 					if(!points[i].contains(","))
 						continue;
 					for(int j = (i+1) ; j < points.length; j++){
+						if(!points[j].contains(","))
+							continue;
 						try {
 							p1 = new STPoint(points[i]);
 							p2 = new STPoint(points[j]);
@@ -175,7 +177,7 @@ public class STJoin {
 		JobConf conf = new JobConf(new Configuration(), STJoin.class);
 		FileSystem outfs = outputPath.getFileSystem(conf);
 		outfs.delete(outputPath, true);
-		conf.setJobName("STJoin Hashing");
+		conf.setJobName("STJoin");
 		// pass params to the join map-reduce 
 		conf.set("timedistance", params.get("timedistance"));
 		conf.set("spacedistance", params.get("spacedistance"));
