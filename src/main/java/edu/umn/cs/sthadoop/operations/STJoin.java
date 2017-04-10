@@ -192,8 +192,8 @@ public class STJoin {
 		FileOutputFormat.setOutputPath(conf, outputPath);
 		conf.setNumReduceTasks(0);
 		JobClient.runJob(conf).waitForCompletion();
-		outfs = inputPath.getFileSystem(conf);
-		outfs.delete(inputPath);
+//		outfs = inputPath.getFileSystem(conf);
+//		outfs.delete(inputPath);
 		return 0;
 	}
 	
@@ -214,6 +214,14 @@ public class STJoin {
 	}
 	
 
+	private static String addtimeSpaceToInterval(String date, int interval) throws ParseException{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar c = Calendar.getInstance();
+		c.setTime(sdf.parse(date));
+		c.add(Calendar.DATE, interval);
+		date = sdf.format(c.getTime());
+		return date;
+	}
 
 	/**
 	 * @param args
@@ -267,12 +275,12 @@ public class STJoin {
 		Path outputPath = allFiles.length == 2 ? null : params.getOutputPath();
 		
 		// modify the query range with new time interval to consider in join 
-//		String[] value = params.get("timedistance").split(",");
-//		String[] date = params.get("interval").split(",");
-//		int interval = Integer.parseInt(value[0]);
-//		String start = addtimeSpaceToInterval(date[0], -interval);
-//		String end = addtimeSpaceToInterval(date[1], interval);
-//		params.set("interval", start+","+end);
+		String[] value = params.get("timedistance").split(",");
+		String[] date = params.get("interval").split(",");
+		int interval = Integer.parseInt(value[0]);
+		String start = addtimeSpaceToInterval(date[0], -interval);
+		String end = addtimeSpaceToInterval(date[1], interval);
+		params.set("interval", start+","+end);
 
 		// Query from the dataset.
 		for (Path input : inputPaths) {
@@ -286,7 +294,7 @@ public class STJoin {
 			args[6] = "-no-local";
 			for (String x : args)
 				System.out.println(x);
-//			STRangeQuery.main(args);
+			STRangeQuery.main(args);
 			System.out.println("done with the STQuery from: " + input.toString() + "\n" + "candidate:" + args[1]);
 
 		}
@@ -301,8 +309,15 @@ public class STJoin {
 	    Path hashedbucket = new Path(outputPath.getParent().toString()+"/hashedbucket");
 		long t1 = System.currentTimeMillis();
 		// join hash step 
-//		long resultSize = STHash.stHash(inputstjoin, hashedbucket, params);
-		
+		args = new String[7];
+		args[0] = inputstjoin.toString();
+		args[1] = hashedbucket.toString();
+		args[2] = "shape:" + params.get("shape");
+		args[3] = "rect:" + params.get("rect");
+		args[4] = "interval:" + params.get("interval");
+		args[5] = "-overwrite";
+		args[6] = "-no-local";
+		STHash.main(args);	
 //		//join Step
 //		if(fs.exists(new Path(outputPath.getParent().toString()+"hashedbucket"))){
 //	    	inputstjoin = new Path(outputPath.getParent().toString()+"hashedbucket");

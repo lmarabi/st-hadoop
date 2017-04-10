@@ -111,8 +111,8 @@ public class STHash {
 		FileOutputFormat.setOutputPath(conf, outputPath);
 		conf.setNumReduceTasks(30);
 		JobClient.runJob(conf).waitForCompletion();
-		outfs = inputPath.getFileSystem(conf);
-		outfs.delete(inputPath);
+//		outfs = inputPath.getFileSystem(conf);
+//		outfs.delete(inputPath);
 		return 0;
 	}
 	
@@ -131,14 +131,6 @@ public class STHash {
 		GenericOptionsParser.printGenericCommandUsage(System.out);
 	}
 	
-	private static String addtimeSpaceToInterval(String date, int interval) throws ParseException{
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		Calendar c = Calendar.getInstance();
-		c.setTime(sdf.parse(date));
-		c.add(Calendar.DATE, interval);
-		date = sdf.format(c.getTime());
-		return date;
-	}
 	
 	public static void main(String[] args) throws Exception {
 
@@ -184,45 +176,11 @@ public class STHash {
 			System.exit(1);
 		}
 
-		Path[] inputPaths = allFiles.length == 2 ? allFiles : params.getInputPaths();
+		Path inputPath = allFiles.length == 2 ? null : params.getInputPath();
 		Path outputPath = allFiles.length == 2 ? null : params.getOutputPath();
-		
-		// modify the query range with new time interval to consider in join 
-		String[] value = params.get("timedistance").split(",");
-		String[] date = params.get("interval").split(",");
-		int interval = Integer.parseInt(value[0]);
-		String start = addtimeSpaceToInterval(date[0], -interval);
-		String end = addtimeSpaceToInterval(date[1], interval);
-		params.set("interval", start+","+end);
-
-		// Query from the dataset.
-		for (Path input : inputPaths) {
-			args = new String[7];
-			args[0] = input.toString();
-			args[1] = outputPath.getParent().toString() + "candidatebuckets/" + input.getName();
-			args[2] = "shape:" + params.get("shape");
-			args[3] = "rect:" + params.get("rect");
-			args[4] = "interval:" + params.get("interval");
-			args[5] = "-overwrite";
-			args[6] = "-no-local";
-			for (String x : args)
-				System.out.println(x);
-			STRangeQuery.main(args);
-			System.out.println("done with the STQuery from: " + input.toString() + "\n" + "candidate:" + args[1]);
-
-		}
-		// invoke the map-hash and reduce-join .
-	    FileSystem fs = outputPath.getFileSystem(new Configuration());
-	    Path inputstjoin;
-	    if(fs.exists(new Path(outputPath.getParent().toString() + "candidatebuckets/"))){
-	    	inputstjoin = new Path(outputPath.getParent().toString() + "candidatebuckets");
-	    }else{
-	    	inputstjoin = new Path(outputPath.getParent().toString() + "/candidatebuckets");
-	    }
-	    Path hashedbucket = new Path(outputPath.getParent().toString()+"/hashedbucket");
 		long t1 = System.currentTimeMillis();
 		// join hash step 
-		long resultSize = STHash.stHash(inputstjoin, hashedbucket, params);
+		long resultSize = STHash.stHash(inputPath, outputPath, params);
 		long t2 = System.currentTimeMillis();
 		System.out.println("Total hashing time: " + (t2 - t1) + " millis");
 	}
