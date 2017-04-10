@@ -159,10 +159,7 @@ public class STHash {
 			printUsage();
 			System.exit(1);
 		}
-		if (allFiles.length > 2 && !params.checkInputOutput()) {
-			printUsage();
-			System.exit(1);
-		}
+		
 		
 		if (params.get("timedistance") == null) {
 			System.err.println("time distance is missing");
