@@ -1,6 +1,9 @@
 package edu.umn.cs.sthadoop.operations;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
@@ -21,6 +24,7 @@ import org.apache.hadoop.mapred.Reducer;
 import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.hadoop.mapred.TextOutputFormat;
+import org.apache.hadoop.util.GenericOptionsParser;
 
 import edu.umn.cs.spatialHadoop.OperationsParams;
 import edu.umn.cs.sthadoop.core.STPoint;
@@ -110,6 +114,117 @@ public class STHash {
 		outfs = inputPath.getFileSystem(conf);
 		outfs.delete(inputPath);
 		return 0;
+	}
+	
+	
+	private static void printUsage() {
+		System.out.println("Runs a spatio-temporal range query on indexed data");
+		System.out.println("Parameters: (* marks required parameters)");
+		System.out.println("<input file> - (*) Path to input file");
+		System.out.println("<output file> -  Path to input file");
+		System.out.println("shape:<STPoint> - (*) Type of shapes stored in input file");
+		System.out.println("rect:<x1,y1,x2,y2> - Spatial query range");
+		System.out.println("interval:<date1,date2> - Temporal query range. " + "Format of each date is yyyy-mm-dd");
+		System.out.println("timeDistance:[1,day - 1,hour - 30,minute - 120,second] -  time distance degree");
+		System.out.println("spaceDistance:integer -  time distance degree");
+		System.out.println("-overwrite - Overwrite output file without notice");
+		GenericOptionsParser.printGenericCommandUsage(System.out);
+	}
+	
+	private static String addtimeSpaceToInterval(String date, int interval) throws ParseException{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar c = Calendar.getInstance();
+		c.setTime(sdf.parse(date));
+		c.add(Calendar.DATE, interval);
+		date = sdf.format(c.getTime());
+		return date;
+	}
+	
+	public static void main(String[] args) throws Exception {
+
+//		 args = new String[10];
+//		 args[0] = "/home/louai/nyc-taxi/yellowIndex";
+//		 args[1] = "/home/louai/nyc-taxi/humanIndex";
+//		 args[2] = "/home/louai/nyc-taxi/resultSTJoin";
+//		 args[3] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+//		 args[4] =
+//		 "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
+//		 args[5] = "interval:2015-01-01,2015-01-02";
+//		 args[6] = "timeDistance:1,day";
+//		 args[7] = "spaceDistance:2";
+//		 args[8] = "-overwrite";
+//		 args[9] = "-no-local";
+
+		OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
+		Path[] allFiles = params.getPaths();
+		if (allFiles.length < 2) {
+			System.err.println("This operation requires at least two input files");
+			printUsage();
+			System.exit(1);
+		}
+		if (allFiles.length == 2 && !params.checkInput()) {
+			// One of the input files does not exist
+			printUsage();
+			System.exit(1);
+		}
+		if (allFiles.length > 2 && !params.checkInputOutput()) {
+			printUsage();
+			System.exit(1);
+		}
+		
+		if (params.get("timedistance") == null) {
+			System.err.println("time distance is missing");
+			printUsage();
+			System.exit(1);
+		}
+		
+		if (params.get("spacedistance") == null) {
+			System.err.println("space distance is missing");
+			printUsage();
+			System.exit(1);
+		}
+
+		Path[] inputPaths = allFiles.length == 2 ? allFiles : params.getInputPaths();
+		Path outputPath = allFiles.length == 2 ? null : params.getOutputPath();
+		
+		// modify the query range with new time interval to consider in join 
+		String[] value = params.get("timedistance").split(",");
+		String[] date = params.get("interval").split(",");
+		int interval = Integer.parseInt(value[0]);
+		String start = addtimeSpaceToInterval(date[0], -interval);
+		String end = addtimeSpaceToInterval(date[1], interval);
+		params.set("interval", start+","+end);
+
+		// Query from the dataset.
+		for (Path input : inputPaths) {
+			args = new String[7];
+			args[0] = input.toString();
+			args[1] = outputPath.getParent().toString() + "candidatebuckets/" + input.getName();
+			args[2] = "shape:" + params.get("shape");
+			args[3] = "rect:" + params.get("rect");
+			args[4] = "interval:" + params.get("interval");
+			args[5] = "-overwrite";
+			args[6] = "-no-local";
+			for (String x : args)
+				System.out.println(x);
+			STRangeQuery.main(args);
+			System.out.println("done with the STQuery from: " + input.toString() + "\n" + "candidate:" + args[1]);
+
+		}
+		// invoke the map-hash and reduce-join .
+	    FileSystem fs = outputPath.getFileSystem(new Configuration());
+	    Path inputstjoin;
+	    if(fs.exists(new Path(outputPath.getParent().toString() + "candidatebuckets/"))){
+	    	inputstjoin = new Path(outputPath.getParent().toString() + "candidatebuckets");
+	    }else{
+	    	inputstjoin = new Path(outputPath.getParent().toString() + "/candidatebuckets");
+	    }
+	    Path hashedbucket = new Path(outputPath.getParent().toString()+"/hashedbucket");
+		long t1 = System.currentTimeMillis();
+		// join hash step 
+		long resultSize = STHash.stHash(inputstjoin, hashedbucket, params);
+		long t2 = System.currentTimeMillis();
+		System.out.println("Total hashing time: " + (t2 - t1) + " millis");
 	}
 
 }
