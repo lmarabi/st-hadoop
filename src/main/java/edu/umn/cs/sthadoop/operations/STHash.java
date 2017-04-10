@@ -148,11 +148,19 @@ public class STHash {
 //		 args[9] = "-no-local";
 
 		OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
-		Path[] allFiles = params.getPaths();
-		
-
-		Path inputPath = allFiles.length == 2 ? null : params.getInputPath();
-		Path outputPath = allFiles.length == 2 ? null : params.getOutputPath();
+		final Path[] paths = params.getPaths();
+		if (paths.length <= 1 && !params.checkInput()) {
+			printUsage();
+			System.exit(1);
+		}
+		if (paths.length >= 2 && !params.checkInputOutput()) {
+			printUsage();
+			System.exit(1);
+		}
+		Path inputPath = params.getInputPath();
+		Path outputPath = params.getOutputPath();
+		System.out.println("STHash >>>>>> InputPath - "+ inputPath.toString());
+		System.out.println("STHash >>>>>> outputPath - "+ outputPath.toString());
 		long t1 = System.currentTimeMillis();
 		// join hash step 
 		long resultSize = STHash.stHash(inputPath, outputPath, params);
