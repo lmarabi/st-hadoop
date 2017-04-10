@@ -299,7 +299,7 @@ public class STJoin {
 
 		}
 		// invoke the map-hash and reduce-join .
-	    FileSystem fs = outputPath.getFileSystem(new Configuration());
+	    FileSystem fs = outputPath.getFileSystem(params);
 	    Path inputstjoin;
 	    if(fs.exists(new Path(outputPath.getParent().toString() + "candidatebuckets/"))){
 	    	inputstjoin = new Path(outputPath.getParent().toString() + "candidatebuckets");
