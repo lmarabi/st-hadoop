@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.hadoop.io.IntWritable;
@@ -23,8 +24,6 @@ public class testsjoin {
 		String outputFile = "/home/louai/nyc-taxi/candidatebuckets/result.txt";
 		BufferedReader br =  new BufferedReader(new FileReader(fileName));
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
-		
-		
 		
 		String line;
 		double x1 = -180;

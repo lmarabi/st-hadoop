@@ -9,8 +9,10 @@
 package edu.umn.cs.sthadoop.operations;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -79,9 +81,10 @@ public class STJoin {
 		private Text pair1 = new Text();
 		private Text pair2 = new Text();
 		private Text joinResult = new Text();
-		int distance = 0; 
+		double distance = 0.0; 
 		String timeresolution = "";
 		int interval = 0;	
+		LinkedList<STPoint> shapes = new LinkedList<STPoint>();
 		
 		
 		 @Override
@@ -92,7 +95,8 @@ public class STJoin {
 			String[] temp = value.split(",");
 			this.timeresolution = temp[1];
 			this.interval = Integer.parseInt(temp[0]);
-			this.distance = Integer.parseInt(job.get("spacedistance"));
+			int miledistance = Integer.parseInt(job.get("spacedistance"));
+			this.distance = (0.01167734911823545*miledistance)/0.81;
 		}
 
 
@@ -102,7 +106,7 @@ public class STJoin {
 		@Override
 		public void reduce(final LongWritable cellId, Iterator<Text> values, 
 				final OutputCollector<LongWritable,Text> output,Reporter reporter) throws IOException {
-			LinkedList<STPoint> shapes = new LinkedList<STPoint>();
+			
 			STPoint shape = new STPoint();
 			
 			Text temp = new Text(); 
@@ -237,6 +241,15 @@ public class STJoin {
 		System.out.println("-overwrite - Overwrite output file without notice");
 		GenericOptionsParser.printGenericCommandUsage(System.out);
 	}
+	
+	private static String addtimeSpaceToInterval(String date, int interval) throws ParseException{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar c = Calendar.getInstance();
+		c.setTime(sdf.parse(date));
+		c.add(Calendar.DATE, interval);
+		date = sdf.format(c.getTime());
+		return date;
+	}
 
 	/**
 	 * @param args
@@ -288,6 +301,14 @@ public class STJoin {
 
 		Path[] inputPaths = allFiles.length == 2 ? allFiles : params.getInputPaths();
 		Path outputPath = allFiles.length == 2 ? null : params.getOutputPath();
+		
+		// modify the query range with new time interval to consider in join 
+		String[] value = params.get("timedistance").split(",");
+		String[] date = params.get("interval").split(",");
+		int interval = Integer.parseInt(value[0]);
+		String start = addtimeSpaceToInterval(date[0], -interval);
+		String end = addtimeSpaceToInterval(date[1], interval);
+		params.set("interval", start+","+end);
 
 		// Query from the dataset.
 		for (Path input : inputPaths) {
