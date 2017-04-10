@@ -114,7 +114,7 @@ public class STJoin {
 				temp = values.next();
 				shape.fromText(temp);
 				shapes.add(shape);
-				output.collect(cellId, temp);
+//				output.collect(cellId, temp);
 			}
 			
 
@@ -137,17 +137,17 @@ public class STJoin {
 //						}
 //					}, new Progressable.ReporterProgressable(reporter));			
 			
-//			for(int i=0 ; i< shapes.size(); i++){
-//				for(int j=i+1; j< shapes.size(); j++){
+			for(int i=0 ; i< shapes.size(); i++){
+				for(int j=i+1; j< shapes.size(); j++){
 //					if(shapes.get(i).distanceTo(shapes.get(j)) <= (double)distance){
 //						if(getTimeDistance(shapes.get(i).time,shapes.get(j).time, timeresolution, interval)){
-//							joinResult.set(shapes.get(i).toText(new Text()).toString() + "\t"
-//									+ shapes.get(j).toText(new Text()).toString());
-//							output.collect(cellId, joinResult);
+							joinResult.set(shapes.get(i).toText(new Text()).toString() + "\t"
+									+ shapes.get(j).toText(new Text()).toString());
+							output.collect(cellId, joinResult);
 //						}
 //					}
-//				}
-//			}
+				}
+			}
 
 			
 		}
