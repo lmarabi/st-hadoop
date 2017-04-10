@@ -93,9 +93,6 @@ public class STHash {
 		FileSystem outfs = outputPath.getFileSystem(conf);
 		outfs.delete(outputPath, true);
 		conf.setJobName("STJoin Hashing");
-		// pass params to the join map-reduce 
-		conf.set("timedistance", params.get("timedistance"));
-		conf.set("spacedistance", params.get("spacedistance"));
 		conf.setMapOutputKeyClass(LongWritable.class);
 		conf.setMapOutputValueClass(Text.class);
 		conf.setOutputKeyClass(LongWritable.class);
