@@ -85,6 +85,8 @@ public class STJoin {
 			if(value != null){
 				String[] points = value.toString().split("\t");
 				for(int i=1 ; i < points.length ; i++){
+					if(!points[i].contains(","))
+						continue;
 					for(int j = (i+1) ; j < points.length; j++){
 						try {
 							p1 = new STPoint(points[i]);
@@ -190,7 +192,7 @@ public class STJoin {
 		conf.setOutputFormat(TextOutputFormat.class);
 		FileInputFormat.setInputPaths(conf, inputPath);
 		FileOutputFormat.setOutputPath(conf, outputPath);
-		conf.setNumReduceTasks(0);
+//		conf.setNumReduceTasks(0);
 		JobClient.runJob(conf).waitForCompletion();
 //		outfs = inputPath.getFileSystem(conf);
 //		outfs.delete(inputPath);
@@ -229,18 +231,18 @@ public class STJoin {
 	 */
 	public static void main(String[] args) throws Exception {
 
-//		 args = new String[10];
-//		 args[0] = "/home/louai/nyc-taxi/yellowIndex";
-//		 args[1] = "/home/louai/nyc-taxi/humanIndex";
-//		 args[2] = "/home/louai/nyc-taxi/resultSTJoin";
-//		 args[3] = "shape:edu.umn.cs.sthadoop.core.STPoint";
-//		 args[4] =
-//		 "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
-//		 args[5] = "interval:2015-01-01,2015-01-02";
-//		 args[6] = "timeDistance:1,day";
-//		 args[7] = "spaceDistance:2";
-//		 args[8] = "-overwrite";
-//		 args[9] = "-no-local";
+		 args = new String[10];
+		 args[0] = "/home/louai/nyc-taxi/yellowIndex";
+		 args[1] = "/home/louai/nyc-taxi/humanIndex";
+		 args[2] = "/home/louai/nyc-taxi/resultSTJoin";
+		 args[3] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+		 args[4] =
+		 "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
+		 args[5] = "interval:2015-01-01,2015-01-02";
+		 args[6] = "timeDistance:1,day";
+		 args[7] = "spaceDistance:2";
+		 args[8] = "-overwrite";
+		 args[9] = "-no-local";
 
 		OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
 		Path[] allFiles = params.getPaths();
