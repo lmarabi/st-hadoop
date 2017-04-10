@@ -119,7 +119,24 @@ public class STJoin {
 //				shapes.add(shape);
 //				output.collect(cellId, temp);
 			}
-			output.collect(cellId,new Text(txt.toString()));
+			String[] points = txt.toString().split("\t");
+			for(int i =0 ; i< points.length; i++){
+				for( int j = (i+1) ; j < points.length; j++){
+					STPoint p1 = null;
+					STPoint p2 = null;
+					Text joinResult = new Text();
+					try {
+						p1 = new STPoint(points[i]);
+						p2  = new STPoint(points[j]);
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					joinResult.set(p1.toText(new Text()).toString() + "\t"+ p2.toText(new Text()).toString());
+					output.collect(cellId, joinResult);
+				}
+			}
+//			output.collect(cellId,new Text(txt.toString()));
 
 //			SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), false, new OutputCollector<Shape, Shape>() {
 //						@Override
