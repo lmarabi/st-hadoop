@@ -149,29 +149,7 @@ public class STHash {
 
 		OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
 		Path[] allFiles = params.getPaths();
-		if (allFiles.length < 2) {
-			System.err.println("This operation requires at least two input files");
-			printUsage();
-			System.exit(1);
-		}
-		if (allFiles.length == 2 && !params.checkInput()) {
-			// One of the input files does not exist
-			printUsage();
-			System.exit(1);
-		}
 		
-		
-		if (params.get("timedistance") == null) {
-			System.err.println("time distance is missing");
-			printUsage();
-			System.exit(1);
-		}
-		
-		if (params.get("spacedistance") == null) {
-			System.err.println("space distance is missing");
-			printUsage();
-			System.exit(1);
-		}
 
 		Path inputPath = allFiles.length == 2 ? null : params.getInputPath();
 		Path outputPath = allFiles.length == 2 ? null : params.getOutputPath();
