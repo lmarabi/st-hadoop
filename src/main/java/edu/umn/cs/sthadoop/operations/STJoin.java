@@ -12,7 +12,6 @@ import java.awt.image.WritableRenderedImage;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.io.WriteAbortedException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -29,7 +28,6 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
-import org.apache.hadoop.io.WritableComparator;
 import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapred.FileOutputFormat;
 import org.apache.hadoop.mapred.JobClient;
@@ -58,88 +56,17 @@ import edu.umn.cs.sthadoop.core.STPoint;
 public class STJoin {
 	
 	
-	private static class PartitionID implements Writable, WritableComparable<PartitionID>{
-		private Text joinkey = new Text();
-		private IntWritable tag = new IntWritable();
-		
-		public PartitionID() {
-			this.joinkey.set("");
-			this.tag.set(0);
-		}
-		
-		public PartitionID(String key, int tag) {
-			this.joinkey.set(key);
-			this.tag.set(tag);
-		}
-		
-		@Override
-		public int compareTo(PartitionID id) {
-			int compareValue = this.joinkey.compareTo(id.joinkey);
-			if(compareValue == 0){
-				compareValue = this.tag.compareTo(id.tag);
-			}
-			return compareValue;
-		}
-		
-		public Text getJoinkey() {
-			return joinkey;
-		}
-		
-		public void setJoinkey(Text joinkey) {
-			this.joinkey = joinkey;
-		}
-		
-		public IntWritable getTag() {
-			return tag;
-		}
-		
-		@Override
-		public void write(DataOutput out) throws IOException {
-			out.writeUTF(this.getJoinkey().toString());
-			out.writeInt(this.tag.get());
-			
-		}
-		@Override
-		public void readFields(DataInput in) throws IOException {
-			this.joinkey.set(in.readUTF());
-			this.tag.set(in.readInt());
-			
-		}
-		
-	}
-	
-	private static class PartitionIDIndex extends Partitioner<PartitionID, Text>{
-		@Override
-		public int getPartition(PartitionID key, Text value, int numPartitions) {
-			return key.getJoinkey().hashCode() % numPartitions;
-		}
-	}
-	
-	private static class PartitionJoinGroupingComparator extends WritableComparator{
-		public PartitionJoinGroupingComparator() {
-			super(PartitionID.class,true);
-		}
-		
-		@Override
-		public int compare(WritableComparable a, WritableComparable b) {
-			PartitionID key1 = (PartitionID)a;
-			PartitionID key2 = (PartitionID)b;
-			return key1.getJoinkey().compareTo(key2.getJoinkey());
-		}
-	}
-
 	/** Class logger */
 	private static final Log LOG = LogFactory.getLog(STJoin.class);
 
-	static class STJoinMap extends MapReduceBase implements Mapper<LongWritable, Text, PartitionID, Text> {
+	static class STJoinMap extends MapReduceBase implements Mapper<LongWritable, Text, LongWritable, Text> {
 		private double degree = 0.1;
 		private double x1 = -180;
 		private double y1 = -90;
-		private PartitionID cellId = new PartitionID();
 	
 		
 		@Override
-		public void map(LongWritable key, Text value, OutputCollector<PartitionID, Text> output, Reporter reporter)
+		public void map(LongWritable key, Text value, OutputCollector<LongWritable, Text> output, Reporter reporter)
 				throws IOException {
 			if(value != null){
 			STPoint shape = new STPoint();
@@ -147,14 +74,13 @@ public class STJoin {
 			// Hasing objects to the grid. 
 			int columnID = (int)((shape.x - x1)/ degree);
 			int rowID = (int)((shape.y - y1)/ degree);
-			cellId.setJoinkey(new Text(columnID+","+rowID));
-			output.collect(cellId, shape.toText(new Text()));
+			output.collect(new LongWritable((columnID*rowID+1)), shape.toText(new Text()));
 			}
 		}
 	}
 
 	static class STJoinReduce extends MapReduceBase implements 
-	Reducer<PartitionID, Text, Text, Text> {		
+	Reducer<LongWritable, Text, LongWritable, Text> {		
 		private Text pair1 = new Text();
 		private Text pair2 = new Text();
 		private Text joinResult = new Text();
@@ -181,8 +107,8 @@ public class STJoin {
 		
 
 		@Override
-		public void reduce(PartitionID cellId, Iterator<Text> values, 
-				final OutputCollector<Text,Text> output,Reporter reporter) throws IOException {
+		public void reduce(final LongWritable cellId, Iterator<Text> values, 
+				final OutputCollector<LongWritable,Text> output,Reporter reporter) throws IOException {
 //			LinkedList<STPoint> shapes = new LinkedList<STPoint>();
 			StringBuilder txt = new StringBuilder();
 			STPoint shape = new STPoint();
@@ -190,8 +116,10 @@ public class STJoin {
 			Text temp = new Text(); 
 			while(values.hasNext()){
 				temp = values.next();
-				output.collect(cellId.getJoinkey(), temp);
+				txt.append("\t");
+				txt.append(temp.toString());
 			}
+			output.collect(cellId, new Text(txt.toString()));
 			
 		}
 		
