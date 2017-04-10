@@ -317,6 +317,8 @@ public class STJoin {
 		args[4] = "interval:" + params.get("interval");
 		args[5] = "-overwrite";
 		args[6] = "-no-local";
+		for (String x : args)
+			System.out.println(x);
 		STHash.main(args);	
 //		//join Step
 //		if(fs.exists(new Path(outputPath.getParent().toString()+"hashedbucket"))){
