@@ -114,37 +114,38 @@ public class STJoin {
 				temp = values.next();
 				shape.fromText(temp);
 				shapes.add(shape);
+				output.collect(cellId, temp);
 			}
 			
 
-			SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), false, new OutputCollector<Shape, Shape>() {
-						@Override
-						public void collect(Shape r, Shape s) throws IOException {
-							if (!r.equals(s)) {
-								STPoint s1;
-								STPoint s2;
-								s1 = (STPoint) r;
-								s2 = (STPoint) s;
-							if (s1.distanceTo(s2) <= (double)distance) {
-									if (getTimeDistance(s1.time, s2.time, timeresolution, interval)) {
-										joinResult.set(r.toText(new Text()).toString() + "\t"
-												+ s.toText(new Text()).toString());
-										output.collect(cellId, joinResult);
-									}
-							}
-							}
-						}
-					}, new Progressable.ReporterProgressable(reporter));			
+//			SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), false, new OutputCollector<Shape, Shape>() {
+//						@Override
+//						public void collect(Shape r, Shape s) throws IOException {
+//							if (!r.equals(s)) {
+//								STPoint s1;
+//								STPoint s2;
+//								s1 = (STPoint) r;
+//								s2 = (STPoint) s;
+//							if (s1.distanceTo(s2) <= (double)distance) {
+//									if (getTimeDistance(s1.time, s2.time, timeresolution, interval)) {
+//										joinResult.set(r.toText(new Text()).toString() + "\t"
+//												+ s.toText(new Text()).toString());
+//										output.collect(cellId, joinResult);
+//									}
+//							}
+//							}
+//						}
+//					}, new Progressable.ReporterProgressable(reporter));			
 			
 //			for(int i=0 ; i< shapes.size(); i++){
 //				for(int j=i+1; j< shapes.size(); j++){
-////					if(shapes.get(i).distanceTo(shapes.get(j)) <= (double)distance){
+//					if(shapes.get(i).distanceTo(shapes.get(j)) <= (double)distance){
 //						if(getTimeDistance(shapes.get(i).time,shapes.get(j).time, timeresolution, interval)){
 //							joinResult.set(shapes.get(i).toText(new Text()).toString() + "\t"
 //									+ shapes.get(j).toText(new Text()).toString());
 //							output.collect(cellId, joinResult);
 //						}
-////					}
+//					}
 //				}
 //			}
 
