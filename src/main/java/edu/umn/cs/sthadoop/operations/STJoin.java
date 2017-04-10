@@ -84,7 +84,7 @@ public class STJoin {
 		double distance = 0.0; 
 		String timeresolution = "";
 		int interval = 0;	
-		LinkedList<STPoint> shapes = new LinkedList<STPoint>();
+		
 		
 		
 		 @Override
@@ -106,17 +106,20 @@ public class STJoin {
 		@Override
 		public void reduce(final LongWritable cellId, Iterator<Text> values, 
 				final OutputCollector<LongWritable,Text> output,Reporter reporter) throws IOException {
-			
+//			LinkedList<STPoint> shapes = new LinkedList<STPoint>();
+			StringBuilder txt = new StringBuilder();
 			STPoint shape = new STPoint();
 			
 			Text temp = new Text(); 
 			while(values.hasNext()){
 				temp = values.next();
-				shape.fromText(temp);
-				shapes.add(shape);
+				txt.append("\t");
+				txt.append(temp.toString());
+//				shape.fromText(temp);
+//				shapes.add(shape);
 //				output.collect(cellId, temp);
 			}
-			
+			output.collect(cellId,new Text(txt.toString()));
 
 //			SpatialAlgorithms.SelfJoin_planeSweep(shapes.toArray(new Shape[shapes.size()]), false, new OutputCollector<Shape, Shape>() {
 //						@Override
@@ -136,18 +139,18 @@ public class STJoin {
 //							}
 //						}
 //					}, new Progressable.ReporterProgressable(reporter));			
-			
-			for(int i=0 ; i< shapes.size(); i++){
-				for(int j=i+1; j< shapes.size(); j++){
+//			
+//			for(int i=0 ; i< shapes.size(); i++){
+//				for(int j=i+1; j< shapes.size(); j++){
 //					if(shapes.get(i).distanceTo(shapes.get(j)) <= (double)distance){
 //						if(getTimeDistance(shapes.get(i).time,shapes.get(j).time, timeresolution, interval)){
-							joinResult.set(shapes.get(i).toText(new Text()).toString() + "\t"
-									+ shapes.get(j).toText(new Text()).toString());
-							output.collect(cellId, joinResult);
+//							joinResult.set(shapes.get(i).toText(new Text()).toString() + "\t"
+//									+ shapes.get(j).toText(new Text()).toString());
+//							output.collect(cellId, joinResult);
 //						}
 //					}
-				}
-			}
+//				}
+//			}
 
 			
 		}
