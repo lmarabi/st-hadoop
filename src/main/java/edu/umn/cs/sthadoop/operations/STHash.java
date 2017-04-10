@@ -3,6 +3,8 @@ package edu.umn.cs.sthadoop.operations;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -24,6 +26,8 @@ import edu.umn.cs.spatialHadoop.OperationsParams;
 import edu.umn.cs.sthadoop.core.STPoint;
 
 public class STHash {
+	/** Class logger */
+	private static final Log LOG = LogFactory.getLog(STHash.class);
 	
 	static class STHashMap extends MapReduceBase implements Mapper<LongWritable, Text, LongWritable, Text> {
 		private double degree = 0.1;
