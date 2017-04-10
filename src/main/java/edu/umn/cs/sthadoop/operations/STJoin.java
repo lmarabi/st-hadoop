@@ -25,6 +25,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
@@ -59,7 +60,7 @@ public class STJoin {
 	/** Class logger */
 	private static final Log LOG = LogFactory.getLog(STJoin.class);
 
-	static class STJoinMap extends MapReduceBase implements Mapper<LongWritable, Text, LongWritable, Text> {
+	static class STHashMap extends MapReduceBase implements Mapper<LongWritable, Text, LongWritable, Text> {
 		private double degree = 0.1;
 		private double x1 = -180;
 		private double y1 = -90;
@@ -79,11 +80,35 @@ public class STJoin {
 		}
 	}
 
-	static class STJoinReduce extends MapReduceBase implements 
+	static class STHashReduce extends MapReduceBase implements 
 	Reducer<LongWritable, Text, LongWritable, Text> {		
-		private Text pair1 = new Text();
-		private Text pair2 = new Text();
-		private Text joinResult = new Text();
+	
+		@Override
+		public void reduce(final LongWritable cellId, Iterator<Text> values, 
+				final OutputCollector<LongWritable,Text> output,Reporter reporter) throws IOException {
+//			LinkedList<STPoint> shapes = new LinkedList<STPoint>();
+			StringBuilder txt = new StringBuilder();
+			STPoint shape = new STPoint();
+			
+			Text temp = new Text(); 
+			while(values.hasNext()){
+				temp = values.next();
+				txt.append("\t");
+				txt.append(temp.toString());
+			}
+			output.collect(cellId, new Text(txt.toString()));
+			
+		}
+		
+		
+	}
+	
+	
+	/**
+	 * The following code is the Join step Refinement. 
+	 */
+	static class STJoinMap extends MapReduceBase implements Mapper<LongWritable, Text, LongWritable, Text> {
+		LongWritable id = new LongWritable();
 		double distance = 0.0; 
 		String timeresolution = "";
 		int interval = 0;	
@@ -101,26 +126,34 @@ public class STJoin {
 			int miledistance = Integer.parseInt(job.get("spacedistance"));
 			this.distance = (0.01167734911823545*miledistance)/0.81;
 		}
-
-
-	/** List of cells used by the reducer */
 		
-
+		
 		@Override
-		public void reduce(final LongWritable cellId, Iterator<Text> values, 
-				final OutputCollector<LongWritable,Text> output,Reporter reporter) throws IOException {
-//			LinkedList<STPoint> shapes = new LinkedList<STPoint>();
-			StringBuilder txt = new StringBuilder();
-			STPoint shape = new STPoint();
-			
-			Text temp = new Text(); 
-			while(values.hasNext()){
-				temp = values.next();
-				txt.append("\t");
-				txt.append(temp.toString());
+		public void map(LongWritable key, Text value, OutputCollector<LongWritable, Text> output, Reporter reporter)
+				throws IOException {
+			STPoint p1  = new STPoint();
+			STPoint p2 = new STPoint();
+			Text joined = new Text();
+			if(value != null){
+				String[] points = value.toString().split("\t");
+				for(int i=1 ; i < points.length ; i++){
+					for(int j = (i+1) ; j < points.length; j++){
+						try {
+							p1 = new STPoint(points[i]);
+							p2 = new STPoint(points[j]);
+							joined.set(p1.toText(new Text()).toString()+"\t"+p2.toText(new Text()).toString());
+							id.set(Long.parseLong(points[0]));
+							output.collect(id, joined);
+						} catch (ParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (ArrayIndexOutOfBoundsException e){
+							e.printStackTrace();
+						}
+						
+					}
+				}
 			}
-			output.collect(cellId, new Text(txt.toString()));
-			
 		}
 		
 		
@@ -155,9 +188,69 @@ public class STJoin {
 				return result;
 			}
 		
-		
 	}
 
+	static class STJoinReduce extends MapReduceBase implements 
+	Reducer<LongWritable, Text, LongWritable, Text> {		
+		
+
+		@Override
+		public void reduce(final LongWritable cellId, Iterator<Text> values, 
+				final OutputCollector<LongWritable,Text> output,Reporter reporter) throws IOException {
+ 
+			while(values.hasNext()){
+				output.collect(cellId, values.next());
+			}
+			
+			
+		}
+		
+		
+	}
+	
+	
+
+	/**
+	 * 
+	 * @param inputPath
+	 * @param outputPath
+	 * @param params
+	 * @return
+	 * @throws IOException
+	 * @throws Exception
+	 * @throws InterruptedException
+	 */
+	private static long stHash(Path inputPath, Path outputPath, OperationsParams params)
+			throws IOException, Exception, InterruptedException {
+		
+		JobConf conf = new JobConf(new Configuration(), STJoin.class);
+		FileSystem outfs = outputPath.getFileSystem(conf);
+		outfs.delete(outputPath, true);
+		conf.setJobName("STJoin Hashing");
+		// pass params to the join map-reduce 
+		conf.set("timedistance", params.get("timedistance"));
+		conf.set("spacedistance", params.get("spacedistance"));
+		conf.setMapOutputKeyClass(LongWritable.class);
+		conf.setMapOutputValueClass(Text.class);
+		conf.setOutputKeyClass(LongWritable.class);
+		conf.setOutputValueClass(Text.class);
+		// Mapper settings
+		conf.setMapperClass(STHashMap.class);
+		conf.setReducerClass(STHashReduce.class);
+		conf.setCombinerClass(STHashReduce.class);
+		conf.setBoolean("mapreduce.input.fileinputformat.input.dir.recursive", true);
+		conf.setInputFormat(TextInputFormat.class);
+		conf.setOutputFormat(TextOutputFormat.class);
+		FileInputFormat.setInputPaths(conf, inputPath);
+		FileOutputFormat.setOutputPath(conf, outputPath);
+		conf.setNumReduceTasks(30);
+		JobClient.runJob(conf).waitForCompletion();
+		outfs = inputPath.getFileSystem(conf);
+		outfs.delete(inputPath);
+		return 0;
+	}
+	
+	
 	/**
 	 * 
 	 * @param inputPath
@@ -174,7 +267,7 @@ public class STJoin {
 		JobConf conf = new JobConf(new Configuration(), STJoin.class);
 		FileSystem outfs = outputPath.getFileSystem(conf);
 		outfs.delete(outputPath, true);
-		conf.setJobName("STJoin Query");
+		conf.setJobName("STJoin Hashing");
 		// pass params to the join map-reduce 
 		conf.set("timedistance", params.get("timedistance"));
 		conf.set("spacedistance", params.get("spacedistance"));
@@ -191,7 +284,7 @@ public class STJoin {
 		conf.setOutputFormat(TextOutputFormat.class);
 		FileInputFormat.setInputPaths(conf, inputPath);
 		FileOutputFormat.setOutputPath(conf, outputPath);
-		conf.setNumReduceTasks(30);
+		conf.setNumReduceTasks(0);
 		JobClient.runJob(conf).waitForCompletion();
 		outfs = inputPath.getFileSystem(conf);
 		outfs.delete(inputPath);
@@ -306,12 +399,21 @@ public class STJoin {
 	    }else{
 	    	inputstjoin = new Path(outputPath.getParent().toString() + "/candidatebuckets");
 	    }
-	    
+	    Path hashedbucket = new Path(outputPath.getParent().toString()+"/hashedbucket");
 		long t1 = System.currentTimeMillis();
-		long resultSize = stJoin(inputstjoin, outputPath, params);
+		// join hash step 
+		long resultSize = stHash(inputstjoin, hashedbucket, params);
+		
+		//join Step
+		if(fs.exists(new Path(outputPath.getParent().toString()+"hashedbucket"))){
+	    	inputstjoin = new Path(outputPath.getParent().toString()+"hashedbucket");
+	    }else{
+	    	inputstjoin = new Path(outputPath.getParent().toString()+"/hashedbucket");
+	    }
+		//Join refinement Step 
+		stJoin(inputstjoin, hashedbucket, params);
 		long t2 = System.currentTimeMillis();
 		System.out.println("Total time: " + (t2 - t1) + " millis");
-		System.out.println("Result size: " + resultSize);
 	}
 
 }
