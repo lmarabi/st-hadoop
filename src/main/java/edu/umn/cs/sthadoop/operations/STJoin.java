@@ -306,7 +306,7 @@ public class STJoin {
 	    }else{
 	    	inputstjoin = new Path(outputPath.getParent().toString() + "/candidatebuckets");
 	    }
-	    Path hashedbucket = new Path(outputPath.getParent().toString()+"/hashedbucket");
+	    Path hashedbucket = new Path(outputPath.getParent().toString()+"hashedbucket");
 		long t1 = System.currentTimeMillis();
 		// join hash step 
 		args = new String[7];
