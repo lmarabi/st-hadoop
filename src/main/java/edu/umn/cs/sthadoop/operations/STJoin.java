@@ -189,8 +189,8 @@ public class STJoin {
 		// pass params to the join map-reduce 
 		conf.set("timedistance", params.get("timedistance"));
 		conf.set("spacedistance", params.get("spacedistance"));
-		conf.setMapOutputKeyClass(LongWritable.class);
-		conf.setMapOutputValueClass(Text.class);
+//		conf.setMapOutputKeyClass(LongWritable.class);
+//		conf.setMapOutputValueClass(Text.class);
 		conf.setOutputKeyClass(LongWritable.class);
 		conf.setOutputValueClass(Text.class);
 		// Mapper settings
