@@ -86,7 +86,7 @@ public class STJoin {
 			STPoint p1  = new STPoint();
 			STPoint p2 = new STPoint();
 			Text joined = new Text();
-			ArrayList<STPoint> list = new ArrayList<>();
+			ArrayList<STPoint> list = new ArrayList<STPoint>();
 			if(value != null){
 				String[] points = value.toString().split("\t");
 				id.set(Long.parseLong(points[0]));
