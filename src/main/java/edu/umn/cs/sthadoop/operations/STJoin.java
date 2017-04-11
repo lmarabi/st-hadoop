@@ -150,23 +150,23 @@ public class STJoin {
 		
 	}
 
-	static class STJoinReduce extends MapReduceBase implements 
-	Reducer<LongWritable, Text, LongWritable, Text> {		
-		
-
-		@Override
-		public void reduce(final LongWritable cellId, Iterator<Text> values, 
-				final OutputCollector<LongWritable,Text> output,Reporter reporter) throws IOException {
- 
-			while(values.hasNext()){
-				output.collect(cellId, values.next());
-			}
-			
-			
-		}
-		
-		
-	}
+//	static class STJoinReduce extends MapReduceBase implements 
+//	Reducer<LongWritable, Text, LongWritable, Text> {		
+//		
+//
+//		@Override
+//		public void reduce(final LongWritable cellId, Iterator<Text> values, 
+//				final OutputCollector<LongWritable,Text> output,Reporter reporter) throws IOException {
+// 
+//			while(values.hasNext()){
+//				output.collect(cellId, values.next());
+//			}
+//			
+//			
+//		}
+//		
+//		
+//	}
 	
 	
 	/**
@@ -195,8 +195,8 @@ public class STJoin {
 		conf.setOutputValueClass(Text.class);
 		// Mapper settings
 		conf.setMapperClass(STJoinMap.class);
-		conf.setReducerClass(STJoinReduce.class);
-		conf.setCombinerClass(STJoinReduce.class);
+//		conf.setReducerClass(STJoinReduce.class);
+//		conf.setCombinerClass(STJoinReduce.class);
 		conf.setBoolean("mapreduce.input.fileinputformat.input.dir.recursive", true);
 		conf.setInputFormat(TextInputFormat.class);
 		conf.setOutputFormat(TextOutputFormat.class);
