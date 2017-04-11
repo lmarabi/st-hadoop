@@ -11,7 +11,9 @@ package edu.umn.cs.sthadoop.operations;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -34,6 +36,8 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.hadoop.mapred.TextOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
+
+import com.sun.tools.javac.code.Attribute.Array;
 
 import edu.umn.cs.spatialHadoop.OperationsParams;
 import edu.umn.cs.sthadoop.core.STPoint;
@@ -82,29 +86,33 @@ public class STJoin {
 			STPoint p1  = new STPoint();
 			STPoint p2 = new STPoint();
 			Text joined = new Text();
+			ArrayList<STPoint> list = new ArrayList<>();
 			if(value != null){
 				String[] points = value.toString().split("\t");
-				for(int i=1 ; i < points.length ; i++){
-					if(!points[i].contains(","))
-						continue;
-					for(int j = (i+1) ; j < points.length; j++){
-						if(!points[j].contains(","))
-							continue;
-						try {
-							p1 = new STPoint(points[i]);
-							p2 = new STPoint(points[j]);
-							joined.set(p1.toText(new Text()).toString()+"\t"+p2.toText(new Text()).toString());
-							id.set(Long.parseLong(points[0]));
-							output.collect(id, joined);
-						} catch (ParseException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (ArrayIndexOutOfBoundsException e){
-							e.printStackTrace();
-						}
+				id.set(Long.parseLong(points[0]));
+				for(String p : points){
+					try{
+						p1 = new STPoint(p);
+						list.add(p1);
+					}catch (Exception e){
 						
 					}
 				}
+				
+				Collections.sort(list);
+				int j = 0; 
+				for(int i=0 ;i <list.size();i++){
+					j = i+1;
+					while(j< list.size() && (list.get(i).distanceTo(list.get(j)) <= distance)){
+						if(getTimeDistance(list.get(i).time, list.get(j).time, timeresolution, interval)){
+							joined.set(list.get(i).toText(new Text()).toString()
+									+"\t"
+									+list.get(j).toText(new Text()).toString());
+							output.collect(id, joined);
+						}
+						j++;	
+					}
+				}	
 			}
 		}
 		
@@ -194,7 +202,7 @@ public class STJoin {
 		conf.setOutputFormat(TextOutputFormat.class);
 		FileInputFormat.setInputPaths(conf, inputPath);
 		FileOutputFormat.setOutputPath(conf, outputPath);
-//		conf.setNumReduceTasks(0);
+		conf.setNumReduceTasks(0);
 		JobClient.runJob(conf).waitForCompletion();
 //		outfs = inputPath.getFileSystem(conf);
 //		outfs.delete(inputPath);
@@ -333,7 +341,7 @@ public class STJoin {
 		//Join refinement Step 
 		stJoin(hashedbucket, outputPath, params);
 		long t2 = System.currentTimeMillis();
-		System.out.println("Total time: " + (t2 - t1) + " millis");
+		System.out.println("Total join time: " + (t2 - t1) + " millis");
 	}
 
 }
