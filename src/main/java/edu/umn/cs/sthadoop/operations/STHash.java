@@ -26,6 +26,8 @@ import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.hadoop.mapred.TextOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 
+import com.sun.mail.handlers.text_html;
+
 import edu.umn.cs.spatialHadoop.OperationsParams;
 import edu.umn.cs.sthadoop.core.STPoint;
 
@@ -62,12 +64,18 @@ public class STHash {
 //			LinkedList<STPoint> shapes = new LinkedList<STPoint>();
 			StringBuilder txt = new StringBuilder();
 			STPoint shape = new STPoint();
-			
+			int size = 0 ; 
 			Text temp = new Text(); 
 			while(values.hasNext()){
 				temp = values.next();
+				size += temp.getBytes().length;
+				if(size > 100){
+					output.collect(cellId, new Text(txt.toString()));
+					txt = new StringBuilder();
+					size  = 0;
+				}
 				txt.append("\t");
-				txt.append(temp.toString());
+				txt.append(temp.toString());				
 			}
 			output.collect(cellId, new Text(txt.toString()));
 			
