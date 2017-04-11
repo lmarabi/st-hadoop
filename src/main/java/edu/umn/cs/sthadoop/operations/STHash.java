@@ -70,7 +70,7 @@ public class STHash {
 				temp = values.next();
 				size += temp.getBytes().length;
 				if(size > 100){
-					output.collect(cellId, new Text(txt.toString()));
+					output.collect(new LongWritable(cellId.get()*10), new Text(txt.toString()));
 					txt = new StringBuilder();
 					size  = 0;
 				}
