@@ -13,3 +13,4 @@ lib/ivy/**/*.jar
 /lib/* 
 .classpath
 st-hadoop-uber.jar
+config.properties
