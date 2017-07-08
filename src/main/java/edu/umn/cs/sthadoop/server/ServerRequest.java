@@ -6,27 +6,18 @@ package edu.umn.cs.sthadoop.server;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 import edu.umn.cs.spatialHadoop.OperationsParams;
-import edu.umn.cs.spatialHadoop.io.TextSerializable;
-import edu.umn.cs.spatialHadoop.operations.RangeQuery;
-import edu.umn.cs.sthadoop.core.QueryPlanner;
-import edu.umn.cs.sthadoop.core.STPoint;
 import edu.umn.cs.sthadoop.operations.STRangeQuery;
-import edu.umn.cs.sthadoop.operations.TestSTRQ;
 
 /**
  *
@@ -38,18 +29,17 @@ import edu.umn.cs.sthadoop.operations.TestSTRQ;
  */
 public class ServerRequest {
 
-
-
-	
+	private Commons config;
 	private queryShape shape;
 	private queryoperation operation;
-	private String x1; 
-	private String y1; 
-	private String x2; 
+	private String x1;
+	private String y1;
+	private String x2;
 	private String y2;
-	private String t1; 
+	private String t1;
 	private String t2;
-
+	private MBR rect;
+	
 	public String getX1() {
 		return x1;
 	}
@@ -98,6 +88,18 @@ public class ServerRequest {
 		this.t2 = t2;
 	}
 
+	public MBR getRect() {
+		return rect;
+	}
+	
+	public void setRect(String x1, String y1, String x2, String y2) {
+		this.x1 = x1;
+		this.y1 = y1;
+		this.x2 = x2;
+		this.y2 = y2;
+		this.rect = new MBR(new Point(x1, y1),new Point(x2, y2)) ;
+	}
+
 	public enum queryShape {
 
 		stpoint, twitter
@@ -125,23 +127,138 @@ public class ServerRequest {
 	}
 
 	public ServerRequest() throws FileNotFoundException, IOException, ParseException {
+		// load the configuration file.
+		this.config = new Commons();
 	}
 
+	public void executeQuery() throws Exception {
+		if (operation.equals(queryoperation.rq)) {
+			executeRQ();
+		} else if (operation.equals(queryoperation.join)) {
+			// executeRQ();
+		} else if (operation.equals(queryoperation.knn)) {
+			// executeRQ();
+		} else {
+			System.out.println("no selected operation!");
+		}
+	}
+
+	/**
+	 * This method invok the ST-Hadoop operations and only write the result to
+	 * the outputfile.
+	 * 
+	 * @throws Exception
+	 */
 	public void executeRQ() throws Exception {
-		String[] args = new String[5];	
+		String[] args = new String[5];
 		args[0] = Commons.getQueryIndex();
-		args[1] = "/home/louai/nyc-taxi/resultSTRQ";
-		if(shape.equals(queryShape.twitter)){
+		File file = new File(Commons.getQueryResult());
+		if (file.exists()) {
+			file.delete();
+		}
+		args[1] = Commons.getQueryResult();
+		if (shape.equals(queryShape.twitter)) {
 			args[2] = "shape:edu.umn.cs.sthadoop.core.STpointsTweets";
-		}else{
+		} else {
 			args[2] = "shape:edu.umn.cs.sthadoop.core.STPoint";
 		}
-		args[3] = "rect:"+x1+","+y1+","+x2+","+y2;
-		args[4] = "interval:"+ t1 + ","+ t2;
+		args[3] = "rect:" + x1 + "," + y1 + "," + x2 + "," + y2;
+		args[4] = "interval:" + t1 + "," + t2;
 		STRangeQuery.main(args);
-		
+
 	}
 	
-	
+	/**
+	 * This method to return the list of selected Temporal Range. 
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Partition> getQueryPartitions() throws Exception{
+		List<Partition> result = new ArrayList<>();
+		String[] args = new String[5];
+		args[0] = Commons.getQueryIndex();
+		File file = new File(Commons.getQueryResult());
+		if (file.exists()) {
+			file.delete();
+		}
+		args[1] = Commons.getQueryResult();
+		if (shape.equals(queryShape.twitter)) {
+			args[2] = "shape:edu.umn.cs.sthadoop.core.STpointsTweets";
+		} else {
+			args[2] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+		}
+		args[3] = "rect:" + x1 + "," + y1 + "," + x2 + "," + y2;
+		args[4] = "interval:" + t1 + "," + t2;
+	    OperationsParams params = new OperationsParams(new GenericOptionsParser(args), false);
+	    // get the temporal range from ST-Hadoop index. 
+		List<Path> paths = STRangeQuery.getIndexedSlices(params);
+		// get the exact partitions.
+		for(Path p : paths){
+			result.addAll(ReadMaster(p));
+		}
+		return result;
+	}
+
+	/**
+	 * This Method read all the files in the data directory and fetch only the
+	 * Intersect files
+	 *
+	 * @param maxLat
+	 * @param minLat
+	 * @param maxLon
+	 * @param minLon
+	 * @param path
+	 * @return
+	 */
+	private List<Partition> ReadMaster(Path dir) {
+		File master;
+		String path = dir.getParent()+"/"+dir.getName();
+		List<Partition> result = new ArrayList<Partition>();
+		// check the master files with the index used at the backend
+		master = new File(path + "/_master.quadtree");
+		if (!master.exists()) {
+			master = new File(path + "/_master.str");
+			if (!master.exists()) {
+				master = new File(path + "/_master.str+");
+				if (!master.exists()) {
+					master = new File(path + "/_master.grid");
+				}
+			}
+		}
+
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(master));
+
+			// FileInputStream fin = new FileInputStream(master);
+			// BufferedInputStream bis = new BufferedInputStream(fin);
+			// CompressorInputStream input = new
+			// CompressorStreamFactory().createCompressorInputStream(bis);
+			// BufferedReader reader = new BufferedReader(new
+			// InputStreamReader(input, "UTF-8"));
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				String[] temp = line.split(",");
+				// The file has the following format as Aggreed with the
+				// interface
+				// between hadoop and this program
+				// #filenumber,minLat,minLon,maxLat,maxLon
+				// 0,minLon,MinLat,MaxLon,MaxLat,Filename
+				if (temp.length == 8) {
+					Partition part = new Partition(line, path, dir.getName());
+					// System.out.println(part.getPartition().getName()+"\t"+part.getArea().toWKT());
+					if (rect.Intersect(part.getArea())) {
+						result.add(part);
+					}
+				}
+			}
+			reader.close();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
+	}
 
 }

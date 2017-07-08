@@ -31,6 +31,13 @@ import com.sun.mail.handlers.text_html;
 import edu.umn.cs.spatialHadoop.OperationsParams;
 import edu.umn.cs.sthadoop.core.STPoint;
 
+
+/**
+ *  
+ * @author louai Alarabi
+ *
+ */
+
 public class STHash {
 	/** Class logger */
 	private static final Log LOG = LogFactory.getLog(STHash.class);

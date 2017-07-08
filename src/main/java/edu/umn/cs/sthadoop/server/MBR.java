@@ -1,7 +1,7 @@
 package edu.umn.cs.sthadoop.server;
 
 /**
- * Created by saifalharthi on 6/12/14.
+ * Created by Louai Alarabi
  */
 public class MBR {
 
@@ -11,28 +11,10 @@ public class MBR {
     public MBR() {
     }
     
-    public MBR(String parsString){
-    	String[] token = parsString.split(" ");
-    	this.max = new Point(token[3], token[1]);
-    	this.min = new Point(token[7], token[5]);
-    }
-    
-    /**
-     * This method take MBR.toString() and convert it to MBR object
-     * @param stringValue
-     * @return
-     */
-    public void parse(String stringValue){
-    	MBR temp = new MBR();
-    	String[] token = stringValue.split(" ");
-    	this.max = new Point(token[3], token[1]);
-    	this.min = new Point(token[7], token[5]);
-    	
-    }
 
-    public MBR(Point max, Point min) {
-        this.max = max;
+    public MBR(Point min, Point max) {
         this.min = min;
+        this.max = max;
     }
 
     public Point getMain() {
@@ -68,10 +50,10 @@ public class MBR {
         //return !(x2 < x3 || x1 > x2 || y2 > y3 || y1 < y4)
         //if (RectA.X1 < RectB.X2 && RectA.X2 > RectB.X1 &&
         //    RectA.Y1 < RectB.Y2 && RectA.Y2 > RectB.Y1) 
-        if (this.min.getLon() <= pmax.getLon()
-                && this.max.getLon() >= pmin.getLon()
-                && this.min.getLat() <= pmax.getLat()
-                && this.max.getLat() >= pmin.getLat()) {
+        if (this.min.getY() <= pmax.getY()
+                && this.max.getY() >= pmin.getY()
+                && this.min.getX() <= pmax.getX()
+                && this.max.getX() >= pmin.getX()) {
             return true;
         } else {
             return false;
@@ -84,10 +66,10 @@ public class MBR {
         //return !(x2 < x3 || x1 > x2 || y2 > y3 || y1 < y4)
         //if (RectA.X1 < RectB.X2 && RectA.X2 > RectB.X1 &&
         //    RectA.Y1 < RectB.Y2 && RectA.Y2 > RectB.Y1) 
-        if (this.min.getLon() <= mbr.getMax().getLon()
-                && this.max.getLon() >= mbr.getMin().getLon()
-                && this.min.getLat() <= mbr.getMax().getLat()
-                && this.max.getLat() >= mbr.getMin().getLat()) {
+        if (this.min.getY() <= mbr.getMax().getY()
+                && this.max.getY() >= mbr.getMin().getY()
+                && this.min.getX() <= mbr.getMax().getX()
+                && this.max.getX() >= mbr.getMin().getX()) {
             return true;
         } else {
             return false;
@@ -101,10 +83,10 @@ public class MBR {
      * @return true if the point inside the area other wise return false
      */
     public boolean insideMBR(Point point) {
-        if (point.getLat() <= this.max.getLat()
-                && point.getLat() >= this.min.getLat()
-                && point.getLon() <= this.max.getLon()
-                && point.getLon() >= this.min.getLon()) {
+        if (point.getX() <= this.max.getX()
+                && point.getX() >= this.min.getX()
+                && point.getY() <= this.max.getY()
+                && point.getY() >= this.min.getY()) {
             return true;
         } else {
             return false;
@@ -116,7 +98,7 @@ public class MBR {
      * @return
      */
     public double getWidth(){
-    	return this.max.getLon() - this.min.getLon();
+    	return this.max.getY() - this.min.getY();
     }
     
     
@@ -125,7 +107,7 @@ public class MBR {
      * @return
      */
     public double getHeight(){
-    	return this.max.getLat() - this.min.getLat();
+    	return this.max.getX() - this.min.getX();
     }
     
     /**
@@ -134,19 +116,19 @@ public class MBR {
      */
     public String toWKT(){
     	return "POLYGON (("
-    		    +this.max.getLon() + " "+ this.min.getLat() 
-    		    +", "+ this.max.getLon() + " "+ this.max.getLat()
-    		    +", "+ this.min.getLon() + " "+ this.max.getLat()
-    		    +", "+ this.min.getLon() + " "+ this.min.getLat()
-    		    +", "+ this.max.getLon() + " "+ this.min.getLat()
+    		    +this.max.getY() + " "+ this.min.getX() 
+    		    +", "+ this.max.getY() + " "+ this.max.getX()
+    		    +", "+ this.min.getY() + " "+ this.max.getX()
+    		    +", "+ this.min.getY() + " "+ this.min.getX()
+    		    +", "+ this.max.getY() + " "+ this.min.getX()
     		    + "))";
     }
     
     @Override
     public String toString() {
     	// TODO Auto-generated method stub
-    	return "maxlon "+ this.max.getLon()+ " maxlat " + this.max.getLat()+
-    			" minlon "+ this.min.getLon()+ " minlat " + this.min.getLat();
+    	return "maxlon "+ this.max.getY()+ " maxlat " + this.max.getX()+
+    			" minlon "+ this.min.getY()+ " minlat " + this.min.getX();
     }
 
 	

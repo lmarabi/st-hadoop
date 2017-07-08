@@ -96,7 +96,7 @@ public class QueryPlanner {
 				this.timeFormat = new TimeFormatST(resolution);
 				break;
 			default:
-				//do nothing This to support a higher resolution level. 
+				// do nothing This to support a higher resolution level.
 				break;
 
 			}
@@ -117,7 +117,8 @@ public class QueryPlanner {
 	}
 
 	/**
-	 * This method return list of temporal slices that should be queried from specific level " resolution" 
+	 * This method return list of temporal slices that should be queried from
+	 * specific level " resolution"
 	 * 
 	 * @param time1
 	 * @param time2
@@ -254,9 +255,7 @@ public class QueryPlanner {
 		cstart.setTime(start);
 		cend.setTime(end);
 		List<String> intermediateResult = new ArrayList<String>();
-		while (!(cstart.get(Calendar.YEAR) == cend.get(Calendar.YEAR)
-				&& (cstart.get(Calendar.MONTH) == cend.get(Calendar.MONTH))
-				&& (cstart.get(Calendar.DATE) == cend.get(Calendar.DATE)))) {
+		while (cstart.before(cend) || cstart.equals(cend)) {
 			String day = (cstart.get(Calendar.DAY_OF_MONTH) >= 10) ? String.valueOf(cstart.get(Calendar.DAY_OF_MONTH))
 					: "0" + String.valueOf(cstart.get(Calendar.DAY_OF_MONTH));
 			String month = ((cstart.get(Calendar.MONTH) + 1) >= 10) ? String.valueOf((cstart.get(Calendar.MONTH) + 1))
@@ -275,14 +274,14 @@ public class QueryPlanner {
 		}
 
 		// add the last day
-		String day = (cstart.get(Calendar.DAY_OF_MONTH) >= 10) ? String.valueOf(cstart.get(Calendar.DAY_OF_MONTH))
-				: "0" + String.valueOf(cstart.get(Calendar.DAY_OF_MONTH));
-		String month = ((cstart.get(Calendar.MONTH) + 1) >= 10) ? String.valueOf((cstart.get(Calendar.MONTH) + 1))
-				: "0" + String.valueOf((cstart.get(Calendar.MONTH) + 1));
-		String date = cstart.get(Calendar.YEAR) + "-" + month + "-" + day;
-		if (!intermediateResult.contains(date)) {
-			intermediateResult.add(date);
-		}
+//		String day = (cstart.get(Calendar.DAY_OF_MONTH) >= 10) ? String.valueOf(cstart.get(Calendar.DAY_OF_MONTH))
+//				: "0" + String.valueOf(cstart.get(Calendar.DAY_OF_MONTH));
+//		String month = ((cstart.get(Calendar.MONTH) + 1) >= 10) ? String.valueOf((cstart.get(Calendar.MONTH) + 1))
+//				: "0" + String.valueOf((cstart.get(Calendar.MONTH) + 1));
+//		String date = cstart.get(Calendar.YEAR) + "-" + month + "-" + day;
+//		if (!intermediateResult.contains(date)) {
+//			intermediateResult.add(date);
+//		}
 
 		return intermediateResult;
 	}
@@ -337,17 +336,27 @@ public class QueryPlanner {
 		cstart.setTime(start);
 		cend.setTime(end);
 		List<String> intermediateResult = new ArrayList<String>();
-		while (!(cstart.get(Calendar.YEAR) == cend.get(Calendar.YEAR)
-				&& (cstart.get(Calendar.MONTH) == cend.get(Calendar.MONTH))
-				&& (cstart.get(Calendar.DATE) == cend.get(Calendar.DATE)))) {
+		while (cstart.before(cend) || cstart.equals(cend)) {
 			String month = ((cstart.get(Calendar.MONTH) + 1) >= 10) ? String.valueOf((cstart.get(Calendar.MONTH) + 1))
 					: "0" + String.valueOf((cstart.get(Calendar.MONTH) + 1));
 			String weekofDay = cstart.get(Calendar.YEAR) + "-" + month + "-" + cstart.get(Calendar.WEEK_OF_MONTH);
 			String year = String.valueOf(cstart.get(Calendar.YEAR));
 			if (!this.yearContained.contains(year) && !this.monthContained.contains(year + "-" + month)) {
 				//
-				if (!intermediateResult.contains(weekofDay)) {
-					intermediateResult.add(weekofDay);
+				Calendar temp = Calendar.getInstance();
+				temp.setTime(cstart.getTime());
+				temp.add(Calendar.DATE, -1);
+				if (temp.get(Calendar.WEEK_OF_MONTH) != cstart.get(Calendar.WEEK_OF_MONTH)) {
+					int daysinWeek = 1;
+					temp.add(Calendar.DATE, 1);
+					while(temp.get(Calendar.WEEK_OF_MONTH) == cstart.get(Calendar.WEEK_OF_MONTH)){
+						temp.add(Calendar.DATE, 1);
+					}
+					temp.add(Calendar.DATE, -1);
+					if (!temp.after(cend) && !intermediateResult.contains(weekofDay)) {
+						intermediateResult.add(weekofDay);
+					}
+					
 				}
 			}
 			cstart.add(Calendar.DATE, 1);
@@ -512,67 +521,66 @@ public class QueryPlanner {
 	}
 
 	public static void main(String[] args) throws Exception {
-//		args = new String[6];
-//		args[0] = "/home/louai/nyc-taxi/yellowIndex";
-//		args[1] = "/home/louai/nyc-taxi/resultSTRQ";
-//		args[2] = "shape:edu.umn.cs.sthadoop.core.STPoint";
-//		args[3] = "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
-//		args[4] = "interval:2015-01-01,2015-01-02";
-//		args[5] = "-overwrite";
-//		final OperationsParams params = new OperationsParams(new GenericOptionsParser(args), false);
-//		QueryPlanner l = new QueryPlanner(params);
-//
-//		String from = "2014-01-01";
-//		String to = "2014-01-04";
-//
-//		List<Path> result = l.getQueryPlan(from, to);
-//		System.out.println("Result: \n");
-//		for (Path x : result)
-//			System.out.println(x.toString());
+		args = new String[6];
+		args[0] = "/home/louai/nyc-taxi/yellowIndex";
+		args[1] = "/home/louai/nyc-taxi/resultSTRQ";
+		args[2] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+		args[3] = "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
+		args[4] = "interval:2015-01-01,2015-01-02";
+		args[5] = "-overwrite";
+		final OperationsParams params = new OperationsParams(new GenericOptionsParser(args), false);
+		QueryPlanner l = new QueryPlanner(params);
 
-		// List<String> result = null;
+		String from = "2014-01-02";
+		String to = "2014-01-13";
 		//
-		// result = l.getYear(from, to);
-		// System.out.println("Result year:");
-		// for (String x : result)
-		// System.out.println(x);
-		//
-		// result = l.getMonth(from, to);
-		// System.out.println("Result month:");
-		// for (String x : result)
-		// System.out.println(x);
-		//
-		// result = l.getWeek(from, to);
-		// System.out.println("Result week:");
-		// for (String x : result)
-		// System.out.println(x);
-		//
-		// result = l.getDay(from, to);
-		// System.out.println("Result Day: \n");
-		// for (String x : result)
-		// System.out.println(x);
-		//
-		// System.out.println("*****************************");
-		// result = l.getYearContainedBy(from, to);
-		// System.out.println("Result Year Contained: \n");
-		// for (String x : result)
-		// System.out.println(x);
-		//
-		// result = l.getMonthsContainedBy(from, to);
-		// System.out.println("Result monthContain: \n");
-		// for (String x : result)
-		// System.out.println(x);
-		//
-		// result = l.getWeekContainedBy(from, to);
-		// System.out.println("Result Weeks Contained: \n");
-		// for (String x : result)
-		// System.out.println(x);
-		//
-		// result = l.getDayContainedBy(from, to);
-		// System.out.println("Result days Contained: \n");
-		// for (String x : result)
-		// System.out.println(x);
-		//
+		// List<Path> result = l.getQueryPlan(from, to);
+		// System.out.println("Result: \n");
+		// for (Path x : result)
+		// System.out.println(x.toString());
+
+		List<String> result = null;
+
+		result = l.getYear(from, to);
+		System.out.println("Result year:");
+		for (String x : result)
+			System.out.println(x);
+
+		result = l.getMonth(from, to);
+		System.out.println("Result month:");
+		for (String x : result)
+			System.out.println(x);
+
+		result = l.getWeek(from, to);
+		System.out.println("Result week:");
+		for (String x : result)
+			System.out.println(x);
+
+		result = l.getDay(from, to);
+		System.out.println("Result Day: \n");
+		for (String x : result)
+			System.out.println(x);
+
+		System.out.println("*****************************");
+		result = l.getYearContainedBy(from, to);
+		System.out.println("Result Year Contained: \n");
+		for (String x : result)
+			System.out.println(x);
+
+		result = l.getMonthsContainedBy(from, to);
+		System.out.println("Result monthContain: \n");
+		for (String x : result)
+			System.out.println(x);
+
+		result = l.getWeekContainedBy(from, to);
+		System.out.println("Result Weeks Contained: \n");
+		for (String x : result)
+			System.out.println(x);
+
+		result = l.getDayContainedBy(from, to);
+		System.out.println("Result days Contained: \n");
+		for (String x : result)
+			System.out.println(x);
 
 	}
 }

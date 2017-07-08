@@ -52,15 +52,20 @@ public class HomeServer extends AbstractHandler {
 		response.addHeader("Access-Control-Allow-Credentials", "true");
 		String path = request.getPathInfo();
 		if (path.equals("/query")) {
-			serverRequester.setX1(request.getParameter("x1"));
-			serverRequester.setY1(request.getParameter("y1"));
-			serverRequester.setX2(request.getParameter("x2"));
-			serverRequester.setY2(request.getParameter("y2"));
+			serverRequester.setRect(request.getParameter("x1"),request.getParameter("y1")
+			,request.getParameter("x2"),request.getParameter("y2"));
 			serverRequester.setT1(request.getParameter("t1"));
 			serverRequester.setT2(request.getParameter("t2"));
 			serverRequester.setOperation(queryoperation.valueOf(request.getParameter("operation")));
 			serverRequester.setShape(queryShape.valueOf(request.getParameter("shape")));
 			// query the data from the spatio-temporal index. 
+			try {
+				serverRequester.getQueryPartitions();
+				//serverRequester.executeQuery();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			// respond to the user throw jason 
 			JsonWriter writer = new JsonWriter(new OutputStreamWriter(

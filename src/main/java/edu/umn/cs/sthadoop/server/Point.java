@@ -1,72 +1,54 @@
 package edu.umn.cs.sthadoop.server;
 
 /**
- * Created by saifalharthi on 6/12/14.
+ * Created by Louai Alarabi
  */
 public class Point {
-    private Long id;
-    private double lat;
-    private double lon;
+	
+    private double x;
+    private double y;
 
     public Point() {
     }
 
-    public Point(double lat, double lon) {
-        this.lat = lat;
-        this.lon = lon;
+    public Point(double x, double y) {
+        this.x = x;
+        this.y = y;
     }
 
-    public Point(String lat, String lon) {
-        this.lat = Double.parseDouble(lat);
-        this.lon = Double.parseDouble(lon);
+    public Point(String x, String y) {
+        this.x = Double.parseDouble(x);
+        this.y = Double.parseDouble(y);
     }
 
-    public Point(String id, String lat, String lon) {
-        this.id = Long.parseLong(id);
-        this.lat = Double.parseDouble(lat);
-        this.lon = Double.parseDouble(lon);
+    public void setX(double x) {
+        this.x = x;
     }
 
-    public void setLat(double lat) {
-        this.lat = lat;
+    public void setY(double y) {
+        this.y = y;
     }
 
-    public Long getId() {
-        return id;
+    public double getX() {
+        return x;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setLon(double lon) {
-        this.lon = lon;
-    }
-
-    public double getLat() {
-        return lat;
-    }
-
-    public double getLon() {
-        return lon;
+    public double getY() {
+        return y;
     }
 
     @Override
     public String toString() {
-        return this.id + "," + this.lat + "," + this.lon;
+        return  this.x + "," + this.y;
     }
 
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
     /**
      * if the passed parameter is greater than the invoker.
      * @param obj
      * @return
      */
     public boolean isGreater(Point obj){
-        if(this.lat <= obj.getLat() && this.lon <= this.getLon() )
+        if(this.x <= obj.getX() && this.y <= this.getY() )
             return true;
         else
             return false;
@@ -83,7 +65,7 @@ public class Point {
         if (obj instanceof Point) {
             Point s1 = (Point) obj;
 
-            if (s1.getId().equals(this.getId())) {
+            if (s1.x == this.x && s1.y == this.y) {
                 return true;
             }
         }
