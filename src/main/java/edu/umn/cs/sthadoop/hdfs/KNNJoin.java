@@ -181,7 +181,7 @@ public class KNNJoin {
 	/**
 	 * Keeps KNN objects ordered by their distance descending
 	 * 
-	 * @author Ahmed Eldawy
+	 * @author louai alarabi 
 	 *
 	 */
 	public static class KNNObjects<E extends Comparable<E>, S extends Shape> extends PriorityQueue<E> {

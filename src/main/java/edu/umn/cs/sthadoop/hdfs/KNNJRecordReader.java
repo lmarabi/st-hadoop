@@ -111,10 +111,6 @@ public class KNNJRecordReader<S extends STPoint> extends RecordReader<Partition,
 				while (internalReaders.get(i).nextKeyValue()) {
 					Iterable<S> shapes = internalReaders.get(i).getCurrentValue();
 					for (S shape : shapes) {
-						Text tx = new Text();
-						STPoint stpoint = new STPoint();
-						shape.toText(tx);
-						stpoint.fromText(tx);
 						this.knnjData.refSet.add((S) shape.clone());
 					}
 				}		

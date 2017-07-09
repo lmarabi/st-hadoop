@@ -62,13 +62,14 @@ public class STPoint extends Point {
 	public STPoint clone() {
 		STPoint c = new STPoint();
 		c.time = this.time;
-		super.set(x, y);
+		c.x = this.x;
+		c.y = this.y;
 		return c;
 	}
 	
 	@Override
 	public String toString() {
-		return "Point: ("+x+","+y+","+time+")";
+		return "STPoint: ("+x+","+y+","+time+")";
 	}
 
 }
