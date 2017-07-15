@@ -7,6 +7,7 @@ public class Point {
 	
     private double x;
     private double y;
+    private int priority;
 
     public Point() {
     }
@@ -19,6 +20,7 @@ public class Point {
     public Point(String x, String y) {
         this.x = Double.parseDouble(x);
         this.y = Double.parseDouble(y);
+        this.priority = 0;
     }
 
     public void setX(double x) {
@@ -36,6 +38,14 @@ public class Point {
     public double getY() {
         return y;
     }
+    
+    public void setPriority(int priority) {
+		this.priority = priority;
+	}
+    
+    public int getPriority() {
+		return priority;
+	}
 
     @Override
     public String toString() {

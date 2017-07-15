@@ -127,8 +127,7 @@ public class MBR {
     @Override
     public String toString() {
     	// TODO Auto-generated method stub
-    	return "maxlon "+ this.max.getY()+ " maxlat " + this.max.getX()+
-    			" minlon "+ this.min.getY()+ " minlat " + this.min.getX();
+    	return this.min.toString()+","+this.max.toString();
     }
 
 	

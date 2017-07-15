@@ -4,12 +4,10 @@
  */
 package edu.umn.cs.sthadoop.server;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
@@ -17,8 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
-import org.mortbay.jetty.Request;
+import org.apache.hadoop.fs.Path;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
 
@@ -34,6 +31,7 @@ import edu.umn.cs.sthadoop.server.ServerRequest.queryoperation;
 public class HomeServer extends AbstractHandler {
 	
 	public static ServerRequest serverRequester;
+	
 	
 	
 	@Override
@@ -58,10 +56,21 @@ public class HomeServer extends AbstractHandler {
 			serverRequester.setT2(request.getParameter("t2"));
 			serverRequester.setOperation(queryoperation.valueOf(request.getParameter("operation")));
 			serverRequester.setShape(queryShape.valueOf(request.getParameter("shape")));
-			// query the data from the spatio-temporal index. 
+			// query the data from the spatio-temporal index.
+			List<Partition> stPartitions = new ArrayList<>();
+			List<Partition> sPartitions = new ArrayList<>();
+			List<Point> result = new ArrayList<>();
+			long resultCount; // store the result count of the answer
 			try {
-				serverRequester.getQueryPartitions();
+				//First Get the spatio-temporal partitions
+				stPartitions = serverRequester.getQueryPartitions(null);
+				//Second Get the spatial Partitions
+				sPartitions = serverRequester.ReadMaster(new Path(Commons.getQueryIndex()+"/all"));
 				//serverRequester.executeQuery();
+				resultCount = serverRequester.executeRangeQuery();
+				System.out.println("Result count: "+resultCount);
+				result = serverRequester.getFinalResult();
+				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -72,14 +81,53 @@ public class HomeServer extends AbstractHandler {
 					new GZIPOutputStream(response.getOutputStream()),
 					"UTF-8"));
 			writer.setLenient(true);
+			/*
+			 * Get the spatio-temporal partitions 
+			 */
 			writer.beginObject();
-			writer.name("result");
+			writer.name("STPartitions");
 			writer.beginArray();
-			writer.beginObject();
-			writer.name("hello").value(1);
-			writer.endObject();
+			for(Partition part : stPartitions){
+				writer.beginObject();
+				writer.name("day").value(part.getDay());
+				writer.name("mbr").value(part.getArea().toString());
+				writer.name("cardinality").value(part.getCardinality());
+				writer.endObject();
+			}
 			writer.endArray();
 			writer.endObject();
+			/*
+			 * Get the spatial partitions information
+			 */
+			writer.beginObject();
+			writer.name("SPartitions");
+			writer.beginArray();
+			for(Partition part : sPartitions){
+				writer.beginObject();
+				writer.name("day").value(part.getDay());
+				writer.name("mbr").value(part.getArea().toString());
+				writer.name("cardinality").value(part.getCardinality());
+				writer.endObject();
+			}
+			writer.endArray();
+			writer.endObject();
+			/*
+			 * Get the actual data for visualization
+			 */
+			writer.beginObject();
+			writer.name("data");
+			writer.beginArray();
+			for(Point p : result){
+				writer.beginObject();
+				writer.name("x").value(p.getX());
+				writer.name("y").value(p.getY());
+				writer.endObject();
+			}
+			writer.endArray();
+			writer.endObject();
+
+			
+			
 			writer.close();
 			
 		} else {

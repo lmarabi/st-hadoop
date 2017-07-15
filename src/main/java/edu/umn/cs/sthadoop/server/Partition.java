@@ -36,6 +36,10 @@ public class Partition {
 			this.Day = day;
 		}
 	}
+	
+	public String getDay() {
+		return Day;
+	}
 
 	public File getPartition() {
 		return partition;
