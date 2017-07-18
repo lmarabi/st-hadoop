@@ -48,7 +48,7 @@ public class KNNJInputFormat<S extends STPoint>
 	public RecordReader<Partition, KNNJData<S>>
 			createRecordReader(InputSplit split, TaskAttemptContext context)
 					throws IOException, InterruptedException {
-		KNNJRecordReader<S> reader = new KNNJRecordReader<>();
+		KNNJRecordReader<S> reader = new KNNJRecordReader<S>();
 		return (RecordReader<Partition, KNNJData<S>>) reader;
 	}
 
@@ -83,7 +83,7 @@ public class KNNJInputFormat<S extends STPoint>
 		Configuration jobConf = job.getConfiguration();
 		Path[] inputPaths = getInputPaths(job);
 		//FileStatus[] statuses = {};
-		List<FileStatus> result = new Vector<>();
+		List<FileStatus> result = new Vector<FileStatus>();
 
 		FileSystem[] arrFS = new FileSystem[inputPaths.length];
 		for (int i_fs = 0; i_fs < inputPaths.length; i_fs++) {
@@ -166,7 +166,7 @@ public class KNNJInputFormat<S extends STPoint>
 				}
 			}
 			
-			Set<Partition> pCandidatesSet = new HashSet<>();
+			Set<Partition> pCandidatesSet = new HashSet<Partition>();
 			pCandidatesSet.addAll(pCandidates);
 			for (Iterator<Partition> iterator = pCandidatesSet.iterator(); iterator.hasNext();) {
 				Partition partition = (Partition) iterator.next();

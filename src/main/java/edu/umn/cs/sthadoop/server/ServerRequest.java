@@ -51,7 +51,7 @@ public class ServerRequest {
 	public ServerRequest() throws FileNotFoundException, IOException, ParseException {
 		// load the configuration file.
 		this.config = new Commons();
-		this.stPartitions = new ArrayList<>();
+		this.stPartitions = new ArrayList<Partition>();
 		this.finalResult = new TopResults(900);
 	}
 	
@@ -112,7 +112,7 @@ public class ServerRequest {
 	 * @return
 	 */
 	public List<Point> getFinalResult(){
-		List<Point> result = new ArrayList<>();
+		List<Point> result = new ArrayList<Point>();
 		while(finalResult.size() > 0){
 			result.add(finalResult.pop());
 		}

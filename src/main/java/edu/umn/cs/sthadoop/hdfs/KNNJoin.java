@@ -245,7 +245,7 @@ public class KNNJoin {
 		protected void setup(Context context) throws IOException, InterruptedException {
 			super.setup(context);
 			conf = context.getConfiguration();
-			multipleOuts = new MultipleOutputs<>(context);
+			multipleOuts = new MultipleOutputs<NullWritable, Text>(context);
 			k = conf.getInt("k", 1);
 			csplit = ((CombineFileSplit) context.getInputSplit());
 			if (csplit.getNumPaths() > 1) { // check if there are reference partitions.

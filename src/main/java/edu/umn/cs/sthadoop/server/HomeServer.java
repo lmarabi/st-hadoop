@@ -57,9 +57,9 @@ public class HomeServer extends AbstractHandler {
 			serverRequester.setOperation(queryoperation.valueOf(request.getParameter("operation")));
 			serverRequester.setShape(queryShape.valueOf(request.getParameter("shape")));
 			// query the data from the spatio-temporal index.
-			List<Partition> stPartitions = new ArrayList<>();
-			List<Partition> sPartitions = new ArrayList<>();
-			List<Point> result = new ArrayList<>();
+			List<Partition> stPartitions = new ArrayList<Partition>();
+			List<Partition> sPartitions = new ArrayList<Partition>();
+			List<Point> result = new ArrayList<Point>();
 			long resultCount; // store the result count of the answer
 			try {
 				//First Get the spatio-temporal partitions
