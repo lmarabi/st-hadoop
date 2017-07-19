@@ -175,7 +175,7 @@ public class ServerRequest {
 	 */
 	public void executeMapReduceRQ() throws Exception {
 		String[] args = new String[5];
-		args[0] = Commons.getQueryIndex();
+		
 		File file = new File(Commons.getQueryResult());
 		if (file.exists()) {
 			file.delete();
@@ -183,8 +183,10 @@ public class ServerRequest {
 		args[1] = Commons.getQueryResult();
 		if (shape.equals(queryShape.twitter)) {
 			args[2] = "shape:edu.umn.cs.sthadoop.core.STpointsTweets";
+			args[0] = Commons.getTwitterIndex();
 		} else {
 			args[2] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+			args[0] = Commons.getNycIndex();
 		}
 		args[3] = "rect:" + x1 + "," + y1 + "," + x2 + "," + y2;
 		args[4] = "interval:" + t1 + "," + t2;
@@ -282,7 +284,6 @@ private synchronized int smartQuery(Partition part)
 		String[] args;
 		if(level == null){
 			args = new String[5];
-			args[0] = Commons.getQueryIndex();
 			File file = new File(Commons.getQueryResult());
 			if (file.exists()) {
 				file.delete();
@@ -290,14 +291,15 @@ private synchronized int smartQuery(Partition part)
 			args[1] = Commons.getQueryResult();
 			if (shape.equals(queryShape.twitter)) {
 				args[2] = "shape:edu.umn.cs.sthadoop.core.STpointsTweets";
+				args[0] = Commons.getTwitterIndex();
 			} else {
 				args[2] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+				args[0] = Commons.getNycIndex();
 			}
 			args[3] = "rect:" + x1 + "," + y1 + "," + x2 + "," + y2;
 			args[4] = "interval:" + t1 + "," + t2;
 		}else{
 			args = new String[6];
-			args[0] = Commons.getQueryIndex();
 			File file = new File(Commons.getQueryResult());
 			if (file.exists()) {
 				file.delete();
@@ -305,8 +307,10 @@ private synchronized int smartQuery(Partition part)
 			args[1] = Commons.getQueryResult();
 			if (shape.equals(queryShape.twitter)) {
 				args[2] = "shape:edu.umn.cs.sthadoop.core.STpointsTweets";
+				args[0] = Commons.getTwitterIndex();
 			} else {
 				args[2] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+				args[0] = Commons.getNycIndex();
 			}
 			args[3] = "rect:" + x1 + "," + y1 + "," + x2 + "," + y2;
 			args[4] = "interval:" + t1 + "," + t2;

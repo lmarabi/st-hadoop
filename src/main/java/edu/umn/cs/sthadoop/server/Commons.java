@@ -10,7 +10,9 @@ import java.util.Properties;
 public class Commons {
 
 	// point to the spatio-temporal index
-	public static String queryIndex;
+	public static String nycIndex;
+	public static String twitterIndex;
+	public static String spatialIndex;
 	public static String queryResult;
     
 
@@ -19,12 +21,28 @@ public class Commons {
        
     }
     
-    public static void setQueryIndex(String queryIndex) {
-		Commons.queryIndex = queryIndex;
+    public static void setNycIndex(String queryIndex) {
+		Commons.nycIndex = queryIndex;
 	}
     
-    public static String getQueryIndex() {
-		return queryIndex;
+    public static String getNycIndex() {
+		return nycIndex;
+	}
+    
+    public static String getTwitterIndex() {
+		return twitterIndex;
+	}
+    
+    public static String getSpatialIndex() {
+		return spatialIndex;
+	}
+    
+    public static void setTwitterIndex(String queryIndex) {
+		Commons.twitterIndex = queryIndex;
+	}
+    
+    public static void setSpatialIndex(String queryIndex) {
+		Commons.spatialIndex = queryIndex;
 	}
     
     public static void setQueryResult(String queryResult) {
@@ -40,7 +58,9 @@ public class Commons {
 
         Properties prop = new Properties();
         prop.load(new FileInputStream("config.properties"));
-        Commons.queryIndex = prop.getProperty("queryIndex");
+        Commons.nycIndex = prop.getProperty("nycIndex");
+        Commons.twitterIndex = prop.getProperty("twitterIndex");
+        Commons.spatialIndex = prop.getProperty("spatialIndex");
         Commons.queryResult = prop.getProperty("queryResult");
         System.out.println("Config file Loaded");
 

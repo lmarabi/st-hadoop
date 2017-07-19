@@ -34,14 +34,14 @@ public class STpointsTweets extends STPoint{
 	  
 	  public STpointsTweets(String text) throws ParseException {
 		  String[] list = text.toString().split(",");
-		  tweet_id = Long.parseLong(list[1]);
-		  user_id = Long.parseLong(list[2]);
-		  screen_name = list[3];
-		  tweet_text = list[4];
-		  follower_count = Integer.parseInt(list[5]);
-		  language = list[6];
-		  osystem = list[7];
-		  super.fromText(new Text(list[0]+","+list[8]+","+list[9]));
+		  tweet_id = Long.parseLong(list[0]);
+		  user_id = Long.parseLong(list[1]);
+		  screen_name = list[2];
+		  tweet_text = list[3];
+		  follower_count = Integer.parseInt(list[4]);
+		  language = list[5];
+		  osystem = list[6];
+		  super.fromText(new Text(list[7]+","+list[8]+","+list[9]));
 
 	}
 	
