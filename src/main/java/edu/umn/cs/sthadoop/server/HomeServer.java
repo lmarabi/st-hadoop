@@ -60,7 +60,7 @@ public class HomeServer extends AbstractHandler {
 			List<Partition> stPartitions = new ArrayList<Partition>();
 			List<Partition> sPartitions = new ArrayList<Partition>();
 			List<Point> result = new ArrayList<Point>();
-			long resultCount; // store the result count of the answer
+			long resultCount = 0; // store the result count of the answer
 			try {
 				//First Get the spatio-temporal partitions
 				stPartitions = serverRequester.getQueryPartitions(null);
@@ -95,11 +95,11 @@ public class HomeServer extends AbstractHandler {
 				writer.endObject();
 			}
 			writer.endArray();
-			writer.endObject();
+			
 			/*
 			 * Get the spatial partitions information
 			 */
-			writer.beginObject();
+			
 			writer.name("SPartitions");
 			writer.beginArray();
 			for(Partition part : sPartitions){
@@ -110,11 +110,11 @@ public class HomeServer extends AbstractHandler {
 				writer.endObject();
 			}
 			writer.endArray();
-			writer.endObject();
+			
 			/*
 			 * Get the actual data for visualization
 			 */
-			writer.beginObject();
+			
 			writer.name("data");
 			writer.beginArray();
 			for(Point p : result){
@@ -124,10 +124,15 @@ public class HomeServer extends AbstractHandler {
 				writer.endObject();
 			}
 			writer.endArray();
+			
+			writer.name("resultCount");
+			writer.beginArray();
+			writer.beginObject();
+			writer.name("count").value(resultCount);
 			writer.endObject();
-
+			writer.endArray();
 			
-			
+			writer.endObject();
 			writer.close();
 			
 		} else {
