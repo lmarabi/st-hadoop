@@ -1,0 +1,15 @@
+start reading the master files
+Chose MBR Min(20.9478815,39.1035797) - Max(21.4115232,41.54497955000001)
+Chose MBR Min(21.4115232,39.1340429) - Max(21.5082552,41.1800979)
+Chose MBR Min(21.5082552,39.100849100000005) - Max(21.64607289999999,41.11511130000001)
+end reading master file and selected (3) which took 0.33 seconds
+start reading from selected files
+Start Reading file part-00041_data_08407_356
+End reading file part-00041_data_08407_356
+Start Reading file part-00042_data_08408_356
+End reading file part-00042_data_08408_356
+Start Reading file part-00043_data_08409_356
+End reading file part-00043_data_08409_356
+end reading files which took 0.994 seconds
+Generate KML file
+/media/Louai/usersData/email/248.txt

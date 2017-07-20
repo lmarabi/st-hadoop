@@ -1,0 +1,107 @@
+<?php
+// *************Query from Database************
+$db_host = 'localhost';
+$db_user = 'traffic';
+$db_pwd = 'thetrafficgenerator';
+$database = 'traffic';
+
+// Connect to database
+if (!mysql_connect($db_host, $db_user, $db_pwd))
+    die("Can't connect to database");
+
+if (!mysql_select_db($database))
+    die("Can't select database");
+
+// Create tables 
+$sql="CREATE TABLE edge (edge_id VARCHAR(40),node_1 VARCHAR(40),node_2 VARCHAR(40),tags VARCHAR(200));";
+if(!mysql_query($sql)){
+	die('could not crate edge tabel');
+	echo "could not careate edge table";
+}
+
+$sql="CREATE TABLE node (id VARCHAR(40),lat VARCHAR(40),lon VARCHAR(40))";
+if(!mysql_query($sql)){
+	die('could not crate node table ');
+	echo "could not careate node table";
+}
+
+
+
+/*
+
+
+//upload datato database
+$sql = "LOAD DATA INFILE '/home/yackel/public_html/app/webroot/tareeq/data/1/node.txt' INTO TABLE node COLUMNS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' ESCAPED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES";
+if(!mysql_query($conn,$sql)){
+	die('could not import nodes to database');
+	echo "could not import nodes to database";
+}
+$sql = "LOAD DATA INFILE '/home/yackel/public_html/app/webroot/tareeq/data/1/edge.txt' INTO TABLE edge COLUMNS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"' ESCAPED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES";
+if(!mysql_query($conn,$sql)){
+	die('could not import edge to database');
+	echo "could not import edge to database";
+}
+/*LOAD DATA INFILE '/home/yackel/public_html/app/webroot/tareeq/data/1/node.txt' INTO TABLE node
+  COLUMNS TERMINATED BY ','
+  OPTIONALLY ENCLOSED BY '"'
+  ESCAPED BY '"'
+  LINES TERMINATED BY '\n'
+  IGNORE 1 LINES;
+*/
+
+
+
+// Query database for nodes 
+// sending query
+$table = 'node';
+$result = mysql_query("SELECT * FROM {$table}");
+if (!$result) {
+    die("Query to show fields from table failed");
+    echo "query node fail";
+}
+
+    $file = fopen("./node.txt", "w");
+    fwrite($file, "node_id, lat, lon\n");
+    while ($row = mysql_fetch_row($result)) {
+        $n++;
+        $nodes .="$row[0],$row[1],$row[2];";
+        fwrite($file, "$row[0],$row[1],$row[2]\n");
+    }
+	fclose($file);
+
+// Query database for edges
+$table = 'edge';
+$result = mysql_query("SELECT * FROM {$table}");
+if (!$result) {
+    die("Query to show fields from table failed");
+    echo "query edge fail";
+}
+
+    $file = fopen("./edge.txt", "w");
+    fwrite($file, "edge_id, from_node, to_node\n");
+    while ($row = mysql_fetch_row($result)) {
+        $e++;
+        $edges .="$row[0],$row[1],$row[2];";
+        fwrite($file, "$row[0],$row[1],$row[2],$row[3]\n");
+    }
+fclose($file);
+    
+
+//delete data from tables
+$sql = "DELETE FROM node";
+if(!mysql_query($conn,$sql)){
+	die('could not delete nodes from database');
+	echo "could not delete nodes from databae";
+}
+$sql = "DELETE FROM edge";
+if(!mysql_query($conn,$sql)){
+	die('could not delete edges from database');
+	echo "could not delete nodes from databae";
+}
+//**************************
+
+
+//exec("rm -rf /home/yackel/public_html/app/webroot/tareeq/data/*");
+mysql_close($conn);
+*/
+?>
