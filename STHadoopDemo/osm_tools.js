@@ -324,7 +324,7 @@ function drawBoxPartition(){
                 bounds = OpenLayers.Bounds.fromArray(ext);
                 box = new OpenLayers.Marker.Box(bounds);
                 box.events.register("click", box, function (e) {
-                    this.setBorder("yellow");
+                    this.setBorder("black");
                 });
                 boxes.addMarker(box);
             }
@@ -337,29 +337,18 @@ function drawBoxPartition(){
 
 
 function clearMap(){
-
+/*
   var num = map.getNumLayers();
   //alert("number of layers:"+num);
   for (var j=1; j<num; j++) {
    alert(map.layers[j].name);
    if(map.layers[j].name = "partitions"){
-    alert(map.layers[j].name);
-    map.layers[j].clearMarkers();
-    map.removeLayer( map.layers[j] );
+    alert("Im in this layer: "+map.layers[j].name);
+    map.removeLayer( boxes );
+    //map.removeLayer( map.layers[j] );
    }
-  } 
-
-/*
-    pathlocs = new Array();
-    toggleControl(this);
-    delEnd();
-    delStart();
-    document.getElementById('tname').value='';
-    document.getElementById('fname').value='';
-    vectors.removeAllFeatures();
-    document.getElementById('noneToggle').checked = true;
-    map.events.unregister('click', map, handleEndClick);
-    map.events.unregister('click', map, handleStartClick);*/
-	
+  }
+*/
+	map.removeLayer( boxes ); 
 }
 

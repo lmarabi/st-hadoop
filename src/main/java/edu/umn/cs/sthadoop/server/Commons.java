@@ -12,7 +12,8 @@ public class Commons {
 	// point to the spatio-temporal index
 	public static String nycIndex;
 	public static String twitterIndex;
-	public static String spatialIndex;
+	public static String spatialTwitterIndex;
+	public static String spatialTaxiIndex;
 	public static String queryResult;
     
 
@@ -33,16 +34,24 @@ public class Commons {
 		return twitterIndex;
 	}
     
-    public static String getSpatialIndex() {
-		return spatialIndex;
+    public static String getSpatialTwitterIndex() {
+		return spatialTwitterIndex;
 	}
     
     public static void setTwitterIndex(String queryIndex) {
 		Commons.twitterIndex = queryIndex;
 	}
     
-    public static void setSpatialIndex(String queryIndex) {
-		Commons.spatialIndex = queryIndex;
+    public static void setSpatialTwitterIndex(String queryIndex) {
+		Commons.spatialTwitterIndex = queryIndex;
+	}
+    
+    public static void setSpatialTaxiIndex(String queryIndex) {
+		Commons.spatialTaxiIndex = queryIndex;
+	}
+    
+    public static String getSpatialTaxiIndex() {
+		return spatialTaxiIndex;
 	}
     
     public static void setQueryResult(String queryResult) {
@@ -60,7 +69,8 @@ public class Commons {
         prop.load(new FileInputStream("config.properties"));
         Commons.nycIndex = prop.getProperty("nycIndex");
         Commons.twitterIndex = prop.getProperty("twitterIndex");
-        Commons.spatialIndex = prop.getProperty("spatialIndex");
+        Commons.spatialTwitterIndex = prop.getProperty("spatialTwitterIndex");
+        Commons.spatialTaxiIndex = prop.getProperty("spatialTaxiIndex");
         Commons.queryResult = prop.getProperty("queryResult");
         System.out.println("Config file Loaded");
 

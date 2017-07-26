@@ -65,7 +65,12 @@ public class HomeServer extends AbstractHandler {
 				//First Get the spatio-temporal partitions
 				stPartitions = serverRequester.getQueryPartitions(null);
 				//Second Get the spatial Partitions
-				sPartitions = serverRequester.ReadMaster(new Path(Commons.getSpatialIndex()));
+				if(serverRequester.getShape().equals(queryShape.stpoint)){
+					sPartitions = serverRequester.ReadMaster(new Path(Commons.getSpatialTaxiIndex()));
+				}else{
+					sPartitions = serverRequester.ReadMaster(new Path(Commons.getSpatialTwitterIndex()));
+				}
+				
 				//serverRequester.executeQuery();
 				resultCount = serverRequester.executeRangeQuery();
 				System.out.println("Result count: "+resultCount);
