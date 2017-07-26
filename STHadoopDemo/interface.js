@@ -116,6 +116,8 @@ function ProcessRequest()
 	   	var part_sthadoop = 0;
 		var part_shadoop = 0;
 		var part_hadoop = 0;
+		var box_sthadoop = new Array();
+		var box_shadoop = new Array();
 		var info = eval ( "(" + xmlHttp.responseText + ")" ); 
 		//Get the information of the result count 
 		for(var key in info.resultCount){
@@ -126,6 +128,10 @@ function ProcessRequest()
 		for (var key in info.STPartitions) {
 			alert('ST:day ='+info.STPartitions[key].day+' mbr ='+info.STPartitions[key].mbr+' cardinality ='+info.STPartitions[key].cardinality);
 			sthadoop += info.STPartitions[key].cardinality;
+			var mbr = info.STPartitions[key].mbr;
+			// split on comma and then inserted it in array of float before push it to the array box 
+			box = []
+			box_sthadoop.push(box);
 			part_sthadoop += 1;
         	}
 		//Get the information of the SpatialHadoop Partitions  
@@ -148,6 +154,10 @@ function ProcessRequest()
 		drawChart2(part_sthadoop,part_shadoop,part_hadoop);	
 		drawChart1(sthadoop,shadoop,hadoop);
 		drawChart3(sthadoop,shadoop,hadoop);
+		//draw boxes on maps invoke methods
+		clearMap();
+		drawBoxes(box_shadoop,"blue");
+		drawBoxes(box_sthadoop,"brown");
 
 		                   
     	}
