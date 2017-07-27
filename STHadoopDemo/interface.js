@@ -9,6 +9,15 @@ var server = "localhost";
 var portnum = "8085";
 
 
+function processing_on() {
+	document.getElementById('loadingImg').style.visibility='visible';
+}
+
+function processing_off() {
+	document.getElementById('loadingImg').style.visibility='hidden';
+}
+
+
 /*
  *
  * Functions for handeling interface
@@ -89,10 +98,13 @@ function exportForm() {
 	}else{
 		shape = "twitter";
 	}
+	 clearMap();
 	executeQuery(x1,y1,x2,y2,operation,shape,t1,t2);
 }
 
 function executeQuery(x1,y1,x2,y2,operation,shape,from,to){
+
+	processing_on();
 	//http://localhost:8085/query?operation=rq&shape=stpoint&x1=-180&y1=-90&x2=180&y2=90&t1=2015-01-01&t2=2015-01-05
 	var Url = "http://"+server+":"+portnum+"/query?"+"operation="+operation+"&shape="+shape+"&x1="+x1+"&y1="+y1+"&x2="+x2+"&y2="+y2+"&t1="+from+"&t2="+to;
 	xmlHttp = new XMLHttpRequest(); 
@@ -108,7 +120,6 @@ function ProcessRequest()
         if ( xmlHttp.responseText == null ) {
          	// do nothing 
         }else{
-
 		var sthadoop = 0;
 		var shadoop = 0;
 		var hadoop = 0;
@@ -126,20 +137,34 @@ function ProcessRequest()
 
 		//Get the information of the STHadoop Partitions
 		for (var key in info.STPartitions) {
-			alert('ST:day ='+info.STPartitions[key].day+' mbr ='+info.STPartitions[key].mbr+' cardinality ='+info.STPartitions[key].cardinality);
+			//alert('ST:day ='+info.STPartitions[key].day+' mbr ='+info.STPartitions[key].mbr+' cardinality ='+info.STPartitions[key].cardinality);
 			sthadoop += info.STPartitions[key].cardinality;
 			var mbr = info.STPartitions[key].mbr;
+			var xy = mbr.split(',');
 			// split on comma and then inserted it in array of float before push it to the array box 
-			box = []
+			var box = new Array();
+			for( i=0; i< xy.length ; i++){
+				box.push(parseFloat(xy[i]));
+			}
 			box_sthadoop.push(box);
 			part_sthadoop += 1;
         	}
 		//Get the information of the SpatialHadoop Partitions  
 		for (var key in info.SPartitions) {
-			alert('S:day ='+info.SPartitions[key].day+' mbr ='+info.SPartitions[key].mbr+' cardinality ='+info.SPartitions[key].cardinality);
+			//alert('S:day ='+info.SPartitions[key].day+' mbr ='+info.SPartitions[key].mbr+' cardinality ='+info.SPartitions[key].cardinality);
 			shadoop += info.SPartitions[key].cardinality;
+			var mbr = info.SPartitions[key].mbr;
+			var xy = mbr.split(',');
+			// split on comma and then inserted it in array of float before push it to the array box 
+			var box = new Array();
+			for( i=0; i< xy.length ; i++){
+				box.push(parseFloat(xy[i]));
+			}
+			box_shadoop.push(box);
 			part_shadoop += 1; 
         	}
+		//alert("box_sthadoop: "+box_sthadoop);
+		//alert("box_sthadoop: "+box_sthadoop);
 		sthadoop -= resultCount; 
 		shadoop -= resultCount; 
 		hadoop = 1000000000 - resultCount;
@@ -151,14 +176,14 @@ function ProcessRequest()
         	}
 		*/
 		//draw Charts. 
+		processing_off();
 		drawChart2(part_sthadoop,part_shadoop,part_hadoop);	
 		drawChart1(sthadoop,shadoop,hadoop);
 		drawChart3(sthadoop,shadoop,hadoop);
 		//draw boxes on maps invoke methods
-		clearMap();
 		drawBoxes(box_shadoop,"blue");
 		drawBoxes(box_sthadoop,"brown");
-
+		
 		                   
     	}
     }

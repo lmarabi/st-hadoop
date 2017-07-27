@@ -41,7 +41,7 @@ public class STpointsTweets extends STPoint{
 		  follower_count = Integer.parseInt(list[4]);
 		  language = list[5];
 		  osystem = list[6];
-		  super.fromText(new Text(list[7]+","+list[8]+","+list[9]));
+		  super.fromText(new Text(list[7]+","+list[9]+","+list[8]));
 
 	}
 	
@@ -99,7 +99,7 @@ public class STpointsTweets extends STPoint{
 	  follower_count = Integer.parseInt(list[5]);
 	  language = list[6];
 	  osystem = list[7];
-	  super.fromText(new Text(list[0]+","+list[8]+","+list[9]));
+	  super.fromText(new Text(list[0]+","+list[9]+","+list[8]));
 	  
   }
 

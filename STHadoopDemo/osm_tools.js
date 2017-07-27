@@ -22,13 +22,13 @@ function osm_tools_userLocation(){
         fillOpacity: 0.1,
         strokeWidth: 0
     };
-     
+    processing_off();
     map = new OpenLayers.Map("osm-map");
     var layer = new OpenLayers.Layer.OSM();
     vector = new OpenLayers.Layer.Vector('vector');
     markers = new OpenLayers.Layer.Markers( "Markers" );
     lineLayer = new OpenLayers.Layer.Vector("Line Layer");
-    map.addLayers([layer, vector, markers, lineLayer]);
+    map.addLayers([layer, vector, markers, lineLayer,boxes]);
     //map.addLayers(layer);
 
  var glayers=[new OpenLayers.Layer.Google("Google Streets",{numZoomLevels: 50}),new OpenLayers.Layer.Google("Google Hybrid",{type: google.maps.MapTypeId.HYBRID,numZoomLevels: 50})];
@@ -319,8 +319,7 @@ var box_stHadoop;
 
 //function
 function drawBoxPartition(){
-  
-	var b1 = [-10, 50, 5, 60];
+	var b1 = [-49.06039625,-88.450314,36.68330000000001,8.400995610000003];
         var b2 = [-75, 41, -71, 44];
 	var b3 = [-122.6, 37.6, -122.3, 37.9];
 	var b4 = [10, 10, 20, 20];
@@ -329,39 +328,53 @@ function drawBoxPartition(){
 	boxdata.push(b2);
 	boxdata.push(b3);
 	boxdata.push(b4);
-
-
           drawBoxes(boxdata,"blue");
 
 	
 }
 
 function drawBoxes(boxList,color){
+	
             for (var i = 0; i < boxList.length; i++) {
                 ext = boxList[i];
-                bounds = OpenLayers.Bounds.fromArray(ext);
+		var xy = new Array();
+		for( var j = 0; j< ext.length ; j++){
+			xy.push(ext[j]);
+		}
+		bounds = new OpenLayers.Bounds();
+		bounds.extend(getLatlon(xy[0],xy[1]));
+		bounds.extend(getLatlon(xy[2],xy[3]));
+//                bounds = OpenLayers.Bounds.fromArray(ext);
                 box = new OpenLayers.Marker.Box(bounds);
 		box.setBorder(color);
                 boxes.addMarker(box);
             }
-            map.addLayers([boxes]);
+//            map.addLayers([boxes]);
+	    map.addLayers([boxes]);
 }
 
 
+function getLatlon(x,y){
+	epsg4326 =  new OpenLayers.Projection("EPSG:4326"); //WGS 1984 projection
+	var toProjection   = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+	var lonLat = new OpenLayers.LonLat( y , x ).transform(epsg4326, toProjection);
+	return lonLat;
+}
+
 
 function clearMap(){
-/*
-  var num = map.getNumLayers();
-  //alert("number of layers:"+num);
+	map.removeLayer( boxes ); 
+	boxes  = new OpenLayers.Layer.Boxes( "partitions" );
+
+/*  var num = map.getNumLayers();
+  alert("number of layers:"+num);
   for (var j=1; j<num; j++) {
    alert(map.layers[j].name);
    if(map.layers[j].name = "partitions"){
-    alert("Im in this layer: "+map.layers[j].name);
-    map.removeLayer( boxes );
-    //map.removeLayer( map.layers[j] );
+	map.removeLayer( boxes ); 
    }
   }
 */
-	map.removeLayer( boxes ); 
+
 }
 

@@ -64,17 +64,19 @@ public class HomeServer extends AbstractHandler {
 			try {
 				//First Get the spatio-temporal partitions
 				stPartitions = serverRequester.getQueryPartitions(null);
+				System.out.println("stPartitions:"+stPartitions.size());
 				//Second Get the spatial Partitions
 				if(serverRequester.getShape().equals(queryShape.stpoint)){
 					sPartitions = serverRequester.ReadMaster(new Path(Commons.getSpatialTaxiIndex()));
 				}else{
 					sPartitions = serverRequester.ReadMaster(new Path(Commons.getSpatialTwitterIndex()));
 				}
-				
+				System.out.println("sPartitions:"+sPartitions.size());
 				//serverRequester.executeQuery();
 				resultCount = serverRequester.executeRangeQuery();
 				System.out.println("Result count: "+resultCount);
 				result = serverRequester.getFinalResult();
+				System.out.println("Result reported: "+result.size());
 				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
