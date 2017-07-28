@@ -41,7 +41,7 @@ public class STpointsTweets extends STPoint{
 		  follower_count = Integer.parseInt(list[4]);
 		  language = list[5];
 		  osystem = list[6];
-		  super.fromText(new Text(list[7]+","+list[9]+","+list[8]));
+		  super.fromText(new Text(list[7]+","+list[8]+","+list[9]));
 
 	}
 	
@@ -92,14 +92,14 @@ public class STpointsTweets extends STPoint{
   @Override
   public void fromText(Text text) {
 	  String[] list = text.toString().split(",");
-	  tweet_id = Long.parseLong(list[1]);
-	  user_id = Long.parseLong(list[2]);
-	  screen_name = list[3];
-	  tweet_text = list[4];
-	  follower_count = Integer.parseInt(list[5]);
-	  language = list[6];
-	  osystem = list[7];
-	  super.fromText(new Text(list[0]+","+list[9]+","+list[8]));
+	  tweet_id = Long.parseLong(list[0]);
+	  user_id = Long.parseLong(list[1]);
+	  screen_name = list[2];
+	  tweet_text = list[3];
+	  follower_count = Integer.parseInt(list[4]);
+	  language = list[5];
+	  osystem = list[6];
+	  super.fromText(new Text(list[7]+","+list[8]+","+list[9]));
 	  
   }
 
@@ -119,20 +119,21 @@ public class STpointsTweets extends STPoint{
   
   public static void main(String[] args){
 	  String temp = "2015-10-25 01:18,658165748653690882,375915680,beckyfinnz,got me daytrippin' #estelle #kaskade  #roomies #waiting @ Pier 94 https://t.co/INiCDwlbjG,437,en,Instagram,40.76971376,-73.99460931"; 
-	  try {
-		STpointsTweets point = new STpointsTweets(temp);
+	  
+		STpointsTweets point = new STpointsTweets();
+		point.fromText(new Text(temp));
 		STPoint point3d  = (STPoint) point;
 		System.out.println(point.time);
 		System.out.println(point3d.time);
 		
 		// Test casting from 3D to 2D shape.
 		Point point2D = (Point) point;
+		Text txt = new Text();
+		point.toText(txt);
+		System.out.println("Point : "+txt.toString());
 		System.out.println("Point3D : "+point3d.toString());
 		System.out.println("Point2D : "+point2D.toString());
-	} catch (ParseException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
+	
   }
 
 }
