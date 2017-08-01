@@ -309,30 +309,7 @@ map.setCenter (lonLat, zoom);
 //Attributes 
  var boxes  = new OpenLayers.Layer.Boxes( "partitions" );
  var countBoxes = 0; 
- var box_spatial = [
-            [-10, 50, 5, 60],
-            [-75, 41, -71, 44],
-            [-122.6, 37.6, -122.3, 37.9],
-            [10, 10, 20, 20]
-        ];	
-
 var box_stHadoop; 
-
-//function
-function drawBoxPartition(){
-	var b1 = [-49.06039625,-88.450314,36.68330000000001,8.400995610000003];
-        var b2 = [-75, 41, -71, 44];
-	var b3 = [-122.6, 37.6, -122.3, 37.9];
-	var b4 = [10, 10, 20, 20];
-	boxdata = new Array();
-	boxdata.push(b1);
-	boxdata.push(b2);
-	boxdata.push(b3);
-	boxdata.push(b4);
-          drawBoxes(boxdata,"blue");
-
-	
-}
 
 function drawBoxes(boxList,color){
 	

@@ -101,6 +101,9 @@ function exportForm() {
 	}else{
 		shape = "twitter";
 	}
+	if(document.getElementById('both').checked){
+		shape = "both";
+	}
 	clearMap();
 	executeQuery(x1,y1,x2,y2,operation,shape,t1,t2);
 }
@@ -187,7 +190,7 @@ function ProcessRequest()
 		if( couldbe > value){	
 			part_sthadoop = value;
 		}
-		*/
+
 		if(part_shadoop < part_sthadoop){
 			var temp = part_sthadoop; 
 			part_sthadoop = part_shadoop;
@@ -200,6 +203,7 @@ function ProcessRequest()
 			shadoop = temp; 
 			
 		}
+		*/
 		drawChart2(part_sthadoop,part_shadoop,part_hadoop);	
 		drawChart1(sthadoop,shadoop,hadoop);
 		drawChart3(sthadoop,shadoop,hadoop);
@@ -215,6 +219,12 @@ function ProcessRequest()
  
 
 function drawChart2(part_sthadoop,part_shadoop,part_hadoop){
+
+if(part_sthadoop == 0)
+	part_sthadoop = "";
+if(part_shadoop == 0)
+	part_shadoop = "";
+
 	var chart = new CanvasJS.Chart("chartContainer2",
     {
       title:{
@@ -247,11 +257,16 @@ function drawChart2(part_sthadoop,part_shadoop,part_hadoop){
       }   
       ]
     });
-
     chart.render();
 }
 
 function drawChart1(sthadoop,shadoop,hadoop){
+
+if(sthadoop == 0)
+	sthadoop = "";
+if(shadoop == 0)
+	shadoop = "";
+
     var chart = new CanvasJS.Chart("chartContainer1",
     {
       title:{
