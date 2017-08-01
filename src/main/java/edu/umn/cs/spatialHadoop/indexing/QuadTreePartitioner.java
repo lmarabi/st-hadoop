@@ -101,6 +101,10 @@ public class QuadTreePartitioner extends Partitioner {
     
     while (!nodesToSplit.isEmpty()) {
       QuadTreeNode nodeToSplit = nodesToSplit.remove();
+      if(nodeToSplit.nodeID <0){
+    	  nodesToSplit.remove();
+    	  continue;
+      }
       if (nodeToSplit.toIndex - nodeToSplit.fromIndex <= capacity) {
         // No need to split
         leafNodeIDs.add(nodeToSplit.nodeID);
@@ -125,21 +129,29 @@ public class QuadTreePartitioner extends Partitioner {
           QuadTreeNode childNode = new QuadTreeNode(childFromIndex,
               childToIndex, childMinZ, childMaxZ,
               nodeToSplit.nodeID * 4 + iChild, nodeToSplit.depth + 1);
-          nodesToSplit.add(childNode);
-          childMinZ = childMaxZ;
-          childFromIndex = childToIndex;
+          if(childNode.nodeID > 0){
+        	  nodesToSplit.add(childNode);
+        	  childMinZ = childMaxZ;
+        	  childFromIndex = childToIndex;
+          }
         }
       }
-    }
-    
-    leafNodes = new BitArray(maxNodeID + 1);
-    this.leafNodeIDs = new int[leafNodeIDs.size()];
-    for (int i = 0; i < leafNodeIDs.size(); i++) {
-      leafNodes.set(leafNodeIDs.get(i), true);
-      this.leafNodeIDs[i] = leafNodeIDs.get(i);
-    }
-    Arrays.sort(this.leafNodeIDs);
-  }
+		}
+
+		leafNodes = new BitArray(maxNodeID + 1);
+		this.leafNodeIDs = new int[leafNodeIDs.size()];
+		for (int i = 0; i < leafNodeIDs.size(); i++) {
+			try {
+				leafNodes.set(leafNodeIDs.get(i), true);
+				this.leafNodeIDs[i] = leafNodeIDs.get(i);
+			} catch (ArrayIndexOutOfBoundsException e) {
+				System.out
+						.println("catch java.lang.ArrayIndexOutOfBoundsException");
+			}
+		}
+		Arrays.sort(this.leafNodeIDs);
+
+	}
 
 
   @Override
@@ -204,6 +216,9 @@ public class QuadTreePartitioner extends Partitioner {
       // Go down as necessary
       CellInfo nodeToSearch = nodesToSearch.remove();
       if (shapeMBR.isIntersected(nodeToSearch)) {
+    	  if(nodeToSearch.cellId < 0){
+    		  continue;
+    	  }
         if (leafNodes.get(nodeToSearch.cellId)) {
           // Reached a leaf node that overlaps the given shape
           matcher.collect(nodeToSearch.cellId);
