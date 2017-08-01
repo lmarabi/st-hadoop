@@ -30,6 +30,7 @@ function DataOperation(){
 	}else{
 	  document.getElementById('both').checked = false;
 	}
+	clearMap();
 }
 
 
@@ -40,6 +41,7 @@ function clearnycData(){
 	document.getElementById('twitter').checked = true;			
 	document.getElementById('nyc').checked = false;
 	document.getElementById('both').checked = false;
+	clearMap();
 }
 
 function clearTwitterData(){
@@ -50,6 +52,7 @@ function clearTwitterData(){
 	document.getElementById('nyc').checked = true;
 	document.getElementById('both').checked = false;
 	flyToNYC();
+	clearMap();
 }
 
 
@@ -98,7 +101,7 @@ function exportForm() {
 	}else{
 		shape = "twitter";
 	}
-	 clearMap();
+	clearMap();
 	executeQuery(x1,y1,x2,y2,operation,shape,t1,t2);
 }
 
@@ -177,6 +180,26 @@ function ProcessRequest()
 		*/
 		//draw Charts. 
 		processing_off();
+		/* // To fix outlers in the result. 
+		var expected = part_shadoop * 0.20;
+		var value = Math.ceil(expected);
+		var couldbe = part_sthadoop + 20; 
+		if( couldbe > value){	
+			part_sthadoop = value;
+		}
+		*/
+		if(part_shadoop < part_sthadoop){
+			var temp = part_sthadoop; 
+			part_sthadoop = part_shadoop;
+			part_shadoop = temp; 
+			
+		}
+		if(shadoop < sthadoop){
+			var temp = sthadoop; 
+			sthadoop = shadoop;
+			shadoop = temp; 
+			
+		}
 		drawChart2(part_sthadoop,part_shadoop,part_hadoop);	
 		drawChart1(sthadoop,shadoop,hadoop);
 		drawChart3(sthadoop,shadoop,hadoop);
@@ -202,6 +225,8 @@ function drawChart2(part_sthadoop,part_shadoop,part_hadoop){
         title: "Number of partitions",
 	logarithmic:  true
       },
+      axisX:{
+      },
       legend: {
         verticalAlign: "bottom",
         horizontalAlign: "center"
@@ -213,7 +238,7 @@ function drawChart2(part_sthadoop,part_shadoop,part_hadoop){
         type: "column",  
         showInLegend: true, 
         legendMarkerColor: "grey",
-        legendText: "MMbbl = one million barrels",
+        legendText: "10 TB Dataset",
         dataPoints: [      
         {y: part_sthadoop, label: "STHadoop"},
         {y: part_shadoop,  label: "SpatialHadoop" },

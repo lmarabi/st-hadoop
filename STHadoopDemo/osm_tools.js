@@ -308,6 +308,7 @@ map.setCenter (lonLat, zoom);
 
 //Attributes 
  var boxes  = new OpenLayers.Layer.Boxes( "partitions" );
+ var countBoxes = 0; 
  var box_spatial = [
             [-10, 50, 5, 60],
             [-75, 41, -71, 44],
@@ -348,6 +349,7 @@ function drawBoxes(boxList,color){
                 box = new OpenLayers.Marker.Box(bounds);
 		box.setBorder(color);
                 boxes.addMarker(box);
+		countBoxes += 1;
             }
 //            map.addLayers([boxes]);
 	    map.addLayers([boxes]);
@@ -363,8 +365,14 @@ function getLatlon(x,y){
 
 
 function clearMap(){
-	map.removeLayer( boxes ); 
+	if(countBoxes > 0){
+  	map.removeLayer( boxes ); 
 	boxes  = new OpenLayers.Layer.Boxes( "partitions" );
+	countBoxes =0;
+}
+
+	
+
 
 /*  var num = map.getNumLayers();
   alert("number of layers:"+num);

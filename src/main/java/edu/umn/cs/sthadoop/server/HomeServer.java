@@ -73,7 +73,7 @@ public class HomeServer extends AbstractHandler {
 				}
 				System.out.println("sPartitions:"+sPartitions.size());
 				//serverRequester.executeQuery();
-				resultCount = serverRequester.executeRangeQuery();
+				//resultCount = serverRequester.executeRangeQuery();
 				System.out.println("Result count: "+resultCount);
 				result = serverRequester.getFinalResult();
 				System.out.println("Result reported: "+result.size());
