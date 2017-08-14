@@ -36,7 +36,7 @@ import edu.umn.cs.sthadoop.core.STPoint;
  */
 
 public class HdfsInputFormat<S extends STPoint>
-		extends FileInputFormat<Partition, KNNJData<S>> {
+		extends FileInputFormat<Partition, HdfsDataPartitions<S>> {
 
 	/** Logger for KNNJSpatialInputFormat */
 	private static final Log LOG = LogFactory.getLog(HdfsInputFormat.class);
@@ -45,11 +45,11 @@ public class HdfsInputFormat<S extends STPoint>
 
 	// This is load everything in memory separating the query points from the reference points
 	@Override
-	public RecordReader<Partition, KNNJData<S>>
+	public RecordReader<Partition, HdfsDataPartitions<S>>
 			createRecordReader(InputSplit split, TaskAttemptContext context)
 					throws IOException, InterruptedException {
-		KNNJRecordReader<S> reader = new KNNJRecordReader<S>();
-		return (RecordReader<Partition, KNNJData<S>>) reader;
+		HdfsRecordReader<S> reader = new HdfsRecordReader<S>();
+		return (RecordReader<Partition, HdfsDataPartitions<S>>) reader;
 	}
 
 	@Override

@@ -219,7 +219,7 @@ public class STJoins {
 
 
 
-	public static class KNNJMap<S extends STPoint> extends Mapper<Partition, HdfsDataPartitions<S>, NullWritable, Text> {
+	public static class STJoinsMapper<S extends STPoint> extends Mapper<Partition, HdfsDataPartitions<S>, NullWritable, Text> {
 		/** A temporary object to be used for output */
 		// private final TextWithDistance outputValue = new TextWithDistance();
 
@@ -323,7 +323,7 @@ public class STJoins {
 		}
 	}
 
-	static void knnJoinMapReduce(OperationsParams params)
+	static void JoinMapReduce(OperationsParams params)
 			throws IOException, InterruptedException, ClassNotFoundException {
 		final Path[] inputPaths = params.getInputPaths();
 		Path outputPath = params.getOutputPath();
@@ -336,11 +336,11 @@ public class STJoins {
 		long t1 = System.currentTimeMillis();
 		// phase 1
 		params.set("type", "phase1");
-		Job job = Job.getInstance(params, "KNNJoin Phase1");
-		job.setJarByClass(STJoins.class);
+		Job job = Job.getInstance(params, "ST-Join Phase1");
+		job.setJarByClass( STJoinsMapper.class);
 		job.setInputFormatClass(HdfsInputFormat.class);
 		HdfsInputFormat.setInputPaths(job, inputPaths[0], inputPaths[1]);
-		job.setMapperClass(KNNJMap.class);
+		job.setMapperClass( STJoinsMapper.class);
 		job.setOutputKeyClass(NullWritable.class);
 		job.setOutputValueClass(Text.class);
 		job.setNumReduceTasks(0);
@@ -358,11 +358,11 @@ public class STJoins {
 		long t2 = System.currentTimeMillis() - t1;
 		t1 = System.currentTimeMillis();
 		Counters counters = job.getCounters();
-		long refSplits = counters.findCounter(KNNJMap.Stats.refSplits).getValue();
-		long qSplits = counters.findCounter(KNNJMap.Stats.qSplits).getValue();
-		long numRefRecs = counters.findCounter(KNNJMap.Stats.numRefRecs).getValue();
-		long numQRecs = counters.findCounter(KNNJMap.Stats.numQRecs).getValue();
-		long numP2Recs = counters.findCounter(KNNJMap.Stats.phase2Recs).getValue();
+		long refSplits = counters.findCounter( STJoinsMapper.Stats.refSplits).getValue();
+		long qSplits = counters.findCounter( STJoinsMapper.Stats.qSplits).getValue();
+		long numRefRecs = counters.findCounter( STJoinsMapper.Stats.numRefRecs).getValue();
+		long numQRecs = counters.findCounter( STJoinsMapper.Stats.numQRecs).getValue();
+		long numP2Recs = counters.findCounter( STJoinsMapper.Stats.phase2Recs).getValue();
 		String str = String.format(
 				"stat:counters[refSplits=%s;qSplits=%s;numRefRecs=%s;" + "numQRecs=%s;numP2Recs=%s;t1=%s]", refSplits, qSplits,
 				numRefRecs, numQRecs, numP2Recs, t2);
@@ -423,7 +423,7 @@ public class STJoins {
 		Job job3 = Job.getInstance(params, "KNNJoin Phase3");
 		job3.setJarByClass(KNNJoin.class);
 
-		job3.setMapperClass(KNNJMapPhase3.class);
+		job3.setMapperClass( STJoinsMapperPhase3.class);
 		job3.setOutputKeyClass(NullWritable.class);
 		job3.setOutputValueClass(Text.class);
 		job3.setNumReduceTasks(0);
@@ -540,7 +540,7 @@ public class STJoins {
 		} else {
 			long t1 = System.currentTimeMillis();
 			try {
-				knnJoinMapReduce(params);
+				JoinMapReduce(params);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {

@@ -29,14 +29,14 @@ import edu.umn.cs.sthadoop.mapreduce.SpatioTemporalRecordReader;
  *
  */
 
-public class HdfsRecordReader<S extends STPoint> extends RecordReader<Partition, KNNJData<S>> {
+public class HdfsRecordReader<S extends STPoint> extends RecordReader<Partition, HdfsDataPartitions<S>> {
 
 	/** Logger for KNNJRecordReader */
 	private static final Log LOG = LogFactory.getLog(HdfsRecordReader.class);
 
 	private List<RecordReader<Partition, Iterable<S>>> internalReaders;
 	public static OperationsParams params = null;
-	KNNJData<S> knnjData;
+	HdfsDataPartitions<S> jData;
 	private boolean processed = false;
 
 	@Override
@@ -54,8 +54,8 @@ public class HdfsRecordReader<S extends STPoint> extends RecordReader<Partition,
 	}
 
 	@Override
-	public KNNJData<S> getCurrentValue() throws IOException, InterruptedException {
-		return knnjData;
+	public HdfsDataPartitions<S> getCurrentValue() throws IOException, InterruptedException {
+		return jData;
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class HdfsRecordReader<S extends STPoint> extends RecordReader<Partition,
 		LOG.info("Splits in the CompineSplit: "+csplit);
 		int numPaths = csplit.getNumPaths();
 		internalReaders = new Vector<RecordReader<Partition, Iterable<S>>>(numPaths);
-		this.knnjData = new KNNJData<S>();
+		this.jData = new HdfsDataPartitions<S>();
 		for (int i = 0; i < numPaths; i++) {
 			FileSplit fsplit = new FileSplit(csplit.getPath(i), csplit.getOffset(i), csplit.getLength(i),
 					csplit.getLocations());
@@ -103,7 +103,7 @@ public class HdfsRecordReader<S extends STPoint> extends RecordReader<Partition,
 //			while (internalReaders.get(0).nextKeyValue()) {
 //				Iterable<S> shapes = internalReaders.get(0).getCurrentValue();
 //				for (S shape : shapes) {
-//					this.knnjData.qSet.add((S) shape.clone());
+//					this.HdfsDataPartitions.qSet.add((S) shape.clone());
 //				}				
 //			}
 			// Get the remaining Shapes
@@ -111,7 +111,7 @@ public class HdfsRecordReader<S extends STPoint> extends RecordReader<Partition,
 				while (internalReaders.get(i).nextKeyValue()) {
 					Iterable<S> shapes = internalReaders.get(i).getCurrentValue();
 					for (S shape : shapes) {
-						this.knnjData.refSet.add((S) shape.clone());
+						this.jData.refSet.add((S) shape.clone());
 					}
 				}		
 			}
