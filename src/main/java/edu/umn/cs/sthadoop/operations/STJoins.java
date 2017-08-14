@@ -6,7 +6,7 @@
 * http://www.opensource.org/licenses/apache2.0.php.
 *
 *************************************************************************/
-package edu.umn.cs.sthadoop.hdfs;
+package edu.umn.cs.sthadoop.operations;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Vector;
-import java.lang.System;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -28,7 +28,6 @@ import org.apache.hadoop.mapreduce.Counters;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.lib.input.CombineFileSplit;
 import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
@@ -36,10 +35,7 @@ import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.PriorityQueue;
 
 import edu.umn.cs.spatialHadoop.OperationsParams;
-import edu.umn.cs.spatialHadoop.core.Circle;
-import edu.umn.cs.spatialHadoop.core.Point;
 import edu.umn.cs.spatialHadoop.core.Rectangle;
-import edu.umn.cs.spatialHadoop.core.ResultCollector;
 import edu.umn.cs.spatialHadoop.core.Shape;
 import edu.umn.cs.spatialHadoop.core.SpatialSite;
 import edu.umn.cs.spatialHadoop.indexing.GlobalIndex;
@@ -52,17 +48,20 @@ import edu.umn.cs.spatialHadoop.mapreduce.SpatialInputFormat3;
 import edu.umn.cs.spatialHadoop.mapreduce.SpatialRecordReader3;
 import edu.umn.cs.spatialHadoop.nasa.HDFRecordReader;
 import edu.umn.cs.sthadoop.core.STPoint;
+import edu.umn.cs.sthadoop.hdfs.HdfsDataPartitions;
+import edu.umn.cs.sthadoop.hdfs.HdfsInputFormat;
+import edu.umn.cs.sthadoop.hdfs.HdfsRecordReader;
 
 /**
- * Performs k Nearest Neighbor (kNN) query over a spatio-temporal Index.
+ * Performs Spatio-temporal Join query over two indexed spatio-temporal datasets.
  * 
  * @author louai Alarabi
  *
  */
-public class KNNJoin {
+public class STJoins {
 	/** Logger for KNNJoin */
 	// private static final Log LOG = LogFactory.getLog(KNNJoin.class);
-	private static final Log LOG = LogFactory.getLog(KNNJoin.class);
+	private static final Log LOG = LogFactory.getLog(STJoins.class);
 
 	public static OperationsParams params = null;
 
@@ -220,7 +219,7 @@ public class KNNJoin {
 
 
 
-	public static class KNNJMap<S extends STPoint> extends Mapper<Partition, KNNJData<S>, NullWritable, Text> {
+	public static class KNNJMap<S extends STPoint> extends Mapper<Partition, HdfsDataPartitions<S>, NullWritable, Text> {
 		/** A temporary object to be used for output */
 		// private final TextWithDistance outputValue = new TextWithDistance();
 
@@ -265,7 +264,7 @@ public class KNNJoin {
 		}
 
 		@Override
-		protected void map(Partition key, KNNJData<S> input, final Context context)
+		protected void map(Partition key, HdfsDataPartitions<S> input, final Context context)
 				throws IOException, InterruptedException {
 //			final List<S> qSet = input.qSet;
 			final List<S> refSet = input.refSet;
@@ -329,7 +328,7 @@ public class KNNJoin {
 		final Path[] inputPaths = params.getInputPaths();
 		Path outputPath = params.getOutputPath();
 		//final int k = params.getInt("k", 1);
-		KNNJRecordReader.params = params;
+		HdfsRecordReader.params = params;
 		//System.out.println(params.getInputPaths().length);
 		
 		
@@ -338,9 +337,9 @@ public class KNNJoin {
 		// phase 1
 		params.set("type", "phase1");
 		Job job = Job.getInstance(params, "KNNJoin Phase1");
-		job.setJarByClass(KNNJoin.class);
-		job.setInputFormatClass(KNNJInputFormat.class);
-		KNNJInputFormat.setInputPaths(job, inputPaths[0], inputPaths[1]);
+		job.setJarByClass(STJoins.class);
+		job.setInputFormatClass(HdfsInputFormat.class);
+		HdfsInputFormat.setInputPaths(job, inputPaths[0], inputPaths[1]);
 		job.setMapperClass(KNNJMap.class);
 		job.setOutputKeyClass(NullWritable.class);
 		job.setOutputValueClass(Text.class);

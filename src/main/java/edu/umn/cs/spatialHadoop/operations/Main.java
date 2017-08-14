@@ -28,6 +28,7 @@ import edu.umn.cs.spatialHadoop.visualization.MagickPlot;
 import edu.umn.cs.sthadoop.indexing.STIndexManager;
 import edu.umn.cs.sthadoop.indexing.TimeSlicing;
 import edu.umn.cs.sthadoop.operations.STJoin;
+import edu.umn.cs.sthadoop.operations.STJoins;
 import edu.umn.cs.sthadoop.operations.STRangeQuery;
 import edu.umn.cs.sthadoop.operations.TestSTRQ;
 import edu.umn.cs.spatialHadoop.delaunay.DelaunayTriangulation;
@@ -145,6 +146,10 @@ public class Main {
       pgd.addClass("stmanager", STIndexManager.class,"ST-Manager");
       pgd.addClass("strangequery", STRangeQuery.class,"ST-RangeQuery");
       pgd.addClass("stjoin",STJoin.class,
+              "Computes the spatio-temporal join between two input files using the " +
+              "hasing join algorithm");
+      
+      pgd.addClass("stjoins",STJoins.class,
               "Computes the spatio-temporal join between two input files using the " +
               "hasing join algorithm");
       
