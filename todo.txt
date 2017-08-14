@@ -1,0 +1,5 @@
+1- You need to fix the join to work with the temporal STJoins. First, you need to select the maximum interval included in the join then processed from there. 
+2- provide two kind of joins, one on the whole partitions, and the other ones work based on the query predicates (i.e., mbr, and interval). 
+3- TJ need to be prepared 
+3- oper on TJ. 
+4- compare with 3D. 
