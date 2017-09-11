@@ -1,4 +1,13 @@
+#!/bin/bash
+
+echo 'compile and update on github server'
+echo 'please enter commit message'
+read txt
+
 git pull
+git add --al .
+git commit -m $txt
+git push 
 mvn compile
 mvn assembly:assembly
 mv ./target/sthadoop-2.4.1-SNAPSHOT-uber.jar st-hadoop-uber.jar

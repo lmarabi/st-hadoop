@@ -27,6 +27,7 @@ import edu.umn.cs.spatialHadoop.visualization.LakesPlot;
 import edu.umn.cs.spatialHadoop.visualization.MagickPlot;
 import edu.umn.cs.sthadoop.indexing.STIndexManager;
 import edu.umn.cs.sthadoop.indexing.TimeSlicing;
+import edu.umn.cs.sthadoop.operations.HSPKNNQ;
 import edu.umn.cs.sthadoop.operations.STJoin;
 import edu.umn.cs.sthadoop.operations.STJoins;
 import edu.umn.cs.sthadoop.operations.STRangeQuery;
@@ -152,6 +153,9 @@ public class Main {
       pgd.addClass("stjoins",STJoins.class,
               "Computes the spatio-temporal join between two input files using the " +
               "hasing join algorithm");
+      
+      pgd.addClass("stjoins",HSPKNNQ.class,
+              "Computes the Historical Snapshot Point K nearest neighbor Query on spatio-temporal input files");
       
       pgd.driver(args);
       
