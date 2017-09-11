@@ -154,7 +154,7 @@ public class Main {
               "Computes the spatio-temporal join between two input files using the " +
               "hasing join algorithm");
       
-      pgd.addClass("stjoins",HSPKNNQ.class,
+      pgd.addClass("pknn",HSPKNNQ.class,
               "Computes the Historical Snapshot Point K nearest neighbor Query on spatio-temporal input files");
       
       pgd.driver(args);
