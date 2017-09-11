@@ -74,7 +74,9 @@ public class STPointMntg extends STPoint{
     STPointMntg c = new STPointMntg();
     c.id = this.id;
     c.type = this.type;
-    super.set(x, y,time);
+    c.time = this.time;
+    c.x = this.x;
+    c.y = this.y;
     return c;
   }
   

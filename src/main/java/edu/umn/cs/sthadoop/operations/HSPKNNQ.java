@@ -12,6 +12,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -65,6 +66,7 @@ import edu.umn.cs.spatialHadoop.mapreduce.SpatialRecordReader3;
 import edu.umn.cs.spatialHadoop.nasa.HDFRecordReader;
 import edu.umn.cs.spatialHadoop.operations.RangeFilter;
 import edu.umn.cs.spatialHadoop.operations.Tail;
+import edu.umn.cs.sthadoop.core.STPoint;
 
 /**
  * Performs Historical Snapshot Point k Nearest Neighbor (HSPkNN) query over a spatio-temporal Index.
@@ -332,7 +334,7 @@ public class HSPKNNQ {
   private static <S extends Shape> Job knnMapReduce(Path inputPath,
       Path userOutputPath, OperationsParams params) throws IOException,
       ClassNotFoundException, InterruptedException {
-    Job job = new Job(params, "KNN");
+    Job job = new Job(params, "PKNN");
     job.setJarByClass(HSPKNNQ.class);
     
     FileSystem inFs = inputPath.getFileSystem(params);
@@ -619,11 +621,24 @@ public class HSPKNNQ {
     System.out.println("<output file> - Path to output file");
     System.out.println("k:<k> - (*) Number of neighbors to file");
     System.out.println("point:<x,y> - (*) Coordinates of the query point");
+    System.out.println(
+			"interval:<date1,date2> - (*) Temporal query range. " + "Format of each date is yyyy-mm-dd");
     System.out.println("-overwrite - Overwrite output file without notice");
     GenericOptionsParser.printGenericCommandUsage(System.out);
   }
 
   public static void main(String[] args) throws IOException {
+	  
+	//./hadoop jar /export/scratch/louai/idea-stHadoop/st-hadoop-uber.jar pknn /mntgIndex/yyyy-MM-dd/2017-08-03 /pknn k:2 point:-78.9659,35.7998 shape:edu.umn.cs.sthadoop.mntg.STPointMntg -overwrite  
+//	 args = new String[8];
+//	 args[0] = "/export/scratch/mntgData/mntgIndex";
+//	 args[1] = "/export/scratch/mntgData/pknn";
+//	 args[2] = "-overwrite";
+//	 args[3] = "k:10";
+//	 args[4] = "point:-78.9659,35.7998";
+//	 args[5] = "shape:edu.umn.cs.sthadoop.mntg.STPointMntg";
+//	 args[6] = "interval:2017-08-03,2017-08-04";
+//	 args[7] = "-overwrite";
     final OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
     Path[] paths = params.getPaths();
     if (paths.length <= 1 && !params.checkInput()) {
@@ -634,7 +649,34 @@ public class HSPKNNQ {
       printUsage();
       System.exit(1);
     }
-    final Path inputFile = params.getInputPath();
+    
+    if (params.get("interval") == null) {
+		System.err.println("Temporal range missing");
+		printUsage();
+		System.exit(1);
+	}
+    
+    TextSerializable inObj = params.getShape("shape");
+	if (!(inObj instanceof STPoint)) {
+		LOG.error("Shape is not instance of STPoint");
+		printUsage();
+		System.exit(1);
+	}
+	
+	// path to the spatio-temporal index.
+	List<Path> STPaths = new ArrayList<Path>();
+	
+	try {
+		STPaths = STRangeQuery.getIndexedSlices(params);
+		
+	} catch (Exception e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+    
+	for(Path input : STPaths){
+		
+    final Path inputFile = input;
     int count = params.getInt("count", 1);
     double closeness = params.getFloat("closeness", -1.0f);
     final Point[] queryPoints = closeness < 0 ? params.getShapes("point", new Point()) : new Point[count];
@@ -649,7 +691,8 @@ public class HSPKNNQ {
       printUsage();
       throw new RuntimeException("Illegal arguments");
     }
-    final Path outputPath = paths.length > 1 ? paths[1] : null;
+    final Path outputPath = paths.length > 1 ? new Path(paths[1].toUri()+"-"+input.getName()) : null;
+    
 
     if (closeness >= 0) {
       // Get query points according to its closeness to grid intersections
@@ -676,7 +719,8 @@ public class HSPKNNQ {
         queryPoints[i] = new Point(x, y);
       }
     }
-
+    
+ 
     final BooleanWritable exceptionHappened = new BooleanWritable();
     
     Thread.UncaughtExceptionHandler h = new Thread.UncaughtExceptionHandler() {
@@ -744,4 +788,6 @@ public class HSPKNNQ {
         + (t2 - t1) + " millis");
     System.out.println("Total iterations: " + TotalIterations);
   }
+  }
+
 }
