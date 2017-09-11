@@ -3,10 +3,10 @@
 echo 'compile and update on github server'
 echo 'please enter commit message'
 read txt
-echo you entered '$txt'
+echo you entered "$txt"
 git pull
 git add --al .
-git commit -m '$txt'
+git commit -m "$txt"
 git push 
 mvn compile
 mvn assembly:assembly
