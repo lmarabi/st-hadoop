@@ -1,4 +1,4 @@
-package edu.umn.cs.sthadoop.mntg;
+package edu.umn.cs.sthadoop.trajectory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -16,16 +16,16 @@ import edu.umn.cs.sthadoop.core.STPoint;
  * A data type used trajectories dataset from MNTG.
  * @author Louai Alarabi
  */
-public class STPointMntg extends STPoint{
-	private static final Log LOG = LogFactory.getLog(STPointMntg.class);
+public class STPointTrajectory extends STPoint{
+	private static final Log LOG = LogFactory.getLog(STPointTrajectory.class);
 	  public String id;
 	  public String type;
 	  
-	  public STPointMntg() {
+	  public STPointTrajectory() {
 		// TODO Auto-generated constructor stub
 	}
 	  
-	  public STPointMntg(String text) throws ParseException {
+	  public STPointTrajectory(String text) throws ParseException {
 		  String[] list = text.toString().split(",");
 		  id = list[0];
 		  type = list[1];
@@ -70,8 +70,8 @@ public class STPointMntg extends STPoint{
   }
 
   @Override
-  public STPointMntg clone() {
-    STPointMntg c = new STPointMntg();
+  public STPointTrajectory clone() {
+    STPointTrajectory c = new STPointTrajectory();
     c.id = this.id;
     c.type = this.type;
     c.time = this.time;
@@ -89,7 +89,7 @@ public class STPointMntg extends STPoint{
   public static void main(String[] args){
 	  String temp = "4953-9,newpoint,2017-08-03 22:45,126.6613993,35.3278531"; 
 	  
-		STPointMntg point = new STPointMntg();
+		STPointTrajectory point = new STPointTrajectory();
 		point.fromText(new Text(temp));
 		STPoint point3d  = (STPoint) point;
 		System.out.println(point.time);

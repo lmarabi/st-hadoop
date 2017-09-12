@@ -67,6 +67,7 @@ import edu.umn.cs.spatialHadoop.nasa.HDFRecordReader;
 import edu.umn.cs.spatialHadoop.operations.RangeFilter;
 import edu.umn.cs.spatialHadoop.operations.Tail;
 import edu.umn.cs.sthadoop.core.STPoint;
+import edu.umn.cs.sthadoop.trajectory.STPointTrajectory;
 
 /**
  * Performs Historical Snapshot Point k Nearest Neighbor (HSPkNN) query over a spatio-temporal Index.
@@ -208,6 +209,8 @@ public class HSPKNNQ {
       // Skip element if already there
       if (allElements.contains(newElement))
         return false;
+      if(trajectoryExist(newElement))
+    	  return false;
       boolean overflow = this.size() == capacity;
       Object overflowItem = this.top();
       boolean inserted = super.insert(newElement);
@@ -218,6 +221,29 @@ public class HSPKNNQ {
       }
       return inserted;
     }
+    
+    	/**
+		 * This method modify the priority query so that it stores unique
+		 * trajectory.
+		 */
+		public boolean trajectoryExist(S newElement) {
+			if (newElement instanceof ShapeWithDistance) {
+				ShapeWithDistance shapedist = (ShapeWithDistance) newElement;
+				if (shapedist.shape instanceof STPointTrajectory) {
+					STPointTrajectory newItem = (STPointTrajectory) shapedist.shape;
+					Iterator<S> iterator = allElements.iterator();
+					while (iterator.hasNext()) {
+						S element = iterator.next();
+						ShapeWithDistance elementwithDist = (ShapeWithDistance) element;
+						STPointTrajectory temp = (STPointTrajectory) elementwithDist.shape;
+						if (temp.id.equals(newItem.id))
+							return true;
+					}
+				}
+				return false;
+			}
+			return false;
+		}
   }
 
   /**
@@ -635,8 +661,8 @@ public class HSPKNNQ {
 //	 args[1] = "/export/scratch/mntgData/pknn";
 //	 args[2] = "-overwrite";
 //	 args[3] = "k:10";
-//	 args[4] = "point:-78.9659,35.7998";
-//	 args[5] = "shape:edu.umn.cs.sthadoop.mntg.STPointMntg";
+//	 args[4] = "point:-78.9659063204100,35.7903907684998";
+//	 args[5] = "shape:edu.umn.cs.sthadoop.trajectory.STPointTrajectory";
 //	 args[6] = "interval:2017-08-03,2017-08-04";
 //	 args[7] = "-overwrite";
     final OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
