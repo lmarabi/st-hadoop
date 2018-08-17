@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.Text;
 
+
 import edu.umn.cs.spatialHadoop.core.Point;
 import edu.umn.cs.sthadoop.core.STPoint;
 
