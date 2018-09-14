@@ -45,7 +45,7 @@ public class QueryPlanner {
 	/**
 	 * Constructor and load the Spatiotemporal Index directory.
 	 * 
-	 * @param params
+	 * @param params parameters
 	 * @throws Exception
 	 */
 	public QueryPlanner(OperationsParams params) throws Exception {
@@ -64,7 +64,7 @@ public class QueryPlanner {
 	 * 
 	 * @param time1
 	 * @param time2
-	 * @return List<Path> , each path represent indexed spatio-temporal slice if
+	 * @return List of Path , each path represent indexed spatio-temporal slice if
 	 *         exist only.
 	 * @throws ParseException
 	 */
@@ -122,7 +122,7 @@ public class QueryPlanner {
 	 * 
 	 * @param time1
 	 * @param time2
-	 * @return List<Path> , each path represent indexed spatio-temporal slice if
+	 * @return List of Path , each path represent indexed spatio-temporal slice if
 	 *         exist only.
 	 * @throws ParseException
 	 */
@@ -171,8 +171,8 @@ public class QueryPlanner {
 	 * This method get all list of indexed slices from indexPath directory based
 	 * on the level.
 	 * 
-	 * @param resolution
-	 * @return
+	 * @param resolution time 
+	 * @return list of paths 
 	 * @throws Exception
 	 * @throws IOException
 	 */
@@ -196,9 +196,9 @@ public class QueryPlanner {
 	/**
 	 * This method return all days between time interval passed as parameter.
 	 * 
-	 * @param startDate
-	 * @param endDate
-	 * @return List<String> each in a format of yyyy-MM-dd
+	 * @param startDate time
+	 * @param endDate time
+	 * @return List of String, each in a format of yyyy-MM-dd
 	 * @throws ParseException
 	 */
 	public List<String> getDay(String startDate, String endDate) throws ParseException {
@@ -242,9 +242,9 @@ public class QueryPlanner {
 	 * as parameter. This method should be called after getYearContainedBy,
 	 * getMonthContainedBy, getWeekContainedBy
 	 * 
-	 * @param startDate
-	 * @param endDate
-	 * @return List<String> each in a format of yyyy-MM-dd
+	 * @param startDate time
+	 * @param endDate time
+	 * @return List of String, each in a format of yyyy-MM-dd
 	 * @throws ParseException
 	 */
 	public List<String> getDayContainedBy(String startDate, String endDate) throws ParseException {
@@ -290,9 +290,9 @@ public class QueryPlanner {
 	 * This method return all weeks between the start and the end date that
 	 * represent time interval.
 	 *
-	 * @param startDate
-	 * @param endDate
-	 * @return List<String> each in a format of yyyy-MM-w
+	 * @param startDate time
+	 * @param endDate time
+	 * @return List of String, each in a format of yyyy-MM-w
 	 * @throws ParseException
 	 */
 	public List<String> getWeek(String startDate, String endDate) throws ParseException {
@@ -323,9 +323,9 @@ public class QueryPlanner {
 	 * end date that represent time interval. This method should be called after
 	 * these methods getYearContainedBy , and MonthContainedBy.
 	 * 
-	 * @param startDate
-	 * @param endDate
-	 * @return List<String> each in a format of yyyy-MM-w
+	 * @param startDate time
+	 * @param endDate time
+	 * @return List of String, each in a format of yyyy-MM-w
 	 * @throws ParseException
 	 */
 	public List<String> getWeekContainedBy(String startDate, String endDate) throws ParseException {
@@ -370,9 +370,9 @@ public class QueryPlanner {
 	 * This method return all months contains the time interval passed in the
 	 * parameters.
 	 * 
-	 * @param startDate
-	 * @param endDate
-	 * @return List<String> each in a format of yyyy-MM
+	 * @param startDate time
+	 * @param endDate time
+	 * @return List of String, each in a format of yyyy-MM
 	 * @throws ParseException
 	 */
 	public List<String> getMonth(String startDate, String endDate) throws ParseException {
@@ -401,9 +401,9 @@ public class QueryPlanner {
 	 * passing parameter 2017-02-01 , 2017-05-10 This method will return month
 	 * 2017-02, 2017-03, 2017-04
 	 * 
-	 * @param startDate
-	 * @param endDate
-	 * @return List<String> each in a format of yyyy-MM
+	 * @param startDate time
+	 * @param endDate time
+	 * @return List of String, each in a format of yyyy-MM
 	 * @throws ParseException
 	 */
 	public List<String> getMonthsContainedBy(String startDate, String endDate) throws ParseException {
@@ -443,10 +443,10 @@ public class QueryPlanner {
 	/**
 	 * This method return true if lookupdate within start,end time window
 	 *
-	 * @param start
-	 * @param end
-	 * @param lookupDate
-	 * @return
+	 * @param start time
+	 * @param end time
+	 * @param lookupStringDate look up 
+	 * @return true if included; otherwise, false
 	 * @throws ParseException
 	 */
 	public static boolean insideDaysBoundry(String start, String end, String lookupStringDate) throws ParseException {
@@ -463,9 +463,9 @@ public class QueryPlanner {
 	 * This method return all years contains the time interval passed in the
 	 * parameters.
 	 * 
-	 * @param startDate
-	 * @param endDate
-	 * @return List<String> each in a format of yyyy
+	 * @param startDate time
+	 * @param endDate time
+	 * @return List of String, each in a format of yyyy
 	 * @throws ParseException
 	 */
 	public List<String> getYear(String startDate, String endDate) throws ParseException {
@@ -487,9 +487,9 @@ public class QueryPlanner {
 	 * This method return all years contains the time interval passed in the
 	 * parameters.
 	 * 
-	 * @param startDate
-	 * @param endDate
-	 * @return List<String> each in a format of yyyy
+	 * @param startDate time
+	 * @param endDate time
+	 * @return List of String, each in a format of yyyy
 	 * @throws ParseException
 	 */
 	public List<String> getYearContainedBy(String startDate, String endDate) throws ParseException {

@@ -118,7 +118,8 @@ public class STpointsTweets extends STPoint{
   }
   
   public static void main(String[] args){
-	  String temp = "2015-10-25 01:18,658165748653690882,375915680,beckyfinnz,got me daytrippin' #estelle #kaskade  #roomies #waiting @ Pier 94 https://t.co/INiCDwlbjG,437,en,Instagram,40.76971376,-73.99460931"; 
+	  String temp = "658165748653690882,375915680,beckyfinnz,got me daytrippin' #estelle #kaskade  #roomies #waiting @ Pier 94 https://t.co/INiCDwlbjG,437,en,Instagram,"
+	  		+ "2015-10-25 01:18,40.76971376,-73.99460931"; 
 	  
 		STpointsTweets point = new STpointsTweets();
 		point.fromText(new Text(temp));

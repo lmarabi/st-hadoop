@@ -185,7 +185,7 @@ public class HdfsInputFormat<S extends STPoint>
 	 * @param splits
 	 * @param startIndex
 	 * @param count
-	 * @return
+	 * @return inputsplit
 	 * @throws IOException
 	 */
 	public static InputSplit combineFileSplits(JobContext job,

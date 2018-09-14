@@ -31,8 +31,8 @@
 
  <developers>
     <developer>
-      <name>Ahmed Eldawy</name>
-      <email>eldawy@cs.umn.edu</email>
+      <name>louai alarabi</name>
+      <email>louai@cs.umn.edu</email>
       <organization>University of Minnesota</organization>
       <organizationUrl>http://www.umn.edu/</organizationUrl>
     </developer>
@@ -45,7 +45,7 @@
         <version>2.6</version>
         <configuration>
           <descriptors>
-            <descriptor>src/main/assembly/assembly.xml</descriptor>
+	    <descriptor>src/main/assembly/assembly.xml</descriptor>
             <descriptor>src/main/assembly/uber-jar.xml</descriptor>
           </descriptors>
           <archive>
