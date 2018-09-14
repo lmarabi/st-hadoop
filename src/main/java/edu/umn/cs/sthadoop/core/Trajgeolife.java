@@ -1,4 +1,4 @@
-package edu.umn.cs.sthadoop.trajectory;
+package edu.umn.cs.sthadoop.core;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -18,8 +18,8 @@ import edu.umn.cs.sthadoop.core.STPoint;
 	Example: 102-20111023101803,0,0,40839.4303703704,2011-10-23 10:19:44,39.9067083333333,116.429903333333
  * @author Louai Alarabi
  */
-public class GeolifeTrajectory extends STPoint {
-	private static final Log LOG = LogFactory.getLog(GeolifeTrajectory.class);
+public class Trajgeolife extends STPoint {
+	private static final Log LOG = LogFactory.getLog(Trajgeolife.class);
 	public String id;
 	public String flag; 
 	public String altitude;
@@ -29,11 +29,11 @@ public class GeolifeTrajectory extends STPoint {
 	public String latitude;
 	
 
-	public GeolifeTrajectory() {
+	public Trajgeolife() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public GeolifeTrajectory(String text) throws ParseException {
+	public Trajgeolife(String text) throws ParseException {
 		String[] list = text.toString().split(",");
 		id = list[0];
 		flag = list[1];
@@ -95,8 +95,8 @@ public class GeolifeTrajectory extends STPoint {
 	}
 
 	@Override
-	public GeolifeTrajectory clone() {
-		GeolifeTrajectory c = new GeolifeTrajectory();
+	public Trajgeolife clone() {
+		Trajgeolife c = new Trajgeolife();
 		c.id = this.id;
 		c.flag = this.flag;
 		c.altitude = this.altitude;
@@ -119,7 +119,7 @@ public class GeolifeTrajectory extends STPoint {
 	public static void main(String[] args) {
 		String temp = "102-20111023101803,0,0,40839.4303703704,2011-10-23 10:19:44,39.9067083333333,116.429903333333";
 
-		GeolifeTrajectory point = new GeolifeTrajectory();
+		Trajgeolife point = new Trajgeolife();
 		point.fromText(new Text(temp));
 		STPoint point3d = (STPoint) point;
 		System.out.println(point.time);
