@@ -27,16 +27,14 @@ import edu.umn.cs.sthadoop.core.STPoint;
 
 public class DataBasedSlicing {
 	private static final Log LOG = LogFactory.getLog(Indexer.class);
-	/**
-	   * Create a partitioner for a particular job
-	   * @param ins
-	   * @param out
-	   * @param job
-	   * @param partitionerName
-	   * @return
-	   * @throws IOException
-	   */
-	  public static void slicing(Path[] ins, Path out,
+/**
+ * Create a partitioner for a particular job
+ * @param ins
+ * @param out
+ * @param paramss
+ * @throws IOException
+ */
+	static void slicing(Path[] ins, Path out,
 			  OperationsParams paramss) throws IOException {
 		  
 		JobConf conf = new JobConf(paramss, STSampler.class);

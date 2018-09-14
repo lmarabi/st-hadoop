@@ -20,7 +20,6 @@ import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 
-
 import org.apache.hadoop.mapreduce.lib.input.CombineFileSplit;
 
 import edu.umn.cs.spatialHadoop.core.Shape;
@@ -30,24 +29,23 @@ import edu.umn.cs.spatialHadoop.indexing.Partition;
 import edu.umn.cs.sthadoop.core.STPoint;
 
 /**
- *  
+ * 
  * @author louai Alarabi
  *
  */
 
-public class KNNJInputFormat<S extends STPoint>
-		extends FileInputFormat<Partition, KNNJData<S>> {
+public class KNNJInputFormat<S extends STPoint> extends FileInputFormat<Partition, KNNJData<S>> {
 
 	/** Logger for KNNJSpatialInputFormat */
 	private static final Log LOG = LogFactory.getLog(KNNJInputFormat.class);
 	/** Create splits from two input files */
 	public static final String KNNJoin = "SpatialInputFormat.KNNJoin";
 
-	// This is load everything in memory separating the query points from the reference points
+	// This is load everything in memory separating the query points from the
+	// reference points
 	@Override
-	public RecordReader<Partition, KNNJData<S>>
-			createRecordReader(InputSplit split, TaskAttemptContext context)
-					throws IOException, InterruptedException {
+	public RecordReader<Partition, KNNJData<S>> createRecordReader(InputSplit split, TaskAttemptContext context)
+			throws IOException, InterruptedException {
 		KNNJRecordReader<S> reader = new KNNJRecordReader<S>();
 		return (RecordReader<Partition, KNNJData<S>>) reader;
 	}
@@ -56,17 +54,16 @@ public class KNNJInputFormat<S extends STPoint>
 	protected boolean isSplitable(JobContext context, Path file) {
 		return false;
 	}
-	
 
 	protected void listStatus(final FileSystem fs, Path dir, final List<FileStatus> result) throws IOException {
-		FileStatus[] fileStatus = fs.listStatus(dir, new PathFilter() {			
+		FileStatus[] fileStatus = fs.listStatus(dir, new PathFilter() {
 			@Override
 			public boolean accept(Path path) {
-				//return !path.getName().endsWith("~");
+				// return !path.getName().endsWith("~");
 				return SpatialSite.NonHiddenFileFilter.accept(path);
 			}
 		});
-		
+
 		for (FileStatus status : fileStatus) {
 			if (status.isDirectory()) {
 				// Recursively go in subdir
@@ -82,7 +79,7 @@ public class KNNJInputFormat<S extends STPoint>
 	protected List<FileStatus> listStatus(JobContext job) throws IOException {
 		Configuration jobConf = job.getConfiguration();
 		Path[] inputPaths = getInputPaths(job);
-		//FileStatus[] statuses = {};
+		// FileStatus[] statuses = {};
 		List<FileStatus> result = new Vector<FileStatus>();
 
 		FileSystem[] arrFS = new FileSystem[inputPaths.length];
@@ -92,21 +89,21 @@ public class KNNJInputFormat<S extends STPoint>
 		for (int i = 0; i < arrFS.length; i++) {
 			listStatus(arrFS[i], inputPaths[i], result);
 		}
-		//statuses = arrFS[0].listStatus(inputPaths, SpatialSite.NonHiddenFileFilter);
-		//result.addAll(Arrays.asList(statuses));
+		// statuses = arrFS[0].listStatus(inputPaths,
+		// SpatialSite.NonHiddenFileFilter);
+		// result.addAll(Arrays.asList(statuses));
 		LOG.info("listStatus returned " + result.size() + " files");
 		return result;
 	}
 
 	@Override
 	public List<InputSplit> getSplits(JobContext job) throws IOException {
-		//List<InputSplit> splits = super.getSplits(job);		
+		// List<InputSplit> splits = super.getSplits(job);
 		Configuration conf = job.getConfiguration();
 
 		// Get a list of all input files. There should be exactly two files.
 		final Path[] inputPaths = getInputPaths(job);
-		Vector<GlobalIndex<Partition>> gIndexes = new Vector<GlobalIndex<Partition>>(
-				2);
+		Vector<GlobalIndex<Partition>> gIndexes = new Vector<GlobalIndex<Partition>>(2);
 
 		// Extract global indexes from input files
 		for (int i_input = 0; i_input < inputPaths.length; i_input++) {
@@ -125,8 +122,8 @@ public class KNNJInputFormat<S extends STPoint>
 		return matchedSplits;
 	}
 
-	public List<InputSplit> findMatchedSplits_Overlap(GlobalIndex<Partition> ind1,
-			GlobalIndex<Partition> ind2, JobContext job) throws IOException {
+	public List<InputSplit> findMatchedSplits_Overlap(GlobalIndex<Partition> ind1, GlobalIndex<Partition> ind2,
+			JobContext job) throws IOException {
 		// Overlapping partitions are combined in one CombineSplit
 		final List<InputSplit> matchedSplits = new Vector<InputSplit>();
 		for (Iterator<Partition> iter = ind1.iterator(); iter.hasNext();) {
@@ -136,8 +133,7 @@ public class KNNJInputFormat<S extends STPoint>
 			Iterator<Partition> iter2 = ind2.iterator();
 			while (iter2.hasNext()) {
 				Partition p2 = iter2.next();
-				if (p1.x1 <= p2.x2 && p1.x2 >= p2.x1 && p1.y1 <= p2.y2
-						&& p1.y2 >= p2.y1) {
+				if (p1.x1 <= p2.x2 && p1.x2 >= p2.x1 && p1.y1 <= p2.y2 && p1.y2 >= p2.y1) {
 					partitions.add(p2);
 				}
 			}
@@ -147,25 +143,24 @@ public class KNNJInputFormat<S extends STPoint>
 		return matchedSplits;
 	}
 
-	public List<InputSplit> findMatchedSplits_Overlap_NN(GlobalIndex<Partition> ind1,
-			GlobalIndex<Partition> ind2, JobContext job) throws IOException {
+	public List<InputSplit> findMatchedSplits_Overlap_NN(GlobalIndex<Partition> ind1, GlobalIndex<Partition> ind2,
+			JobContext job) throws IOException {
 		// Overlapping partitions are combined in one CombineSplit
 		final List<InputSplit> mSplits = new Vector<InputSplit>();
-		
+
 		for (Iterator<Partition> iter1 = ind1.iterator(); iter1.hasNext();) {
 			Partition part1 = (Partition) iter1.next();
 			List<Partition> candidates = new Vector<Partition>();
 			candidates.add(part1);
 			List<Partition> pCandidates = new Vector<Partition>();
-			
+
 			for (Iterator<Partition> iter2 = ind2.iterator(); iter2.hasNext();) {
 				Partition part2 = (Partition) iter2.next();
-				if (part1.x1 <= part2.x2 && part1.x2 >= part2.x1 && part1.y1 <= part2.y2
-						&& part1.y2 >= part2.y1) {
+				if (part1.x1 <= part2.x2 && part1.x2 >= part2.x1 && part1.y1 <= part2.y2 && part1.y2 >= part2.y1) {
 					pCandidates.add(part2);
 				}
 			}
-			
+
 			Set<Partition> pCandidatesSet = new HashSet<Partition>();
 			pCandidatesSet.addAll(pCandidates);
 			for (Iterator<Partition> iterator = pCandidatesSet.iterator(); iterator.hasNext();) {
@@ -176,20 +171,18 @@ public class KNNJInputFormat<S extends STPoint>
 		}
 		return mSplits;
 	}
-	
+
 	/**
 	 * Combines a number of file splits into one CombineFileSplit. If number of
-	 * splits to be combined is one, it returns this split as is without creating
-	 * a CombineFileSplit.
+	 * splits to be combined is one, it returns this split as is without
+	 * creating a CombineFileSplit.
 	 * 
-	 * @param splits
-	 * @param startIndex
-	 * @param count
-	 * @return
+	 * @param job
+	 * @param partitions
+	 * @return InputSplits
 	 * @throws IOException
 	 */
-	public static InputSplit combineFileSplits(JobContext job,
-			List<Partition> partitions) throws IOException {
+	public static InputSplit combineFileSplits(JobContext job, List<Partition> partitions) throws IOException {
 		Path[] paths = new Path[partitions.size()];
 		long[] lengths = new long[partitions.size()];
 		Path[] inputPaths = getInputPaths(job);
