@@ -43,7 +43,8 @@
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.6</version>
-        <configuration>
+	<configuration>
+		<tarLongFileMode>posix</tarLongFileMode>
           <descriptors>
 	    <descriptor>src/main/assembly/assembly.xml</descriptor>
             <descriptor>src/main/assembly/uber-jar.xml</descriptor>
