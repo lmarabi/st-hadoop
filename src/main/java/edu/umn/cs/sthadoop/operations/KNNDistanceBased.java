@@ -57,14 +57,14 @@ import edu.umn.cs.spatialHadoop.util.ResultCollectorSynchronizer;
  * @author Louai Alarabi
  *
  */
-public class STRangeQuery {
+public class KNNDistanceBased {
 	/** Logger for RangeQuery */
-	static final Log LOG = LogFactory.getLog(STRangeQuery.class);
+	static final Log LOG = LogFactory.getLog(KNNDistanceBased.class);
 
 	/**
 	 * The map function used for range query
 	 * 
-	 * @author Louai Alarabi
+	 * @author LouaiAlarabi
 	 */
 	public static class RangeQueryMap extends Mapper<Rectangle, Iterable<Shape>, NullWritable, Shape> {
 		@Override
@@ -84,7 +84,7 @@ public class STRangeQuery {
 		// Use multithreading in case it is running locally
 		params.setInt(LocalJobRunner.LOCAL_MAX_MAPS, Runtime.getRuntime().availableProcessors());
 
-		Job job = new Job(params, "RangeQuery");
+		Job job = new Job(params, "Traj-KNN-distance");
 		job.setJarByClass(RangeQuery.class);
 		job.setNumReduceTasks(0);
 
@@ -204,6 +204,32 @@ public class STRangeQuery {
 			totalResultSize += result;
 		return totalResultSize;
 	}
+	
+	private static String getTrajectoryRectangle(String trajectory){
+		String [] trajectoryPoints = trajectory.split(";");
+		double x1 = Double.parseDouble(trajectoryPoints[0].split(",")[0]);
+		double y1 = Double.parseDouble(trajectoryPoints[0].split(",")[1]);
+		double x2 = x1;
+		double y2 = y1;
+		double tempDouble;
+		for( String p : trajectoryPoints){
+			String [] point = p.split(",");
+			// get the minMax of x point
+			tempDouble = Double.parseDouble(point[0]);
+			if(tempDouble <= x1)
+				x1 = tempDouble;
+			if(tempDouble >= x2)
+				x2 = tempDouble;
+			// get the minMax of y.
+			tempDouble = Double.parseDouble(point[1]);
+			if(tempDouble <= y1)
+				y1 = tempDouble;
+			if(tempDouble >= y2)
+				y2 = tempDouble;
+		}
+		return  Double.toString(x1)+ ","+ Double.toString(y1) + "," + Double.toString(x2) + "," + Double.toString(y2);
+		
+	}
 
 	private static void printUsage() {
 		System.out.println("Runs a spatio-temporal range query on indexed data");
@@ -211,32 +237,26 @@ public class STRangeQuery {
 		System.out.println("<input file> - (*) Path to input file");
 		System.out.println("<output file> -  Path to input file");
 		System.out.println("shape:<STPoint> - (*) Type of shapes stored in input file");
-		System.out.println("rect:<x1,y1,x2,y2> - Spatial query range");
 		System.out.println(
 				"interval:<date1,date2> - Temporal query range. " + "Format of each date is yyyy-mm-dd");
 		System.out.println("time:[day,week,month,year] -  Time Format");
+		System.out.println("traj:<x1,y1;....;xn,yn>  - the Full trajectory");
 		System.out.println("-overwrite - Overwrite output file without notice");
 		GenericOptionsParser.printGenericCommandUsage(System.out);
 	}
 
 	public static void main(String[] args) throws Exception {
-//		args = new String[7];
-//		args[0] = "/home/louai/nyc-taxi/yellowIndex";
-//		args[1] = "/home/louai/nyc-taxi/resultSTRQ";
-//		args[2] = "shape:edu.umn.cs.sthadoop.core.STPoint";
-//		args[3] = "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
-//		args[4] = "interval:2015-01-01,2015-01-02";
-//		args[5] = "-overwrite";
-//		args[6] = "-no-local";
+		args = new String[9];
+		args[0] = "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/index_geolife";
+		args[1] = "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/knn-dis-result";
+		args[2] = "shape:edu.umn.cs.sthadoop.trajectory.GeolifeTrajectory";
+		args[3] = "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
+		args[4] = "interval:2008-05-01,2008-05-30";
+		args[5] = "time:month";
+		args[6] = "traj:39.9119983,116.606835;39.9119783,116.6065483;39.9119599,116.6062649;39.9119416,116.6059899;39.9119233,116.6057282;39.9118999,116.6054783;39.9118849,116.6052366;39.9118666,116.6050099;39.91185,116.604775;39.9118299,116.604525;39.9118049,116.6042649;39.91177,116.6040166;39.9117516,116.6037583;39.9117349,116.6035066;39.9117199,116.6032666;39.9117083,116.6030232;39.9117,116.6027566;39.91128,116.5969383;39.9112583,116.5966766;39.9112383,116.5964232;39.9112149,116.5961699;39.9111933,116.5959249;39.9111716,116.5956883";
+		args[7] = "-overwrite";
+		args[8] = "-local";//"-no-local";
 		
-		// Query for test with output
-//		args = new String[6];
-//		args[0] = "/home/louai/nyc-taxi/yellowIndex";
-//		args[1] = "shape:edu.umn.cs.sthadoop.core.STPoint";
-//		args[2] = "rect:-74.98451232910156,35.04014587402344,-73.97936248779295,41.49399566650391";
-//		args[3] = "interval:2015-01-01,2015-01-03";
-//		args[4] = "-overwrite";
-//		args[5	] = "-no-local";
 		
 		final OperationsParams params = new OperationsParams(new GenericOptionsParser(args));
 
@@ -249,16 +269,21 @@ public class STRangeQuery {
 			printUsage();
 			System.exit(1);
 		}
+		
+		if(params.get("traj") == null){
+			System.err.println("Trajectory query is missing");
+			printUsage();
+			System.exit(1);
+		}
+		
+		// Invoke method to compute the trajectory MBR. 
+		String rectangle = getTrajectoryRectangle(params.get("traj"));
+		params.set("rect", rectangle);
+		
 		if (params.get("rect") == null) {
-			String x1 = "-"+ Double.toString(Double.MAX_VALUE);
-			String y1 = "-"+ Double.toString(Double.MAX_VALUE);
-			String x2 = Double.toString(Double.MAX_VALUE);
-			String y2 = Double.toString(Double.MAX_VALUE);
-			System.out.println(x1 + "," + y1 + ","+ x2 + "," + y2);
-			params.set("rect", x1+","+y1+","+x2+","+y2);
-//			System.err.println("You must provide a query range");
-//			printUsage();
-//			System.exit(1);
+			System.err.println("You must provide a Trajectory Query");
+			printUsage();
+			System.exit(1);
 		}
 
 		if (params.get("interval") == null) {
