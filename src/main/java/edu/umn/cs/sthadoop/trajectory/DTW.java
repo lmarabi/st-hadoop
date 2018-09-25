@@ -11,6 +11,7 @@ import edu.umn.cs.sthadoop.core.STPoint;
  * This class implements the Dynamic Time Warping algorithm given two sequences of trajectory
  *  Given two list of spatio-temporal points STPoint
  *  return the Similarity distance between the two trajectory. 
+ *  The minimum distance value is the most similar. 
  * @author Louai Alarabi
  */
 
@@ -133,7 +134,8 @@ public class DTW {
 	}
 
 	/**
-	 * Returns the warping distance
+	 * Returns the warping distance the smallest distance value is the most similar,
+	 * such if distance value is zero then this mean that both trajectory are identical.  
 	 *
 	 * @return
 	 */

@@ -28,11 +28,11 @@ import edu.umn.cs.spatialHadoop.visualization.MagickPlot;
 import edu.umn.cs.sthadoop.indexing.STIndexManager;
 import edu.umn.cs.sthadoop.indexing.TimeSlicing;
 import edu.umn.cs.sthadoop.operations.HSPKNNQ;
-import edu.umn.cs.sthadoop.operations.KNNDistanceBased;
 import edu.umn.cs.sthadoop.operations.STJoin;
 import edu.umn.cs.sthadoop.operations.STJoins;
 import edu.umn.cs.sthadoop.operations.STRangeQuery;
 import edu.umn.cs.sthadoop.operations.TestSTRQ;
+import edu.umn.cs.sthadoop.trajectory.TrajectoryOverlap;
 import edu.umn.cs.spatialHadoop.delaunay.DelaunayTriangulation;
 
 /**
@@ -160,7 +160,7 @@ public class Main {
 					HSPKNNQ.class,
 					"Computes the Historical Snapshot Point K nearest neighbor Query on spatio-temporal input files");
 
-			pgd.addClass("traj-knn-dist", KNNDistanceBased.class,
+			pgd.addClass("traj-knn-dist", TrajectoryOverlap.class,
 					"Trajectory KNN similarity using distance based algorithm ");
 
 			pgd.driver(args);
