@@ -9,13 +9,9 @@ import edu.umn.cs.sthadoop.core.STPoint;
 
 /**
  * This class implements the Dynamic Time Warping algorithm given two sequences of trajectory
- * 
- * <pre>
- *   X = x1, x2,..., xi,..., xn
- *   Y = y1, y2,..., yj,..., ym
- * </pre>
- * 
- * @author louai Alarabi
+ *  Given two list of spatio-temporal points STPoint
+ *  return the Similarity distance between the two trajectory. 
+ * @author Louai Alarabi
  */
 
 public class DTW {
