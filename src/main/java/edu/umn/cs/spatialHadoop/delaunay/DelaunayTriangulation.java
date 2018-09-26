@@ -235,8 +235,8 @@ public class DelaunayTriangulation {
    * @param inPaths
    * @param outPath
    * @param params
-   * @throws IOException
-   * @throws InterruptedException
+   * @throws IOException error 
+   * @throws InterruptedException error
    */
   public static void delaunayLocal(Path[] inPaths, Path outPath,
       final OperationsParams params) throws IOException, InterruptedException {
