@@ -23,7 +23,9 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.util.GenericOptionsParser;
 
 import edu.umn.cs.spatialHadoop.OperationsParams;
+import edu.umn.cs.spatialHadoop.core.Circle;
 import edu.umn.cs.spatialHadoop.core.Point;
+import edu.umn.cs.spatialHadoop.core.Rectangle;
 import edu.umn.cs.spatialHadoop.io.TextSerializable;
 import edu.umn.cs.sthadoop.core.STPoint;
 import edu.umn.cs.sthadoop.operations.STRangeQuery;
@@ -70,6 +72,16 @@ public class KNNTrajectory {
 				+ Double.toString(x2) + "," + Double.toString(y2);
 
 	}
+	
+	private static class CirclePoint{
+		public Point p; 
+		public  double distance;
+		 public CirclePoint(Point p,double dist) {
+			this.p = p;
+			this.distance = dist;
+		}
+		
+	}
 
 	/**
 	 * This function draw the test circle around the candidate list of k points.
@@ -79,7 +91,7 @@ public class KNNTrajectory {
 	 * @param queue
 	 * @return MBR
 	 */
-	private static String getCircleTextMBR(String trajectory,
+	private static CirclePoint getMaximumDistance(String trajectory,
 			HashMap<String, List<STPoint>> candidates,
 			PriorityQueue<KNNTrajectory.Score> queue) {
 		String minMax = getTrajectoryRectangle(trajectory);
@@ -90,6 +102,7 @@ public class KNNTrajectory {
 		double y2 = Double.parseDouble(minMax.split(",")[3]);
 		Point max = new Point(x2, y2);
 		double maximumDistance = min.distanceTo(max);
+		CirclePoint circlePoint = new CirclePoint(min, maximumDistance);
 		Score[] kthpoints = new Score[queue.size()];
 		queue.toArray(kthpoints);
 		double tempdist = 0f;
@@ -98,19 +111,17 @@ public class KNNTrajectory {
 			for (STPoint p : points) {
 				if (maximumDistance < p.distanceTo(min)) {
 					maximumDistance = p.distanceTo(min);
+					circlePoint = new CirclePoint(new Point(min.x, min.y), maximumDistance);
+					
 				}
 				if (maximumDistance < p.distanceTo(max)) {
 					maximumDistance = p.distanceTo(max);
+					circlePoint = new CirclePoint(new Point(max.x, max.y), maximumDistance);
 				}
 			}
 		}
 
-		x1 += (maximumDistance * 2);
-		y1 += (maximumDistance * 2);
-		x2 += (maximumDistance * 2);
-		y1 += (maximumDistance * 2);
-		return Double.toString(x1) + "," + Double.toString(y1) + ","
-				+ Double.toString(x2) + "," + Double.toString(y2);
+		return circlePoint;
 	}
 
 	/**
@@ -158,7 +169,7 @@ public class KNNTrajectory {
 		args[2] = "shape:edu.umn.cs.sthadoop.trajectory.GeolifeTrajectory";
 		args[3] = "interval:2008-05-01,2008-05-30";
 		args[4] = "time:month";
-		args[5] = "k:100";
+		args[5] = "k:1";
 		args[6] = "traj:39.9119983,116.606835;39.9119783,116.6065483;39.9119599,116.6062649;39.9119416,116.6059899;39.9119233,116.6057282;39.9118999,116.6054783;39.9118849,116.6052366;39.9118666,116.6050099;39.91185,116.604775;39.9118299,116.604525;39.9118049,116.6042649;39.91177,116.6040166;39.9117516,116.6037583;39.9117349,116.6035066;39.9117199,116.6032666;39.9117083,116.6030232;39.9117,116.6027566;39.91128,116.5969383;39.9112583,116.5966766;39.9112383,116.5964232;39.9112149,116.5961699;39.9111933,116.5959249;39.9111716,116.5956883";
 		args[7] = "-overwrite";
 		args[8] = "-no-local";// "-local";
@@ -234,9 +245,12 @@ public class KNNTrajectory {
 				targs[8] = "-no-local";// "-local";
 			} else {
 				// invoke method to get the test circle MBR
-				String circleMbr = getCircleTextMBR(params.get("traj"),
+				CirclePoint queryPoint = getMaximumDistance(params.get("traj"),
 						overlappedTrajectory, pqueue);
-				params.set("rect", circleMbr);
+				Circle range_for_next_iteration = new Circle(queryPoint.p.x,
+						queryPoint.p.y, queryPoint.distance * 2);
+				Rectangle mbr = range_for_next_iteration.getMBR();
+				params.set("rect", mbr.x1+","+mbr.y1+","+mbr.x2+","+mbr.y2);
 				targs[0] = inputPath;
 				targs[1] = intermediatePath;
 				targs[2] = "shape:" + params.get("shape");
