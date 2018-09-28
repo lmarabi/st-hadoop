@@ -163,16 +163,16 @@ public class KNNTrajectory {
 
 	public static void main(String[] args) throws Exception {
 
-		args = new String[9];
-		args[0] = "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/index_geolife";
-		args[1] = "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/knn-dis-result";
-		args[2] = "shape:edu.umn.cs.sthadoop.trajectory.GeolifeTrajectory";
-		args[3] = "interval:2008-05-01,2008-05-30";
-		args[4] = "time:month";
-		args[5] = "k:1";
-		args[6] = "traj:39.9119983,116.606835;39.9119783,116.6065483;39.9119599,116.6062649;39.9119416,116.6059899;39.9119233,116.6057282;39.9118999,116.6054783;39.9118849,116.6052366;39.9118666,116.6050099;39.91185,116.604775;39.9118299,116.604525;39.9118049,116.6042649;39.91177,116.6040166;39.9117516,116.6037583;39.9117349,116.6035066;39.9117199,116.6032666;39.9117083,116.6030232;39.9117,116.6027566;39.91128,116.5969383;39.9112583,116.5966766;39.9112383,116.5964232;39.9112149,116.5961699;39.9111933,116.5959249;39.9111716,116.5956883";
-		args[7] = "-overwrite";
-		args[8] = "-no-local";// "-local";
+//		args = new String[9];
+//		args[0] = "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/index_geolife";
+//		args[1] = "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/knn-dis-result";
+//		args[2] = "shape:edu.umn.cs.sthadoop.trajectory.GeolifeTrajectory";
+//		args[3] = "interval:2008-05-01,2008-05-30";
+//		args[4] = "time:month";
+//		args[5] = "k:5";
+//		args[6] = "traj:39.9119983,116.606835;39.9119783,116.6065483;39.9119599,116.6062649;39.9119416,116.6059899;39.9119233,116.6057282;39.9118999,116.6054783;39.9118849,116.6052366;39.9118666,116.6050099;39.91185,116.604775;39.9118299,116.604525;39.9118049,116.6042649;39.91177,116.6040166;39.9117516,116.6037583;39.9117349,116.6035066;39.9117199,116.6032666;39.9117083,116.6030232;39.9117,116.6027566;39.91128,116.5969383;39.9112583,116.5966766;39.9112383,116.5964232;39.9112149,116.5961699;39.9111933,116.5959249;39.9111716,116.5956883";
+//		args[7] = "-overwrite";
+//		args[8] = "-no-local";// "-local";
 
 		String inputPath, intermediatePath, outputPath;
 		int topk = 0;
