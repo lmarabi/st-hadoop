@@ -247,6 +247,7 @@ public class KNNTrajectory {
 			fs.delete(checkinterpath);
 		}
 		int numTry = 3;
+		long t1 = System.currentTimeMillis();
 		do {
 			 
 			if (numTry == 3) {
@@ -314,7 +315,10 @@ public class KNNTrajectory {
 			numTry--;
 
 		} while (pqueue.size() < topk && numTry >= 0);
-
+		long t2 = System.currentTimeMillis();
+		System.out.println("Time for " + topk +" jobs is "
+				+ (t2 - t1) + " millis");
+		System.out.println("Total iterations: " + Math.abs(numTry-3));
 		// check if the retrieved top-k is equal to the requested k.
 		System.out.println("found top-" + pqueue.size() + "\tTryNum:" + numTry);
 		if (pqueue.size() >= topk) {
