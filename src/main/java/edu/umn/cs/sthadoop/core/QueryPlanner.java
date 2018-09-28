@@ -429,8 +429,9 @@ public class QueryPlanner {
 			if (!this.yearContained.contains(yearCheck)) {
 				c.setTime(monthStart);
 				c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH));
+				c.add(Calendar.DAY_OF_YEAR, 1);
 				monthEnd = c.getTime();
-				if (start.before(monthStart) && end.after(monthEnd)) {
+				if (start.before(monthStart) && monthEnd.after(end) ) {
 					result.add(month);
 				}
 

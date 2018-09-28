@@ -163,6 +163,7 @@ public class KNNTrajectory {
 
 	public static void main(String[] args) throws Exception {
 
+		// with specifying the level 
 //		args = new String[9];
 //		args[0] = "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/index_geolife";
 //		args[1] = "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/knn-dis-result";
@@ -173,6 +174,17 @@ public class KNNTrajectory {
 //		args[6] = "traj:39.9119983,116.606835;39.9119783,116.6065483;39.9119599,116.6062649;39.9119416,116.6059899;39.9119233,116.6057282;39.9118999,116.6054783;39.9118849,116.6052366;39.9118666,116.6050099;39.91185,116.604775;39.9118299,116.604525;39.9118049,116.6042649;39.91177,116.6040166;39.9117516,116.6037583;39.9117349,116.6035066;39.9117199,116.6032666;39.9117083,116.6030232;39.9117,116.6027566;39.91128,116.5969383;39.9112583,116.5966766;39.9112383,116.5964232;39.9112149,116.5961699;39.9111933,116.5959249;39.9111716,116.5956883";
 //		args[7] = "-overwrite";
 //		args[8] = "-no-local";// "-local";
+		
+		// without specifying the level 
+//		args = new String[8];
+//		args[0] = "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/index_geolife";
+//		args[1] = "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/knn-dis-result";
+//		args[2] = "shape:edu.umn.cs.sthadoop.trajectory.GeolifeTrajectory";
+//		args[3] = "interval:2008-05-01,2008-05-31";
+//		args[4] = "k:100";
+//		args[5] = "traj:39.9119983,116.606835;39.9119783,116.6065483;39.9119599,116.6062649;39.9119416,116.6059899;39.9119233,116.6057282;39.9118999,116.6054783;39.9118849,116.6052366;39.9118666,116.6050099;39.91185,116.604775;39.9118299,116.604525;39.9118049,116.6042649;39.91177,116.6040166;39.9117516,116.6037583;39.9117349,116.6035066;39.9117199,116.6032666;39.9117083,116.6030232;39.9117,116.6027566;39.91128,116.5969383;39.9112583,116.5966766;39.9112383,116.5964232;39.9112149,116.5961699;39.9111933,116.5959249;39.9111716,116.5956883";
+//		args[6] = "-overwrite";
+//		args[7] = "-no-local";// "-local";
 
 		String inputPath, intermediatePath, outputPath;
 		int topk = 0;
@@ -229,20 +241,15 @@ public class KNNTrajectory {
 		Configuration conf = new Configuration();
 		Job job = Job.getInstance(conf);
 		FileSystem fs = FileSystem.get(conf);
+		Path checkinterpath = new Path(intermediatePath); 
+		if(fs.exists(checkinterpath)){
+			fs.delete(checkinterpath);
+		}
 		int numTry = 3;
 		do {
-
-			String[] targs = new String[9];
+			 
 			if (numTry == 3) {
-				targs[0] = inputPath;
-				targs[1] = intermediatePath;
-				targs[2] = "shape:" + params.get("shape");
-				targs[3] = "interval:" + params.get("interval");
-				targs[4] = "time:" + params.get("time");
-				targs[5] = "k:" + params.get("k");
-				targs[6] = "rect:" + params.get("rect");
-				targs[7] = "-overwrite";
-				targs[8] = "-no-local";// "-local";
+				params.setOutputPath(intermediatePath);
 			} else {
 				// invoke method to get the test circle MBR
 				CirclePoint queryPoint = getMaximumDistance(params.get("traj"),
@@ -251,19 +258,10 @@ public class KNNTrajectory {
 						queryPoint.p.y, queryPoint.distance * 2);
 				Rectangle mbr = range_for_next_iteration.getMBR();
 				params.set("rect", mbr.x1+","+mbr.y1+","+mbr.x2+","+mbr.y2);
-				targs[0] = inputPath;
-				targs[1] = intermediatePath;
-				targs[2] = "shape:" + params.get("shape");
-				targs[3] = "interval:" + params.get("interval");
-				targs[4] = "time:" + params.get("time");
-				targs[5] = "k:" + params.get("k");
-				targs[6] = "rect:" + params.get("rect");
-				targs[7] = "-overwrite";
-				targs[8] = "-no-local";// "-local";
 			}
 
 			// get the overlap data partitions with the given trajectory.
-			STRangeQuery.main(targs);
+			STRangeQuery.rangeQueryOperation(params);
 
 			// read all the result in the HDFS Build HashMap of trajectory based
 			// on TrajId.
