@@ -29,7 +29,7 @@ Examples
 Please visit [ST-Hadoop](http://st-hadoop.cs.umn.edu) website there are few examples of how to use ST-Hadoop operations. 
 
 |Operation	|operator 	| Example	|
-|:-------------:| :-------------------:| :---------------:|
+|:-------------:| :-------------------:| ---------------|
 |spatio-temporal index | stmanager | ./hadoop jar st-hadoop-uber.jar stmanager /geolife_raw_data.txt /index_geolife time:year shape:edu.umn.cs.sthadoop.trajectory.GeolifeTrajectory sindex:str -no-local -overwrite |
 |spatio-temporal range query| strangequery | ./hadoop jar st-hadoop-uber.jar strangequery /index_geolife /rq_result shape:edu.umn.cs.sthadoop.trajectory.GeolifeTrajectory rect:39.9111716,116.5956883,39.9119983,116.606835 interval:2008-05-01,2008-05-31 time:year -overwrite |
 |Spatio-temporal DTW KNN| dtwknn | ./hadoop jar st-hadoop-uber.jar dtwknn /index_geolife /knndtw_result shape:edu.umn.cs.sthadoop.trajectory.GeolifeTrajectory interval:2008-05-01,2008-05-31 time:year k:20 traj:39.9119983,116.606835x39.9119783,116.6065483x39.9119599,116.6062649x39.9119416,116.6059899x39.9119233,116.6057282x39.9118999,116.6054783x39.9118849,116.6052366x39.9118666,116.6050099x39.91185,116.604775x39.9118299,116.604525x39.9118049,116.6042649x39.91177,116.6040166x39.9117516,116.6037583x39.9117349,116.6035066x39.9117199,116.6032666x39.9117083,116.6030232x39.9117,116.6027566x39.91128,116.5969383x39.9112583,116.5966766x39.9112383,116.5964232x39.9112149,116.5961699x39.9111933,116.5959249x39.9111716,116.5956883 -overwrite -no-local |
