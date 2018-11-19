@@ -112,13 +112,24 @@ public class TimeSlicing {
 //				}
 				if (value.toString().contains(",")) {
 				Date date;
-				inputShape.fromText(value);
-				STPoint obj = (STPoint) inputShape;
-				String temp = obj.time;
-				date = sdf.parse(temp);
-				keyDate = sdf.toPattern() + "/" + sdf.format(date);
-				keyDate = keyDate.replace(":", "-");
-				keyDate = keyDate.replace(" ", "-");
+				try{
+					inputShape.fromText(value);
+					STPoint obj = (STPoint) inputShape;
+					String temp = obj.time;
+					date = sdf.parse(temp);
+					keyDate = sdf.toPattern() + "/" + sdf.format(date);
+					keyDate = keyDate.replace(":", "-");
+					keyDate = keyDate.replace(" ", "-");
+				}catch(java.lang.ClassCastException e){
+					inputShape.fromText(value);
+					STRectangle obj = (STRectangle) inputShape;
+					String temp = obj.time;
+					date = sdf.parse(temp);
+					keyDate = sdf.toPattern() + "/" + sdf.format(date);
+					keyDate = keyDate.replace(":", "-");
+					keyDate = keyDate.replace(" ", "-");
+				}
+				
 			}
 				
 			} catch (ParseException e) {
