@@ -27,14 +27,19 @@ import org.apache.hadoop.mapred.Reporter;
 import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.hadoop.mapred.lib.MultipleTextOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
+
 import edu.umn.cs.spatialHadoop.OperationsParams;
 import edu.umn.cs.spatialHadoop.core.Shape;
 import edu.umn.cs.spatialHadoop.io.TextSerializable;
 import edu.umn.cs.sthadoop.core.STPoint;
+import edu.umn.cs.sthadoop.core.STRectangle;
 
 public class TimeSlicing {
 	public static SimpleDateFormat sdf;
 	public static Shape inputShape;
+	
+	/** Logger */
+	private static final Log LOG = LogFactory.getLog(TimeSlicing.class);
 
 	static enum TimeFormat {
 		year, month, week, day, minute;
@@ -247,8 +252,33 @@ public class TimeSlicing {
 			FileOutputFormat.setOutputPath(conf, outputPath);
 			JobClient.runJob(conf).waitForCompletion();
 			
+		}else if(inObj instanceof STRectangle ){
+//			inputShape =  inObj;
+			FileSystem outfs = outputPath.getFileSystem(conf);
+			outfs.delete(outputPath, true);
+			conf.setJobName("Temporal Space Slicing");
+			conf.set("time", spaceFormat);
+			conf.set("shape", inObj.getClass().getName());
+			conf.setOutputKeyClass(Text.class);
+			conf.setMapOutputKeyClass(Text.class);
+			conf.setOutputValueClass(Text.class);
+			// Mapper settings
+			conf.setMapperClass(TimeSlicing.Map.class);
+			ClusterStatus clusterStatus = new JobClient(conf).getClusterStatus();
+			conf.setNumMapTasks(10 * Math.max(1, clusterStatus.getMaxMapTasks()));
+			// Reducer Settings
+			conf.setNumReduceTasks(0);
+			conf.setReducerClass(TimeSlicing.Reduce.class);
+			conf.setCombinerClass(TimeSlicing.Reduce.class);
+
+			conf.setInputFormat(TextInputFormat.class);
+			conf.setOutputFormat(TimeSlicing.KeyBasedMultiFileOutput.class);
+
+			FileInputFormat.setInputPaths(conf, inputPath);
+			FileOutputFormat.setOutputPath(conf, outputPath);
+			JobClient.runJob(conf).waitForCompletion();
 		}else{
-			System.out.println("Not Instance of STPoint did not recognize the shape");
+			System.out.println("Not Instance of STPoint or STRectangle. We did not recognize the shape");
 		}
 		
 		return 0;
@@ -258,9 +288,9 @@ public class TimeSlicing {
 		// check if arguments length is 3.
 		
 //		 args = new String[4];
-//		 args[0] = "/home/louai/nyc-taxi/yellow/output.txt";
-//		 args[1] = "/home/louai/nyc-taxi/result/" ;
-//		 args[2] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+//		 args[0] = "/export/scratch/louai/hdfsTest/fulltrajectory_yellow_1.txt";
+//		 args[1] = "/export/scratch/louai/hdfsTest/Result/" ;
+//		 args[2] = "shape:edu.umn.cs.sthadoop.core.STNycTrajectory";
 //				 //"shape:edu.umn.cs.sthadoop.core.STpointsTweets";
 //		 args[3] = "time:month";
 			OperationsParams params = new OperationsParams(
