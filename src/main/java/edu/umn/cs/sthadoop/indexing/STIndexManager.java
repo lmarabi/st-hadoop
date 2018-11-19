@@ -230,7 +230,7 @@ public class STIndexManager {
 
 
 		TextSerializable inObj = params.getShape("shape");
-		if (!(inObj instanceof STPoint) || !(inObj instanceof STRectangle)) {
+		if (!(inObj instanceof STPoint) && !(inObj instanceof STRectangle)) {
 			LOG.error("Shape is not instance of STPoint or STRectangle");
 			return;
 		} else {
