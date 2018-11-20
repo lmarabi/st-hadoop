@@ -196,7 +196,7 @@ public class HomeServer extends AbstractHandler {
 
 
 	public static void main(String[] args) throws Exception {
-		Server server = new Server(8085);
+		Server server = new Server(8000);
 		server.setHandler(new HomeServer());
 		server.start();
 		server.join();
