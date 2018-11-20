@@ -19,6 +19,7 @@ import edu.umn.cs.spatialHadoop.OperationsParams;
 import edu.umn.cs.spatialHadoop.indexing.Indexer;
 import edu.umn.cs.spatialHadoop.io.TextSerializable;
 import edu.umn.cs.sthadoop.core.STPoint;
+import edu.umn.cs.sthadoop.core.STRectangle;
 import edu.umn.cs.sthadoop.core.TimeFormatST;
 import edu.umn.cs.sthadoop.core.TimeFormatST.TimeFormatEnum;;
 
@@ -199,13 +200,22 @@ public class STIndexManager {
 		System.out.println("<dataset path> - (*) Path to input dataset");
 		System.out.println("<index path> - (*) Path to index output");
 		System.out.println("time:[hour,day,week,month,year] - (*) Time Format");
-		System.out.println("sindex:[hour,day,week,month,year] - (*) Time Format");
+		System.out.println("sindex:[grid,str,str+,rtree,r+tree,quadtree,zcurve,hilbert,kdtree] - (*) Time Format");
 		System.out.println("-overwrite - Overwrite output file without notice");
 		GenericOptionsParser.printGenericCommandUsage(System.out);
 	}
 
 	public static void main(String[] args) throws Exception {
 		// Parse parameters
+		
+//		 args = new String[4];
+//		 args[0] = "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/geolife_raw_data.txt";
+//		 args[1] = "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/" ;
+//		 args[2] = "shape:edu.umn.cs.sthadoop.trajectory.GeolifeTrajectory";
+//				 //"shape:edu.umn.cs.sthadoop.core.STpointsTweets";
+//		 args[3] = "time:month";
+		
+		
 		OperationsParams params = new OperationsParams(
 				new GenericOptionsParser(args));
 		Path datasetPath = params.getInputPath();
@@ -213,10 +223,15 @@ public class STIndexManager {
 		if (params.get("time") == null) {
 			printUsage();
 		}
+		
+		if (params.get("sindex") == null) {
+			printUsage();
+		}
+
 
 		TextSerializable inObj = params.getShape("shape");
-		if (!(inObj instanceof STPoint)) {
-			LOG.error("Shape is not instance of STPoint");
+		if (!(inObj instanceof STPoint) && !(inObj instanceof STRectangle)) {
+			LOG.error("Shape is not instance of STPoint or STRectangle");
 			return;
 		} else {
 			// This constructor will check for what is needed to be done in the

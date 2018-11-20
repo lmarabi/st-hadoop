@@ -197,12 +197,7 @@ public class ServerRequest {
 	
 	/**
 	 * This method execute the range query from the disk. 
-	 * @param mbr
-	 * @param path
-	 * @return
-	 * @throws IllegalArgumentException
-	 * @throws IOException
-	 * @throws InterruptedException 
+	 * @return long value 
 	 */
 	public long executeRangeQuery(){
 		long count =0;
@@ -277,7 +272,7 @@ private synchronized int smartQuery(Partition part)
 	/**
 	 * This method to return the list of selected Spatial/Spatio-Temporal/Temporal Range.
 	 * @param level = if pass null then spatio-temporal selected; otherwise choose one [day-week-month-year] 
-	 * @return
+	 * @return list of partitions
 	 * @throws Exception
 	 */
 	public List<Partition> getQueryPartitions(String level) throws Exception{
@@ -330,13 +325,8 @@ private synchronized int smartQuery(Partition part)
 	/**
 	 * This Method read all the files in the data directory and fetch only the
 	 * Intersect files
-	 *
-	 * @param maxLat
-	 * @param minLat
-	 * @param maxLon
-	 * @param minLon
-	 * @param path
-	 * @return
+	 * @param dir path directory 
+	 * @return list of partitions
 	 */
 	public List<Partition> ReadMaster(Path dir) {
 		File master;

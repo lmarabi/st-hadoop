@@ -1,11 +1,11 @@
 /***********************************************************************
-* Copyright (c) 2015 by Regents of the University of Minnesota.
-* All rights reserved. This program and the accompanying materials
-* are made available under the terms of the Apache License, Version 2.0 which 
-* accompanies this distribution and is available at
-* http://www.opensource.org/licenses/apache2.0.php.
-*
-*************************************************************************/
+ * Copyright (c) 2015 by Regents of the University of Minnesota.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Apache License, Version 2.0 which 
+ * accompanies this distribution and is available at
+ * http://www.opensource.org/licenses/apache2.0.php.
+ *
+ *************************************************************************/
 package edu.umn.cs.spatialHadoop.operations;
 
 import org.apache.hadoop.conf.Configuration;
@@ -27,12 +27,14 @@ import edu.umn.cs.spatialHadoop.visualization.LakesPlot;
 import edu.umn.cs.spatialHadoop.visualization.MagickPlot;
 import edu.umn.cs.sthadoop.indexing.STIndexManager;
 import edu.umn.cs.sthadoop.indexing.TimeSlicing;
+import edu.umn.cs.sthadoop.operations.HSPKNNQ;
 import edu.umn.cs.sthadoop.operations.STJoin;
 import edu.umn.cs.sthadoop.operations.STJoins;
 import edu.umn.cs.sthadoop.operations.STRangeQuery;
 import edu.umn.cs.sthadoop.operations.TestSTRQ;
+import edu.umn.cs.sthadoop.trajectory.KNNTrajectory;
+import edu.umn.cs.sthadoop.trajectory.TrajectoryOverlap;
 import edu.umn.cs.spatialHadoop.delaunay.DelaunayTriangulation;
-
 
 /**
  * The main entry point to all queries.
@@ -41,127 +43,135 @@ import edu.umn.cs.spatialHadoop.delaunay.DelaunayTriangulation;
  *
  */
 public class Main {
-  
-  static {
-    // Load configuration from files
-    Configuration.addDefaultResource("spatial-default.xml");
-    Configuration.addDefaultResource("spatial-site.xml");
-  }
-  
-  public static void main(String[] args) {
-    int exitCode = -1;
-    ProgramDriver pgd = new ProgramDriver();
-    try {
-      pgd.addClass("rangequery", RangeQuery.class,
-          "Finds all objects in the query range given by a rectangle");
 
-      pgd.addClass("knn", KNN.class,
-          "Finds the k nearest neighbor in a file to a point");
+	static {
+		// Load configuration from files
+		Configuration.addDefaultResource("spatial-default.xml");
+		Configuration.addDefaultResource("spatial-site.xml");
+	}
 
-      pgd.addClass("dj", DistributedJoin.class,
-          "Computes the spatial join between two input files using the " +
-          "distributed join algorithm");
-      
-      pgd.addClass("sjmr", SJMR.class,
-          "Computes the spatial join between two input files using the " +
-          "SJMR algorithm");
-      
-      pgd.addClass("index", Indexer.class,
-          "Spatially index a file using a specific indexer");
-      
-      pgd.addClass("oldindex", Repartition.class,
-          "Spatially index a file using a specific indexer");
-      
-      pgd.addClass("mbr", FileMBR.class,
-          "Finds the minimal bounding rectangle of an input file");
-      
-      pgd.addClass("readfile", ReadFile.class,
-          "Retrieve some information about the index of a file");
+	public static void main(String[] args) {
+		int exitCode = -1;
+		ProgramDriver pgd = new ProgramDriver();
+		try {
+			pgd.addClass("rangequery", RangeQuery.class,
+					"Finds all objects in the query range given by a rectangle");
 
-      pgd.addClass("sample", Sampler.class,
-          "Reads a random sample from the input file");
+			pgd.addClass("knn", KNN.class,
+					"Finds the k nearest neighbor in a file to a point");
 
-      pgd.addClass("generate", RandomSpatialGenerator.class,
-          "Generates a random file containing spatial data");
+			pgd.addClass("dj", DistributedJoin.class,
+					"Computes the spatial join between two input files using the "
+							+ "distributed join algorithm");
 
-      pgd.addClass("union", Union.class,
-          "Computes the union of input shapes");
+			pgd.addClass("sjmr", SJMR.class,
+					"Computes the spatial join between two input files using the "
+							+ "SJMR algorithm");
 
-      pgd.addClass("uunion", UltimateUnion.class,
-          "Computes the union of input shapes using the UltimateUnion algorithm");
+			pgd.addClass("index", Indexer.class,
+					"Spatially index a file using a specific indexer");
 
-      pgd.addClass("delaunay", DelaunayTriangulation.class,
-          "Computes the Delaunay triangulation for a set of points");
+			pgd.addClass("oldindex", Repartition.class,
+					"Spatially index a file using a specific indexer");
 
-      pgd.addClass("multihdfplot", MultiHDFPlot.class,
-          "Plots NASA datasets in the spatiotemporal range provided by user");
+			pgd.addClass("mbr", FileMBR.class,
+					"Finds the minimal bounding rectangle of an input file");
 
-      pgd.addClass("hdfplot", HDFPlot.class,
-          "Plots a heat map for a give NASA dataset");
-      
-      pgd.addClass("gplot", GeometricPlot.class,
-          "Plots a file to an image");
+			pgd.addClass("readfile", ReadFile.class,
+					"Retrieve some information about the index of a file");
 
-      pgd.addClass("hplot", HeatMapPlot.class,
-          "Plots a heat map to an image");
-      
-      pgd.addClass("lakesplot", LakesPlot.class,
-          "Plots lakes to SVG image");
-      
-      pgd.addClass("hdfx", HDFToText.class,
-          "Extracts data from a set of HDF files to text files");
+			pgd.addClass("sample", Sampler.class,
+					"Reads a random sample from the input file");
 
-      pgd.addClass("skyline", Skyline.class,
-          "Computes the skyline of an input set of points");
-      
-      pgd.addClass("convexhull", ConvexHull.class,
-          "Computes the convex hull of an input set of points");
+			pgd.addClass("generate", RandomSpatialGenerator.class,
+					"Generates a random file containing spatial data");
 
-      pgd.addClass("farthestpair", FarthestPair.class,
-          "Computes the farthest pair of point of an input set of points");
+			pgd.addClass("union", Union.class,
+					"Computes the union of input shapes");
 
-      pgd.addClass("closestpair", ClosestPair.class,
-          "Computes the closest pair of point of an input set of points");
+			pgd.addClass("uunion", UltimateUnion.class,
+					"Computes the union of input shapes using the UltimateUnion algorithm");
 
-      pgd.addClass("distcp", DistributedCopy.class,
-          "Copies a directory or file using a MapReduce job");
-      
-      pgd.addClass("vizserver", ShahedServer.class,
-          "Starts a server that handles visualization requests");
+			pgd.addClass("delaunay", DelaunayTriangulation.class,
+					"Computes the Delaunay triangulation for a set of points");
 
-      pgd.addClass("staggquery", SpatioAggregateQueries.class,
-          "Runs a spatio temporal aggregate query on HDF files");
-      
-      pgd.addClass("shahedindexer", AggregateQuadTree.class,
-          "Creates a multilevel spatio-temporal indexer for NASA data");
-      
-      pgd.addClass("hadoopviz", HadoopvizServer.class,
-          "Run Hadoopviz Server");
-      
-      pgd.addClass("mplot", MagickPlot.class, "Plot using ImageMagick");
-      
-      // STHadoop
-      pgd.addClass("timeslicing", TimeSlicing.class, "ST-TimeBasedSlicing");
-      // This is for time manager to check indexes
-      pgd.addClass("stmanager", STIndexManager.class,"ST-Manager");
-      pgd.addClass("strangequery", STRangeQuery.class,"ST-RangeQuery");
-      pgd.addClass("stjoin",STJoin.class,
-              "Computes the spatio-temporal join between two input files using the " +
-              "hasing join algorithm");
-      
-      pgd.addClass("stjoins",STJoins.class,
-              "Computes the spatio-temporal join between two input files using the " +
-              "hasing join algorithm");
-      
-      pgd.driver(args);
-      
-      // Success
-      exitCode = 0;
-    }
-    catch(Throwable e){
-      e.printStackTrace();
-    }
-    
-    System.exit(exitCode);
-  }
+			pgd.addClass("multihdfplot", MultiHDFPlot.class,
+					"Plots NASA datasets in the spatiotemporal range provided by user");
+
+			pgd.addClass("hdfplot", HDFPlot.class,
+					"Plots a heat map for a give NASA dataset");
+
+			pgd.addClass("gplot", GeometricPlot.class,
+					"Plots a file to an image");
+
+			pgd.addClass("hplot", HeatMapPlot.class,
+					"Plots a heat map to an image");
+
+			pgd.addClass("lakesplot", LakesPlot.class,
+					"Plots lakes to SVG image");
+
+			pgd.addClass("hdfx", HDFToText.class,
+					"Extracts data from a set of HDF files to text files");
+
+			pgd.addClass("skyline", Skyline.class,
+					"Computes the skyline of an input set of points");
+
+			pgd.addClass("convexhull", ConvexHull.class,
+					"Computes the convex hull of an input set of points");
+
+			pgd.addClass("farthestpair", FarthestPair.class,
+					"Computes the farthest pair of point of an input set of points");
+
+			pgd.addClass("closestpair", ClosestPair.class,
+					"Computes the closest pair of point of an input set of points");
+
+			pgd.addClass("distcp", DistributedCopy.class,
+					"Copies a directory or file using a MapReduce job");
+
+			pgd.addClass("vizserver", ShahedServer.class,
+					"Starts a server that handles visualization requests");
+
+			pgd.addClass("staggquery", SpatioAggregateQueries.class,
+					"Runs a spatio temporal aggregate query on HDF files");
+
+			pgd.addClass("shahedindexer", AggregateQuadTree.class,
+					"Creates a multilevel spatio-temporal indexer for NASA data");
+
+			pgd.addClass("hadoopviz", HadoopvizServer.class,
+					"Run Hadoopviz Server");
+
+			pgd.addClass("mplot", MagickPlot.class, "Plot using ImageMagick");
+
+			// STHadoop
+			pgd.addClass("timeslicing", TimeSlicing.class,
+					"ST-TimeBasedSlicing");
+			// This is for time manager to check indexes
+			pgd.addClass("stmanager", STIndexManager.class, "ST-Manager");
+			pgd.addClass("strangequery", STRangeQuery.class, "ST-RangeQuery");
+			pgd.addClass("stjoin", STJoin.class,
+					"Computes the spatio-temporal join between two input files using the "
+							+ "hasing join algorithm");
+
+			pgd.addClass("stjoins", STJoins.class,
+					"Computes the spatio-temporal join between two input files using the "
+							+ "hasing join algorithm");
+
+			pgd.addClass(
+					"pknn",
+					HSPKNNQ.class,
+					"Computes the Historical Snapshot Point K nearest neighbor Query on spatio-temporal input files");
+
+			pgd.addClass("dtwknn", KNNTrajectory.class,
+					"Trajectory KNN similarity using DTW algorithm ");
+
+			pgd.driver(args);
+
+			// Success
+			exitCode = 0;
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
+		System.exit(exitCode);
+	}
 }

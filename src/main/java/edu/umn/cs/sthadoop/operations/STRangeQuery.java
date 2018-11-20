@@ -64,7 +64,7 @@ public class STRangeQuery {
 	/**
 	 * The map function used for range query
 	 * 
-	 * @author Ahmed Eldawy
+	 * @author Louai Alarabi
 	 */
 	public static class RangeQueryMap extends Mapper<Rectangle, Iterable<Shape>, NullWritable, Shape> {
 		@Override
@@ -217,6 +217,154 @@ public class STRangeQuery {
 		System.out.println("time:[day,week,month,year] -  Time Format");
 		System.out.println("-overwrite - Overwrite output file without notice");
 		GenericOptionsParser.printGenericCommandUsage(System.out);
+	}
+	
+	public static void rangeQueryOperation(OperationsParams parameters) throws Exception {
+		final OperationsParams params = parameters;
+
+		final Path[] paths = params.getPaths();
+		if (paths.length <= 1 && !params.checkInput()) {
+			printUsage();
+			System.exit(1);
+		}
+		if (paths.length >= 2 && !params.checkInputOutput()) {
+			printUsage();
+			System.exit(1);
+		}
+		if (params.get("rect") == null) {
+			String x1 = "-"+ Double.toString(Double.MAX_VALUE);
+			String y1 = "-"+ Double.toString(Double.MAX_VALUE);
+			String x2 = Double.toString(Double.MAX_VALUE);
+			String y2 = Double.toString(Double.MAX_VALUE);
+			System.out.println(x1 + "," + y1 + ","+ x2 + "," + y2);
+			params.set("rect", x1+","+y1+","+x2+","+y2);
+//			System.err.println("You must provide a query range");
+//			printUsage();
+//			System.exit(1);
+		}
+
+		if (params.get("interval") == null) {
+			System.err.println("Temporal range missing");
+			printUsage();
+			System.exit(1);
+		}
+
+		TextSerializable inObj = params.getShape("shape");
+		if (!(inObj instanceof STPoint)) {
+			LOG.error("Shape is not instance of STPoint");
+			printUsage();
+			System.exit(1);
+		}
+
+		// Get spatio-temporal slices.
+		List<Path> STPaths = getIndexedSlices(params);
+		final Path outPath = params.getOutputPath();
+		final Rectangle[] queryRanges = params.getShapes("rect", new Rectangle());
+
+		// All running jobs
+		final Vector<Long> resultsCounts = new Vector<Long>();
+		Vector<Job> jobs = new Vector<Job>();
+		Vector<Thread> threads = new Vector<Thread>();
+
+		long t1 = System.currentTimeMillis();
+		for (Path stPath : STPaths) {
+			final Path inPath = stPath;
+			for (int i = 0; i < queryRanges.length; i++) {
+				final OperationsParams queryParams = new OperationsParams(params);
+				OperationsParams.setShape(queryParams, "rect", queryRanges[i]);
+				if (OperationsParams.isLocal(new JobConf(queryParams), inPath)) {
+					// Run in local mode
+					final Rectangle queryRange = queryRanges[i];
+					final Shape shape = queryParams.getShape("shape");
+					final Path output = outPath == null ? null
+							: (queryRanges.length == 1 ? outPath : new Path(outPath, String.format("%05d", i)));
+					Thread thread = new Thread() {
+						@Override
+						public void run() {
+							FSDataOutputStream outFile = null;
+							final byte[] newLine = System.getProperty("line.separator", "\n").getBytes();
+							try {
+								ResultCollector<Shape> collector = null;
+								if (output != null) {
+									FileSystem outFS = output.getFileSystem(queryParams);
+									final FSDataOutputStream foutFile = outFile = outFS.create(output);
+									collector = new ResultCollector<Shape>() {
+										final Text tempText = new Text2();
+
+										@Override
+										public synchronized void collect(Shape r) {
+											try {
+												tempText.clear();
+												r.toText(tempText);
+												foutFile.write(tempText.getBytes(), 0, tempText.getLength());
+												foutFile.write(newLine);
+											} catch (IOException e) {
+												e.printStackTrace();
+											}
+										}
+									};
+								} else {
+									outFile = null;
+								}
+								long resultCount = rangeQueryLocal(inPath, queryRange, shape, queryParams, collector);
+								resultsCounts.add(resultCount);
+							} catch (IOException e) {
+								e.printStackTrace();
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							} finally {
+								try {
+									if (outFile != null)
+										outFile.close();
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+							}
+						}
+					};
+					thread.start();
+					threads.add(thread);
+				} else {
+					// Run in MapReduce mode
+					Path outTempPath = outPath == null ? null : new Path(outPath, String.format("%05d", i)+"-"+inPath.getName());
+					queryParams.setBoolean("background", true);
+					Job job = rangeQueryMapReduce(inPath, outTempPath, queryParams);
+					jobs.add(job);
+				}
+			}
+		}
+
+		while (!jobs.isEmpty()) {
+			Job firstJob = jobs.firstElement();
+			firstJob.waitForCompletion(false);
+			if (!firstJob.isSuccessful()) {
+				System.err.println("Error running job " + firstJob);
+				System.err.println("Killing all remaining jobs");
+				for (int j = 1; j < jobs.size(); j++)
+					jobs.get(j).killJob();
+				System.exit(1);
+			}
+			Counters counters = firstJob.getCounters();
+			Counter outputRecordCounter = counters.findCounter(Task.Counter.MAP_OUTPUT_RECORDS);
+			resultsCounts.add(outputRecordCounter.getValue());
+			jobs.remove(0);
+		}
+		while (!threads.isEmpty()) {
+			try {
+				Thread thread = threads.firstElement();
+				thread.join();
+				threads.remove(0);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		long t2 = System.currentTimeMillis();
+		System.out.println("QueryPlan:");
+		for (Path stPath : STPaths) {
+			System.out.println(stPath.getName());
+		}
+		System.out.println("Time for " + queryRanges.length + " jobs is " + (t2 - t1) + " millis");
+		System.out.println("Results counts: " + resultsCounts);
 	}
 
 	public static void main(String[] args) throws Exception {

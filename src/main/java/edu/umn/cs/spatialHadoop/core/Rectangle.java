@@ -83,6 +83,7 @@ public class Rectangle implements Shape, WritableComparable<Rectangle> {
   /**
    * Comparison is done by lexicographic ordering of attributes
    * &lt; x1, y1, x2, y2&gt;
+   * @return interger value  
    */
   public int compareTo(Shape s) {
     Rectangle rect2 = (Rectangle) s;
@@ -139,9 +140,9 @@ public class Rectangle implements Shape, WritableComparable<Rectangle> {
 
   /**
    * Maximum distance to the perimeter of the Rectangle
-   * @param px
-   * @param py
-   * @return
+   * @param px point
+   * @param py point 
+   * @return distance in double
    */
   public double getMaxDistanceTo(double px, double py) {
     double dx = Math.max(px - this.x1, this.x2 - px);
@@ -247,9 +248,9 @@ public class Rectangle implements Shape, WritableComparable<Rectangle> {
   /**
    * Compute the intersection of a line segment with the rectangle border.
    * It is assumed that p1 lies inside the rectangle while p2 is outside it.
-   * @param p1
-   * @param p2
-   * @return
+   * @param p1 point
+   * @param p2 point
+   * @return point intersect 
    */
   public Point intersectLineSegment(Point p1, Point p2) {
     double vx = p2.x - p1.x;
