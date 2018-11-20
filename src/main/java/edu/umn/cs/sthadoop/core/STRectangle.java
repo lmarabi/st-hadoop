@@ -74,18 +74,12 @@ public class STRectangle extends Rectangle {
 
   public void write(DataOutput out) throws IOException {
     out.writeUTF(time);
-    out.writeDouble(x1);
-    out.writeDouble(y1);
-    out.writeDouble(x2);
-    out.writeDouble(y2);
+    super.write(out);
   }
 
   public void readFields(DataInput in) throws IOException {
 	this.time = in.readUTF();
-    this.x1 = in.readDouble();
-    this.y1 = in.readDouble();
-    this.x2 = in.readDouble();
-    this.y2 = in.readDouble();
+    super.readFields(in);
   }
   
   /**
@@ -252,11 +246,10 @@ public class STRectangle extends Rectangle {
 
   @Override
   public Text toText(Text text) {
-    TextSerializerHelper.serializeDouble(x1, text, ',');
-    TextSerializerHelper.serializeDouble(y1, text, ',');
-    TextSerializerHelper.serializeDouble(x2, text, ',');
-    TextSerializerHelper.serializeDouble(y2, text, '\0');
-    return text;
+	byte[] separator = new String(",").getBytes();
+	text.append(time.getBytes(), 0, time.getBytes().length);
+	text.append(separator, 0,separator.length);
+    return super.toText(text);
   }
   
   @Override

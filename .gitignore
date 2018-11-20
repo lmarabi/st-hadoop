@@ -14,4 +14,4 @@ lib/ivy/**/*.jar
 .classpath
 st-hadoop-uber.jar
 config.properties
-.*
+.DS_Store
