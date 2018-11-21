@@ -22,18 +22,14 @@ import edu.umn.cs.spatialHadoop.core.Shape;
 import edu.umn.cs.spatialHadoop.io.TextSerializerHelper;
 
 /**
- * A class that holds coordinates of a rectangle. For predicate test functions
+ * A class that holds coordinates of a spatio-temporal rectangle. For predicate test functions
  * (e.g. intersection), the rectangle is considered open-ended. This means that
  * the right and top edge are outside the rectangle.
- * @author Ahmed Eldawy
+ * @author Louai Alarabi.
  *
  */
 public class STRectangle extends Rectangle {
   public String time;
-  public double x1;
-  public double y1;
-  public double x2;
-  public double y2;
 
   public STRectangle() {
     this("",0, 0, 0, 0);

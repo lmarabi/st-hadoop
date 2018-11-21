@@ -92,10 +92,10 @@ public class STNycTrajectory extends STRectangle {
 		String[] startpoint = list[incremmental].split("&");
 		tempx = Double.parseDouble(startpoint[0]);
 		tempy = Double.parseDouble(startpoint[1]);
-		x1 = tempx;
-		y1 = tempy;
-		x2 = tempx;
-		y2 = tempy;
+		this.x1 = tempx;
+		this.y1 = tempy;
+		this.x2 = tempx;
+		this.y2 = tempy;
 		for (int i = incremmental; i < list.length; i++) {
 			String[] point = list[i].split("&");
 			if (point.length == 2) {
@@ -107,10 +107,10 @@ public class STNycTrajectory extends STRectangle {
 
 				tempx = Double.parseDouble(point[0]);
 				tempy = Double.parseDouble(point[1]);
-				x1 = (tempx < x1) ? tempx : x1;
-				x2 = (tempx > x2) ? tempx : x2;
-				y1 = (tempy < y1) ? tempy : y1;
-				y2 = (tempy > y2) ? tempy : y2;
+				this.x1 = (tempx < x1) ? tempx : x1;
+				this.x2 = (tempx > x2) ? tempx : x2;
+				this.y1 = (tempy < y1) ? tempy : y1;
+				this.y2 = (tempy > y2) ? tempy : y2;
 			}
 
 		}
@@ -141,6 +141,8 @@ public class STNycTrajectory extends STRectangle {
 		System.out.println("endtime:" + trajshape.endTime);
 		System.out.println("Rectangle:" + trajshape.toString());
 		System.out.println("points:" + trajshape.points);
+		System.out.println("MBR(" +trajshape.x1+"," +trajshape.y1+"," +trajshape.x2+"," +trajshape.y2 +")");
+		System.out.println("==========");
 		System.out.println("To Text ");
 		Text text = new Text();
 		trajshape.toText(text);
