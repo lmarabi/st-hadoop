@@ -166,7 +166,7 @@ public class STRectangle extends Rectangle {
       Point pt = (Point)s;
       return pt.x >= x1 && pt.x < x2 && pt.y >= y1 && pt.y < y2;
     }
-    STRectangle r = (STRectangle) s.getMBR();
+    Rectangle r = (Rectangle) s.getMBR();
     if (r == null)
       return false;
     return (this.x2 > r.x1 && r.x2 > this.x1 && this.y2 > r.y1 && r.y2 > this.y1);

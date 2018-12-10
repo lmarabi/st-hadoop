@@ -72,7 +72,7 @@ public class STNycTrajectory extends STRectangle {
 	@Override
 	public void fromText(Text text) {
 		// TODO Auto-generated method stub
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		double temp = 0;
 		String[] list = text.toString().split(",");
 		id = list[0];

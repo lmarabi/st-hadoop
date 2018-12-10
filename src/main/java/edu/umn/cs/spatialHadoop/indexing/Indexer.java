@@ -455,10 +455,10 @@ public class Indexer {
    */
   public static void main(String[] args) throws Exception {
 //	args = new String[6];
-//    args[0] = "/export/scratch/louai/scratch1/workspace/dataset/sthadoop/nyc/";
-//    args[1] = "/export/scratch/louai/scratch1/workspace/dataset/sthadoop/nyc/indexnyc";
-//    args[2] = "sindex:quadtree";
-//    args[3] = "shape:edu.umn.cs.sthadoop.core.STPoint";
+//    args[0] = "/export/scratch/louai/scratch1/workspace/dataset/sthadoop/rect/input";
+//    args[1] = "/export/scratch/louai/scratch1/workspace/dataset/sthadoop/rect/output";
+//    args[2] = "sindex:str";
+//    args[3] = "shape:edu.umn.cs.sthadoop.core.STNycTrajectory";
 //    args[4] = "-overwrite";
 //    args[5] = "-local";
 	  

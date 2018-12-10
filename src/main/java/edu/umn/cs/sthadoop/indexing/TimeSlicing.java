@@ -116,7 +116,8 @@ public class TimeSlicing {
 					inputShape.fromText(value);
 					STPoint obj = (STPoint) inputShape;
 					String temp = obj.time;
-					date = sdf.parse(temp);
+					SimpleDateFormat todate = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+					date = todate.parse(temp);
 					keyDate = sdf.toPattern() + "/" + sdf.format(date);
 					keyDate = keyDate.replace(":", "-");
 					keyDate = keyDate.replace(" ", "-");
@@ -124,7 +125,8 @@ public class TimeSlicing {
 					inputShape.fromText(value);
 					STRectangle obj = (STRectangle) inputShape;
 					String temp = obj.time;
-					date = sdf.parse(temp);
+					SimpleDateFormat todate = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+					date = todate.parse(temp);
 					keyDate = sdf.toPattern() + "/" + sdf.format(date);
 					keyDate = keyDate.replace(":", "-");
 					keyDate = keyDate.replace(" ", "-");
@@ -299,11 +301,11 @@ public class TimeSlicing {
 		// check if arguments length is 3.
 		
 //		 args = new String[4];
-//		 args[0] = "/export/scratch/louai/hdfsTest/fulltrajectory_yellow_1.txt";
+//		 args[0] = "/export/scratch/louai/hdfsTest/test_week.txt";
 //		 args[1] = "/export/scratch/louai/hdfsTest/Result/" ;
 //		 args[2] = "shape:edu.umn.cs.sthadoop.core.STNycTrajectory";
 //				 //"shape:edu.umn.cs.sthadoop.core.STpointsTweets";
-//		 args[3] = "time:month";
+//		 args[3] = "time:week";
 			OperationsParams params = new OperationsParams(
 					new GenericOptionsParser(args));
 			Path inputPath = params.getInputPath();
