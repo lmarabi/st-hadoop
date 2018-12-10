@@ -49,6 +49,7 @@ import edu.umn.cs.spatialHadoop.util.Parallel;
 import edu.umn.cs.spatialHadoop.util.Parallel.RunnableRange;
 import edu.umn.cs.sthadoop.core.QueryPlanner;
 import edu.umn.cs.sthadoop.core.STPoint;
+import edu.umn.cs.sthadoop.core.STRectangle;
 import edu.umn.cs.spatialHadoop.util.ResultCollectorSynchronizer;
 
 /**
@@ -250,8 +251,8 @@ public class STRangeQuery {
 		}
 
 		TextSerializable inObj = params.getShape("shape");
-		if (!(inObj instanceof STPoint)) {
-			LOG.error("Shape is not instance of STPoint");
+		if (!(inObj instanceof STPoint) || !(inObj instanceof STRectangle)) {
+			LOG.error("Shape is not instance of STPoint or STRectangle");
 			printUsage();
 			System.exit(1);
 		}
@@ -416,8 +417,8 @@ public class STRangeQuery {
 		}
 
 		TextSerializable inObj = params.getShape("shape");
-		if (!(inObj instanceof STPoint)) {
-			LOG.error("Shape is not instance of STPoint");
+		if (!(inObj instanceof STPoint) || !(inObj instanceof STRectangle)) {
+			LOG.error("Shape is not instance of STPoint or STRectangle");
 			printUsage();
 			System.exit(1);
 		}
