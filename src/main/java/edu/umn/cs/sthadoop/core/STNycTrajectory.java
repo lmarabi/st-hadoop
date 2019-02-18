@@ -20,10 +20,10 @@ import edu.umn.cs.spatialHadoop.core.Rectangle;
  */
 
 public class STNycTrajectory extends STRectangle {
-	String id;
-	String startTime;
-	String endTime;
-	String points;
+	public String id;
+	public String startTime;
+	public String endTime;
+	public String points;
 
 	public STNycTrajectory() {
 		// TODO Auto-generated constructor stub

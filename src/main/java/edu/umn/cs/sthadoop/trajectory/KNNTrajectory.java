@@ -27,6 +27,8 @@ import edu.umn.cs.spatialHadoop.core.Circle;
 import edu.umn.cs.spatialHadoop.core.Point;
 import edu.umn.cs.spatialHadoop.core.Rectangle;
 import edu.umn.cs.spatialHadoop.io.TextSerializable;
+import edu.umn.cs.sthadoop.core.STNycSTPoints;
+import edu.umn.cs.sthadoop.core.STNycTrajectory;
 import edu.umn.cs.sthadoop.core.STPoint;
 import edu.umn.cs.sthadoop.core.STRectangle;
 import edu.umn.cs.sthadoop.operations.STRangeQuery;
@@ -73,15 +75,16 @@ public class KNNTrajectory {
 				+ Double.toString(x2) + "," + Double.toString(y2);
 
 	}
-	
-	private static class CirclePoint{
-		public Point p; 
-		public  double distance;
-		 public CirclePoint(Point p,double dist) {
+
+	private static class CirclePoint {
+		public Point p;
+		public double distance;
+
+		public CirclePoint(Point p, double dist) {
 			this.p = p;
 			this.distance = dist;
 		}
-		
+
 	}
 
 	/**
@@ -112,12 +115,14 @@ public class KNNTrajectory {
 			for (STPoint p : points) {
 				if (maximumDistance < p.distanceTo(min)) {
 					maximumDistance = p.distanceTo(min);
-					circlePoint = new CirclePoint(new Point(min.x, min.y), maximumDistance);
-					
+					circlePoint = new CirclePoint(new Point(min.x, min.y),
+							maximumDistance);
+
 				}
 				if (maximumDistance < p.distanceTo(max)) {
 					maximumDistance = p.distanceTo(max);
-					circlePoint = new CirclePoint(new Point(max.x, max.y), maximumDistance);
+					circlePoint = new CirclePoint(new Point(max.x, max.y),
+							maximumDistance);
 				}
 			}
 		}
@@ -164,28 +169,34 @@ public class KNNTrajectory {
 
 	public static void main(String[] args) throws Exception {
 
-		// with specifying the level 
-//		args = new String[9];
-//		args[0] = "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/index_geolife";
-//		args[1] = "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/knn-dis-result";
-//		args[2] = "shape:edu.umn.cs.sthadoop.trajectory.GeolifeTrajectory";
-//		args[3] = "interval:2008-05-01,2008-05-30";
-//		args[4] = "time:month";
-//		args[5] = "k:100";
-//		args[6] = "traj:39.9119983,116.606835x39.9119783,116.6065483x39.9119599,116.6062649x39.9119416,116.6059899x39.9119233,116.6057282x39.9118999,116.6054783x39.9118849,116.6052366x39.9118666,116.6050099x39.91185,116.604775x39.9118299,116.604525x39.9118049,116.6042649x39.91177,116.6040166x39.9117516,116.6037583x39.9117349,116.6035066x39.9117199,116.6032666x39.9117083,116.6030232x39.9117,116.6027566x39.91128,116.5969383x39.9112583,116.5966766x39.9112383,116.5964232x39.9112149,116.5961699x39.9111933,116.5959249x39.9111716,116.5956883";
-//		args[7] = "-overwrite";
-//		args[8] = "-no-local";// "-local";
-		
-		// without specifying the level 
-//		args = new String[8];
-//		args[0] = "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/index_geolife";
-//		args[1] = "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/knn-dis-result";
-//		args[2] = "shape:edu.umn.cs.sthadoop.trajectory.GeolifeTrajectory";
-//		args[3] = "interval:2008-05-01,2008-05-31";
-//		args[4] = "k:100";
-//		args[5] = "traj:39.9119983,116.606835x39.9119783,116.6065483x39.9119599,116.6062649x39.9119416,116.6059899x39.9119233,116.6057282x39.9118999,116.6054783x39.9118849,116.6052366x39.9118666,116.6050099x39.91185,116.604775x39.9118299,116.604525x39.9118049,116.6042649x39.91177,116.6040166x39.9117516,116.6037583x39.9117349,116.6035066x39.9117199,116.6032666x39.9117083,116.6030232x39.9117,116.6027566x39.91128,116.5969383x39.9112583,116.5966766x39.9112383,116.5964232x39.9112149,116.5961699x39.9111933,116.5959249x39.9111716,116.5956883";
-//		args[6] = "-overwrite";
-//		args[7] = "-no-local";// "-local";
+		// with specifying the level
+		// args = new String[9];
+		// args[0] =
+		// "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/index_geolife";
+		// args[1] =
+		// "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/knn-dis-result";
+		// args[2] = "shape:edu.umn.cs.sthadoop.trajectory.GeolifeTrajectory";
+		// args[3] = "interval:2008-05-01,2008-05-30";
+		// args[4] = "time:month";
+		// args[5] = "k:100";
+		// args[6] =
+		// "traj:39.9119983,116.606835x39.9119783,116.6065483x39.9119599,116.6062649x39.9119416,116.6059899x39.9119233,116.6057282x39.9118999,116.6054783x39.9118849,116.6052366x39.9118666,116.6050099x39.91185,116.604775x39.9118299,116.604525x39.9118049,116.6042649x39.91177,116.6040166x39.9117516,116.6037583x39.9117349,116.6035066x39.9117199,116.6032666x39.9117083,116.6030232x39.9117,116.6027566x39.91128,116.5969383x39.9112583,116.5966766x39.9112383,116.5964232x39.9112149,116.5961699x39.9111933,116.5959249x39.9111716,116.5956883";
+		// args[7] = "-overwrite";
+		// args[8] = "-no-local";// "-local";
+
+		// without specifying the level
+		// args = new String[8];
+		// args[0] =
+		// "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/index_geolife";
+		// args[1] =
+		// "/export/scratch/mntgData/geolifeGPS/geolife_Trajectories_1.3/HDFS/knn-dis-result";
+		// args[2] = "shape:edu.umn.cs.sthadoop.trajectory.GeolifeTrajectory";
+		// args[3] = "interval:2008-05-01,2008-05-31";
+		// args[4] = "k:100";
+		// args[5] =
+		// "traj:39.9119983,116.606835x39.9119783,116.6065483x39.9119599,116.6062649x39.9119416,116.6059899x39.9119233,116.6057282x39.9118999,116.6054783x39.9118849,116.6052366x39.9118666,116.6050099x39.91185,116.604775x39.9118299,116.604525x39.9118049,116.6042649x39.91177,116.6040166x39.9117516,116.6037583x39.9117349,116.6035066x39.9117199,116.6032666x39.9117083,116.6030232x39.9117,116.6027566x39.91128,116.5969383x39.9112583,116.5966766x39.9112383,116.5964232x39.9112149,116.5961699x39.9111933,116.5959249x39.9111716,116.5956883";
+		// args[6] = "-overwrite";
+		// args[7] = "-no-local";// "-local";
 
 		String inputPath, intermediatePath, outputPath;
 		int topk = 0;
@@ -216,7 +227,7 @@ public class KNNTrajectory {
 
 		// Invoke method to compute the trajectory MBR.
 		String rectangle = getTrajectoryRectangle(params.get("traj"));
-		System.out.println("rect:"+rectangle);
+		System.out.println("rect:" + rectangle);
 		params.set("rect", rectangle);
 
 		if (params.get("rect") == null) {
@@ -233,27 +244,28 @@ public class KNNTrajectory {
 
 		TextSerializable inObj = params.getShape("shape");
 		if (!(inObj instanceof STPoint)) {
-			if(!(inObj instanceof STRectangle)){
+			if (!(inObj instanceof STRectangle)) {
 				LOG.error("Shape is not instance of STPoint");
 				printUsage();
 				System.exit(1);
 			}
-			
+
 		}
 
 		PriorityQueue<KNNTrajectory.Score> pqueue = new PriorityQueue<KNNTrajectory.Score>();
 		HashMap<String, List<STPoint>> overlappedTrajectory = new HashMap<String, List<STPoint>>();
+		HashMap<String, List<STNycTrajectory>> overlappedTrajectory_rect = new HashMap<String, List<STNycTrajectory>>();
 		Configuration conf = new Configuration();
 		Job job = Job.getInstance(conf);
 		FileSystem fs = FileSystem.get(conf);
-		Path checkinterpath = new Path(intermediatePath); 
-		if(fs.exists(checkinterpath)){
+		Path checkinterpath = new Path(intermediatePath);
+		if (fs.exists(checkinterpath)) {
 			fs.delete(checkinterpath);
 		}
 		int numTry = 3;
 		long t1 = System.currentTimeMillis();
 		do {
-			 
+
 			if (numTry == 3) {
 				params.setOutputPath(intermediatePath);
 			} else {
@@ -263,7 +275,8 @@ public class KNNTrajectory {
 				Circle range_for_next_iteration = new Circle(queryPoint.p.x,
 						queryPoint.p.y, queryPoint.distance * 2);
 				Rectangle mbr = range_for_next_iteration.getMBR();
-				params.set("rect", mbr.x1+","+mbr.y1+","+mbr.x2+","+mbr.y2);
+				params.set("rect", mbr.x1 + "," + mbr.y1 + "," + mbr.x2 + ","
+						+ mbr.y2);
 			}
 
 			// get the overlap data partitions with the given trajectory.
@@ -282,17 +295,35 @@ public class KNNTrajectory {
 							new InputStreamReader(fs.open(fileStatus.getPath())));
 					String line;
 					while ((line = br.readLine()) != null) {
-						GeolifeTrajectory temp = new GeolifeTrajectory(line);
-						if (overlappedTrajectory.containsKey(temp.id)) {
-							List<STPoint> plist = overlappedTrajectory
-									.get(temp.id);
-							plist.add((STPoint) temp);
-							overlappedTrajectory.put(temp.id, plist);
-						} else {
-							// new trajectory inserted.
-							List<STPoint> plist = new ArrayList<STPoint>();
-							plist.add((STPoint) temp);
-							overlappedTrajectory.put(temp.id, plist);
+
+						if ((inObj instanceof STPoint)) {
+
+							STNycSTPoints temp = new STNycSTPoints(line);
+							if (overlappedTrajectory.containsKey(temp.id)) {
+								List<STPoint> plist = overlappedTrajectory
+										.get(temp.id);
+								plist.add((STPoint) temp);
+								overlappedTrajectory.put(temp.id, plist);
+							} else {
+								// new trajectory inserted.
+								List<STPoint> plist = new ArrayList<STPoint>();
+								plist.add((STPoint) temp);
+								overlappedTrajectory.put(temp.id, plist);
+							}
+						}
+						else if((inObj instanceof STRectangle)){
+							STNycTrajectory temp = new STNycTrajectory(line);
+							if (overlappedTrajectory.containsKey(temp.id)) {
+								List<STNycTrajectory> plist = overlappedTrajectory_rect
+										.get(temp.id);
+								plist.add((STNycTrajectory) temp);
+								overlappedTrajectory_rect.put(temp.id, plist);
+							} else {
+								// new trajectory inserted.
+								List<STNycTrajectory> plist = new ArrayList<STNycTrajectory>();
+								plist.add((STNycTrajectory) temp);
+								overlappedTrajectory_rect.put(temp.id, plist);
+							}
 						}
 
 						// System.out.println(line);
@@ -320,9 +351,9 @@ public class KNNTrajectory {
 
 		} while (pqueue.size() < topk && numTry >= 0);
 		long t2 = System.currentTimeMillis();
-		System.out.println("Time for " + topk +" jobs is "
-				+ (t2 - t1) + " millis");
-		System.out.println("Total iterations: " + Math.abs(numTry-3));
+		System.out.println("Time for " + topk + " jobs is " + (t2 - t1)
+				+ " millis");
+		System.out.println("Total iterations: " + Math.abs(numTry - 3));
 		// check if the retrieved top-k is equal to the requested k.
 		System.out.println("found top-" + pqueue.size() + "\tTryNum:" + numTry);
 		if (pqueue.size() >= topk) {
@@ -334,21 +365,21 @@ public class KNNTrajectory {
 			FSDataOutputStream fout = fs.create(outputHDFS);
 			for (int i = 0; i < topk; i++) {
 				Score temp = pqueue.poll();
-				System.out.println(temp.id + "\tSimilarity Score: "+temp.score);
+				System.out.println(temp.id + "\tSimilarity Score: "
+						+ temp.score);
 				List<STPoint> trajectory = overlappedTrajectory.get(temp.id);
 				Collections.sort(trajectory);
 				for (STPoint p : trajectory) {
 					String text = p.x + "," + p.y + ";";
 					text.replace("\00", "");
 					fout.writeBytes(text);
-					
+
 				}
 				fout.writeBytes("\n");
 			}
 
 			fout.close();
 		}
-
 
 	}
 
