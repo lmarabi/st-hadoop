@@ -28,6 +28,7 @@ import edu.umn.cs.spatialHadoop.core.Point;
 import edu.umn.cs.spatialHadoop.core.Rectangle;
 import edu.umn.cs.spatialHadoop.io.TextSerializable;
 import edu.umn.cs.sthadoop.core.STPoint;
+import edu.umn.cs.sthadoop.core.STRectangle;
 import edu.umn.cs.sthadoop.operations.STRangeQuery;
 
 /***
@@ -232,9 +233,12 @@ public class KNNTrajectory {
 
 		TextSerializable inObj = params.getShape("shape");
 		if (!(inObj instanceof STPoint)) {
-			LOG.error("Shape is not instance of STPoint");
-			printUsage();
-			System.exit(1);
+			if(!(inObj instanceof STRectangle)){
+				LOG.error("Shape is not instance of STPoint");
+				printUsage();
+				System.exit(1);
+			}
+			
 		}
 
 		PriorityQueue<KNNTrajectory.Score> pqueue = new PriorityQueue<KNNTrajectory.Score>();
