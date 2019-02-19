@@ -275,17 +275,11 @@ public class KNNTrajectory {
 		Path checkinterpath = new Path(intermediatePath);
 		if (fs.exists(checkinterpath)) {
 			fs.delete(checkinterpath);
-			fs.create(checkinterpath);
+			fs.mkdirs(checkinterpath);
 		} else {
 			fs.create(checkinterpath);
 		}
-		checkinterpath = new Path(outputPath);
-		if (!fs.exists(checkinterpath)) {
-			fs.create(checkinterpath);
-		} else {
-			fs.delete(checkinterpath);
-			fs.create(checkinterpath);
-		}
+
 		int numTry = 3;
 		long t1 = System.currentTimeMillis();
 		do {
@@ -390,39 +384,39 @@ public class KNNTrajectory {
 		if (pqueue.size() >= topk) {
 			// write the result to HDFS
 			Path outputHDFS = new Path(outputPath);
-			if (fs.exists(outputHDFS)) {
-				fs.delete(outputHDFS);
-			}
-			FSDataOutputStream fout = fs.create(outputHDFS);
+//			if (fs.exists(outputHDFS)) {
+//				fs.delete(outputHDFS);
+//			}
+//			FSDataOutputStream fout = fs.create(outputHDFS);
 			for (int i = 0; i < topk; i++) {
 				Score temp = pqueue.poll();
-				System.out.println(temp.id + "\tSimilarity Score: "
+				System.out.println(temp.id + "\t*Similarity Score: "
 						+ temp.score);
-				if ((inObj instanceof STPoint)) {
-					List<STPoint> trajectory = overlappedTrajectory
-							.get(temp.id);
-					Collections.sort(trajectory);
-					for (STPoint p : trajectory) {
-						String text = p.x + "," + p.y + ";";
-						text.replace("\00", "");
-						fout.writeBytes(text);
-
-					}
-				} else if ((inObj instanceof STRectangle)) {
-					STNycTrajectory trajectory = overlappedTrajectory_rect
-							.get(temp.id);
-					String text = trajectory.toString();
-					text.replace("\00", "");
-					fout.writeBytes(text);
-				}
-				fout.writeBytes("\n");
+//				if ((inObj instanceof STPoint)) {
+//					List<STPoint> trajectory = overlappedTrajectory
+//							.get(temp.id);
+//					Collections.sort(trajectory);
+//					for (STPoint p : trajectory) {
+//						String text = p.x + "," + p.y + ";";
+//						text.replace("\00", "");
+//						fout.writeBytes(text);
+//
+//					}
+//				} else if ((inObj instanceof STRectangle)) {
+//					STNycTrajectory trajectory = overlappedTrajectory_rect
+//							.get(temp.id);
+//					String text = trajectory.toString();
+//					text.replace("\00", "");
+//					fout.writeBytes(text);
+//				}
+//				fout.writeBytes("\n");
 			}
 
-			fout.close();
+//			fout.close();
 		}
 
 		// remove intermediate file.
-		fs.delete(new Path(intermediatePath));
+//		fs.delete(new Path(intermediatePath));
 
 	}
 
