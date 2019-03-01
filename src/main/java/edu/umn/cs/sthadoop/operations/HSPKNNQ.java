@@ -67,6 +67,7 @@ import edu.umn.cs.spatialHadoop.nasa.HDFRecordReader;
 import edu.umn.cs.spatialHadoop.operations.RangeFilter;
 import edu.umn.cs.spatialHadoop.operations.Tail;
 import edu.umn.cs.sthadoop.core.STPoint;
+import edu.umn.cs.sthadoop.core.STRectangle;
 import edu.umn.cs.sthadoop.trajectory.STPointTrajectory;
 
 /**
@@ -684,9 +685,12 @@ public class HSPKNNQ {
     
     TextSerializable inObj = params.getShape("shape");
 	if (!(inObj instanceof STPoint)) {
-		LOG.error("Shape is not instance of STPoint");
-		printUsage();
-		System.exit(1);
+		if (!(inObj instanceof STRectangle)) {
+			LOG.error("Shape is not instance of STPoint or instance of STRectangle");
+			printUsage();
+			System.exit(1);
+		}
+
 	}
 	
 	// path to the spatio-temporal index.
